@@ -91,38 +91,13 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const [profile, setProfile] = useState<HunterProfile>(() => {
-    const saved = localStorage.getItem('hunter_profile');
-    const parsed = saved ? JSON.parse(saved) : INITIAL_PROFILE;
-    if (parsed.totalXpGained === undefined) parsed.totalXpGained = 0;
-    if (parsed.dailyItemDropsCount === undefined) parsed.dailyItemDropsCount = 0;
-    if (parsed.lastItemDropDate === undefined) parsed.lastItemDropDate = "";
-    return parsed;
-  });
+  const [profile, setProfile] = useState<HunterProfile>(INITIAL_PROFILE);
 
-  const [quests, setQuests] = useState<Quest[]>(() => {
-    const saved = localStorage.getItem('hunter_quests');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [quests, setQuests] = useState<Quest[]>([]);
 
-  const [storeItems, setStoreItems] = useState<StoreItem[]>(() => {
-    const saved = localStorage.getItem('system_store');
-    const parsed: StoreItem[] = saved ? JSON.parse(saved) : DEFAULT_STORE_ITEMS;
+  const [storeItems, setStoreItems] = useState<StoreItem[]>(DEFAULT_STORE_ITEMS);
 
-    // Merge logic: ensure all items from DEFAULT_STORE_ITEMS exist in the state
-    const merged = [...parsed];
-    DEFAULT_STORE_ITEMS.forEach(defaultItem => {
-      if (!merged.some(item => item.id === defaultItem.id)) {
-        merged.push(defaultItem);
-      }
-    });
-    return merged;
-  });
-
-  const [vices, setVices] = useState<Vice[]>(() => {
-    const saved = localStorage.getItem('hunter_vices');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [vices, setVices] = useState<Vice[]>([]);
 
   const [messages, setMessages] = useState<SystemMessage[]>([]);
   const [activeTab, setActiveTab] = useState<'quests' | 'status' | 'penalties' | 'inventory' | 'store'>('quests');
@@ -290,12 +265,123 @@ const App: React.FC = () => {
     return () => clearInterval(checkInterval);
   }, [quests, profile, updateCorruption, addSystemMessage]);
 
+  // Load Initial Data
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!session?.user) {
+      // Fallback para localStorage se deslogado
+      const savedProfile = localStorage.getItem('hunter_profile');
+      let parsedProfile = savedProfile ? JSON.parse(savedProfile) : INITIAL_PROFILE;
+      if (parsedProfile.totalXpGained === undefined) parsedProfile.totalXpGained = 0;
+      if (parsedProfile.dailyItemDropsCount === undefined) parsedProfile.dailyItemDropsCount = 0;
+      if (parsedProfile.lastItemDropDate === undefined) parsedProfile.lastItemDropDate = "";
+      setProfile(parsedProfile);
+
+      const savedQuests = localStorage.getItem('hunter_quests');
+      setQuests(savedQuests ? JSON.parse(savedQuests) : []);
+
+      const savedStore = localStorage.getItem('system_store');
+      const parsedStore: StoreItem[] = savedStore ? JSON.parse(savedStore) : DEFAULT_STORE_ITEMS;
+      const mergedStore = [...parsedStore];
+      DEFAULT_STORE_ITEMS.forEach(defaultItem => {
+        if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
+      });
+      setStoreItems(mergedStore);
+
+      const savedVices = localStorage.getItem('hunter_vices');
+      setVices(savedVices ? JSON.parse(savedVices) : []);
+      return;
+    }
+
+    // Busca no Supabase
+    const loadFromCloud = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('user_saves')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error("SISTEMA ERRO: Falha ao sincronizar dados", error);
+          return;
+        }
+
+        if (data) {
+          const cloudProfile = data.profile || INITIAL_PROFILE;
+          if (cloudProfile.totalXpGained === undefined) cloudProfile.totalXpGained = 0;
+          if (cloudProfile.dailyItemDropsCount === undefined) cloudProfile.dailyItemDropsCount = 0;
+          if (cloudProfile.lastItemDropDate === undefined) cloudProfile.lastItemDropDate = "";
+          setProfile(cloudProfile);
+
+          setQuests(data.quests || []);
+
+          const cloudStore: StoreItem[] = data.store_items || DEFAULT_STORE_ITEMS;
+          const mergedStore = [...cloudStore];
+          DEFAULT_STORE_ITEMS.forEach(defaultItem => {
+            if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
+          });
+          setStoreItems(mergedStore);
+
+          setVices(data.vices || []);
+
+          addSystemMessage("SISTEMA: DADOS DE SINCRONIZAÇÃO NUVEM CARREGADOS.", "success");
+        } else {
+          // Cria o primeiro save
+          await supabase.from('user_saves').insert({
+            user_id: session.user.id,
+            profile: INITIAL_PROFILE,
+            quests: [],
+            store_items: DEFAULT_STORE_ITEMS,
+            vices: []
+          });
+          setProfile(INITIAL_PROFILE);
+          setQuests([]);
+          setStoreItems(DEFAULT_STORE_ITEMS);
+          setVices([]);
+        }
+      } catch (err) {
+        console.error("SISTEMA ERRO", err);
+      }
+    };
+
+    loadFromCloud();
+  }, [session, authLoading]);
+
+  // Save Data
+  useEffect(() => {
+    if (authLoading) return;
+
+    // Sempre salva no localStorage como fallback
     localStorage.setItem('hunter_profile', JSON.stringify(profile));
     localStorage.setItem('hunter_quests', JSON.stringify(quests));
     localStorage.setItem('system_store', JSON.stringify(storeItems));
     localStorage.setItem('hunter_vices', JSON.stringify(vices));
-  }, [profile, quests, storeItems, vices]);
+
+    // Salva no Supabase se logado (com debounce básico)
+    if (session?.user) {
+      const saveToCloud = async () => {
+        try {
+          await supabase
+            .from('user_saves')
+            .update({
+              profile,
+              quests,
+              store_items: storeItems,
+              vices,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', session.user.id);
+        } catch (err) {
+          console.error("SISTEMA ERRO: Falha ao salvar na nuvem.", err);
+        }
+      };
+
+      const handler = setTimeout(saveToCloud, 1000);
+      return () => clearTimeout(handler);
+    }
+  }, [profile, quests, storeItems, vices, session, authLoading]);
 
   const handleToggleComplete = (id: string) => {
     if (processingQuestIds.current.has(id)) return;
