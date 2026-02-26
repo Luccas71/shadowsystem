@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://qyjpecfeaxddtehtizqn.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5anBlY2ZlYXhkZHRlaHRpenFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTQ1NDMsImV4cCI6MjA4NzY5MDU0M30.rKlYZyI5b--hqgKZr9-F-7ozw9zzBlE-xNZZqqQPn_A';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+    console.error("SISTEMA: Erro crítico. Credenciais do banco de dados não encontradas.");
+}
+
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');

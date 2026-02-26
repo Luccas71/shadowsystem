@@ -309,7 +309,6 @@ const App: React.FC = () => {
       }
 
       processingQuestIds.current.add(id);
-      setCompletingQuest(quest);
 
       const currentTotalXp = profile.totalXpGained;
 

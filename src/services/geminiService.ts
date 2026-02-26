@@ -9,7 +9,7 @@ async function callWithRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDel
     } catch (error: unknown) {
       lastError = error;
       const isQuotaError = (error as { message?: string, status?: number })?.message?.includes('429') || (error as { message?: string, status?: number })?.status === 429;
-      
+
       if (isQuotaError && i < maxRetries - 1) {
         const delay = initialDelay * Math.pow(2, i);
         await new Promise(resolve => setTimeout(resolve, delay));
@@ -22,10 +22,10 @@ async function callWithRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDel
 }
 
 export async function generateQuestDetails(title: string, difficulty: string): Promise<{ description: string, systemMessage: string }> {
-  const apiKey = process.env.API_KEY;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
     console.warn("API Key not found. System functionality restricted.");
-    return { 
+    return {
       description: `O destino exige que você complete este desafio de Rank ${difficulty}.`,
       systemMessage: "O Sistema está observando cada passo seu."
     };
@@ -52,11 +52,11 @@ export async function generateQuestDetails(title: string, difficulty: string): P
         }
       },
     }));
-    
+
     return JSON.parse(response.text || '{}');
   } catch (error: unknown) {
     console.error("Gemini Error:", error);
-    return { 
+    return {
       description: `O destino exige que você complete este desafio de Rank ${difficulty}.`,
       systemMessage: "O Sistema está observando cada passo seu."
     };
@@ -64,7 +64,7 @@ export async function generateQuestDetails(title: string, difficulty: string): P
 }
 
 export async function generateSystemCommentary(level: number, rank: string): Promise<string> {
-  const apiKey = process.env.API_KEY;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) return "O topo ainda está longe.";
 
   try {
