@@ -1,0 +1,8 @@
+{
+  "name": "Solo Leveling: Shadow System",
+  "description": "A productivity task manager styled after the Solo Leveling 'System'. Level up your life, rank up as a hunter, and conquer your daily quests.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
