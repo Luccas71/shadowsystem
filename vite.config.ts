@@ -9,5 +9,8 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
     host: '0.0.0.0'
+  },
+  build: {
+    chunkSizeWarningLimit: 1500
   }
 });
