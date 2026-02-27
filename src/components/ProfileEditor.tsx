@@ -1,17 +1,19 @@
 
 import React, { useState, useRef } from 'react';
 import { HunterProfile } from '../types';
-import { X, Camera, Save, Upload, Link, RefreshCcw } from 'lucide-react';
+import { X, Camera, Save, Upload, Link, RefreshCcw, AlertOctagon, Trash2 } from 'lucide-react';
 
 interface ProfileEditorProps {
   profile: HunterProfile;
   onSave: (updates: Partial<HunterProfile>) => void;
+  onReset: () => void;
   onClose: () => void;
 }
 
-const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose }) => {
+const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset, onClose }) => {
   const [name, setName] = useState(profile.name);
   const [avatar, setAvatar] = useState(profile.avatar);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -84,31 +86,31 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
             <div className="relative group">
               <div className="w-40 h-40 rounded-full border-4 border-cyan-400 overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.4)] relative">
                 {isCameraActive ? (
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <img 
-                    src={avatar || 'https://picsum.photos/seed/hunter/200'} 
-                    alt="Caçador" 
+                  <img
+                    src={avatar || 'https://picsum.photos/seed/hunter/200'}
+                    alt="Caçador"
                     className="w-full h-full object-cover"
                   />
                 )}
               </div>
-              
+
               {!isCameraActive && (
                 <div className="absolute -bottom-2 -right-2 flex gap-2">
-                   <button 
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     className="p-2 bg-slate-900 border border-cyan-500 rounded-full text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all shadow-lg"
                     title="Carregar Arquivo Local"
                   >
                     <Upload size={18} />
                   </button>
-                  <button 
+                  <button
                     onClick={startCamera}
                     className="p-2 bg-slate-900 border border-cyan-500 rounded-full text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all shadow-lg"
                     title="Acessar Sensores Ópticos"
@@ -121,13 +123,13 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
 
             {isCameraActive && (
               <div className="flex gap-4 w-full">
-                <button 
+                <button
                   onClick={capturePhoto}
                   className="flex-1 py-2 bg-cyan-600 text-white rounded font-game text-sm hover:bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.4)]"
                 >
                   Capturar Imagem
                 </button>
-                <button 
+                <button
                   onClick={stopCamera}
                   className="flex-1 py-2 bg-red-900/50 text-red-400 border border-red-500/50 rounded font-game text-sm hover:bg-red-900/70"
                 >
@@ -142,7 +144,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Link className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-800" size={14} />
-                    <input 
+                    <input
                       type="text"
                       value={avatar}
                       onChange={(e) => setAvatar(e.target.value)}
@@ -150,7 +152,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
                       className="w-full bg-slate-900/80 border border-slate-700 rounded pl-9 pr-4 py-2 text-xs text-cyan-100 focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
-                  <button 
+                  <button
                     onClick={() => setAvatar(`https://picsum.photos/seed/${Math.random()}/300`)}
                     className="p-2 bg-slate-800 text-cyan-400 rounded hover:bg-slate-700 border border-slate-600"
                     title="Aleatorizar Aparência"
@@ -160,12 +162,12 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
                 </div>
               </div>
 
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
-                accept="image/*" 
-                className="hidden" 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept="image/*"
+                className="hidden"
               />
               <canvas ref={canvasRef} className="hidden" />
             </div>
@@ -174,7 +176,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
           <div className="space-y-4 pt-4 border-t border-cyan-900/30">
             <div>
               <label className="block text-xs font-game text-cyan-500 mb-2 uppercase tracking-widest">Codinome do Caçador</label>
-              <input 
+              <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -185,19 +187,55 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onClose 
           </div>
         </div>
 
-        <div className="p-4 border-t border-cyan-900/50 flex gap-4 bg-cyan-950/10">
-          <button 
-            onClick={() => { stopCamera(); onClose(); }}
-            className="flex-1 py-3 rounded bg-slate-800 text-gray-400 hover:bg-slate-700 font-game text-xs tracking-widest uppercase"
-          >
-            Abandonar
-          </button>
-          <button 
-            onClick={handleSave}
-            className="flex-1 py-3 rounded bg-cyan-600 text-white hover:bg-cyan-500 font-game text-xs tracking-widest uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.3)]"
-          >
-            <Save size={16} /> Atualizar Dados
-          </button>
+        <div className="p-4 border-t border-cyan-900/50 flex flex-col gap-4 bg-cyan-950/10">
+          {showResetConfirm ? (
+            <div className="flex flex-col gap-3 animate-in zoom-in-95 duration-300">
+              <div className="flex items-center gap-3 p-3 bg-red-950/30 border border-red-500/50 rounded-lg">
+                <AlertOctagon size={20} className="text-red-500 shrink-0 animate-pulse" />
+                <p className="text-[10px] font-game text-red-400 uppercase leading-tight">
+                  <span className="font-bold">AVISO CRÍTICO:</span> ESTA AÇÃO IRÁ APAGAR PERMANENTEMENTE SEU PROGRESSO, ITENS E ATRIBUTOS. ESTA OPERAÇÃO É IRREVERSÍVEL.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowResetConfirm(false)}
+                  className="flex-1 py-3 rounded bg-slate-800 text-gray-400 hover:bg-slate-700 font-game text-xs tracking-widest uppercase transition-all"
+                >
+                  CANCELAR
+                </button>
+                <button
+                  onClick={() => { onReset(); stopCamera(); }}
+                  className="flex-1 py-3 rounded bg-red-600 text-white hover:bg-red-500 font-game text-xs tracking-widest uppercase shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={16} /> CONFIRMAR RESET
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex gap-4">
+                <button
+                  onClick={() => { stopCamera(); onClose(); }}
+                  className="flex-1 py-3 rounded bg-slate-800 text-gray-400 hover:bg-slate-700 font-game text-xs tracking-widest uppercase transition-all"
+                >
+                  Abandonar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 py-3 rounded bg-cyan-600 text-white hover:bg-cyan-500 font-game text-xs tracking-widest uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all"
+                >
+                  <Save size={16} /> Atualizar Dados
+                </button>
+              </div>
+
+              <button
+                onClick={() => setShowResetConfirm(true)}
+                className="w-full py-2 flex items-center justify-center gap-2 text-[10px] font-game text-red-900 hover:text-red-500 transition-colors uppercase tracking-[0.2em] border-t border-red-950/20 pt-4"
+              >
+                <AlertOctagon size={12} /> REINICIAR SISTEMA (ZERO DATA)
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -920,6 +920,40 @@ const App: React.FC = () => {
     resetForm();
   };
 
+  const handleResetSystem = async () => {
+    try {
+      setProfile(INITIAL_PROFILE);
+      setQuests([]);
+      setStoreItems(DEFAULT_STORE_ITEMS.map(item => ({ ...item, purchasedCount: 0 })));
+      setVices([]);
+
+      localStorage.removeItem('hunter_profile');
+      localStorage.removeItem('hunter_quests');
+      localStorage.removeItem('system_store');
+      localStorage.removeItem('hunter_vices');
+
+      if (session?.user) {
+        await supabase
+          .from('user_saves')
+          .update({
+            profile: INITIAL_PROFILE,
+            quests: [],
+            store_items: DEFAULT_STORE_ITEMS.map(item => ({ ...item, purchasedCount: 0 })),
+            vices: [],
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', session.user.id);
+      }
+
+      addSystemMessage("SISTEMA: REINICIALIZAÇÃO COMPLETA EXECUTADA. TODOS OS DADOS FORAM ZERADOS.", "error");
+      setActiveEffect({ type: 'penalty' }); // Using penalty effect for dramatic reset feel
+      setIsEditingProfile(false);
+    } catch (err) {
+      console.error("ERRO AO REINICIAR SISTEMA", err);
+      addSystemMessage("SISTEMA: FALHA CRÍTICA NA REINICIALIZAÇÃO.", "error");
+    }
+  };
+
   const resetForm = () => {
     setEditingQuest(null);
     setNewQuestTitle('');
@@ -1376,6 +1410,7 @@ const App: React.FC = () => {
         <ProfileEditor
           profile={profile}
           onSave={(updates) => setProfile(p => ({ ...p, ...updates }))}
+          onReset={handleResetSystem}
           onClose={() => setIsEditingProfile(false)}
         />
       )}
