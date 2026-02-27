@@ -86,6 +86,7 @@ export interface Quest {
   createdAt: number;
   isDaily?: boolean; // Nova propriedade
   lastResetAt?: number; // Nova propriedade
+  isSpecial?: boolean; // Expira a meia noite, gera punicao se nao completada e desaparece
 }
 
 export interface StoreItem {

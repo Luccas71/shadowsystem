@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Quest, Rank } from '../types';
 import { RANK_COLORS } from '../constants';
-import { 
+import {
   Check,
-  Trash2, 
+  Trash2,
   RefreshCw,
   Flame,
   Coins,
@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Clock,
   AlertCircle,
-  Edit2
+  Edit2,
+  Zap
 } from 'lucide-react';
 
 interface QuestCardProps {
@@ -54,7 +55,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
+
         setIsUrgent(diff < 3600000); // Urgente se < 1 hora
         setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
       }
@@ -69,7 +70,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
   const rankBorderClass = rankData.split(' ').find(c => c.startsWith('border-')) || 'border-slate-800';
   const rankTextClass = rankData.split(' ').find(c => c.startsWith('text-')) || 'text-slate-400';
   const neonClass = rankData.split(' ').find(c => c.startsWith('neon-text-')) || '';
-  
+
   // Mapa estático de cores para evitar classes Tailwind dinâmicas que não são purgadas
   const colorMap: Record<string, {
     badge: string;
@@ -157,41 +158,39 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
   return (
     <div className={`relative transition-all duration-500 group ${quest.completed ? 'opacity-50 grayscale' : quest.failed ? 'opacity-70 grayscale' : ''}`}>
-      
+
       <div className={`absolute -inset-[1px] opacity-20 ${quest.failed ? 'border-red-600' : rankBorderClass} border`}></div>
-      
-      <div className={`system-panel border overflow-hidden transition-all duration-500 ${
-        quest.completed 
-          ? 'border-slate-900 bg-slate-950/40' 
-          : quest.failed
-            ? 'border-red-900 bg-red-950/20'
-            : `${rankBorderClass} border-opacity-30 shadow-[0_0_30px_rgba(0,0,0,0.6)]`
-      }`}>
-        
+
+      <div className={`system-panel border overflow-hidden transition-all duration-500 ${quest.completed
+        ? 'border-slate-900 bg-slate-950/40'
+        : quest.failed
+          ? 'border-red-900 bg-red-950/20'
+          : `${rankBorderClass} border-opacity-30 shadow-[0_0_30px_rgba(0,0,0,0.6)]`
+        }`}>
+
         <div className={`hud-tl hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
         <div className={`hud-tr hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
         <div className={`hud-bl hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
         <div className={`hud-br hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
 
         <div className="p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 relative z-10 min-w-0">
-          
+
           <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-20 md:h-20 self-center sm:self-auto">
             {!quest.completed && !quest.failed && (
               <>
                 <div className={`absolute w-10 h-10 md:w-14 md:h-14 rotate-45 border border-current opacity-20 ${rankTextClass}`}></div>
               </>
             )}
-            
-            <button 
+
+            <button
               disabled={quest.failed}
               onClick={() => onToggleComplete(quest.id)}
-              className={`w-10 h-10 md:w-11 md:h-11 rotate-45 border-2 transition-all duration-700 flex items-center justify-center relative group/check overflow-hidden ${
-                quest.completed 
-                  ? 'bg-slate-900 border-slate-800 text-slate-700' 
-                  : quest.failed
-                    ? 'bg-red-950 border-red-900 text-red-900 cursor-not-allowed'
-                    : `bg-black ${rankBorderClass} border-opacity-60 ${rankTextClass} shadow-[0_0_15px_rgba(0,0,0,0.6)]`
-              }`}
+              className={`w-10 h-10 md:w-11 md:h-11 rotate-45 border-2 transition-all duration-700 flex items-center justify-center relative group/check overflow-hidden ${quest.completed
+                ? 'bg-slate-900 border-slate-800 text-slate-700'
+                : quest.failed
+                  ? 'bg-red-950 border-red-900 text-red-900 cursor-not-allowed'
+                  : `bg-black ${rankBorderClass} border-opacity-60 ${rankTextClass} shadow-[0_0_15px_rgba(0,0,0,0.6)]`
+                }`}
             >
               <div className="-rotate-45 flex items-center justify-center relative z-20">
                 {quest.completed ? (
@@ -204,7 +203,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
               </div>
             </button>
           </div>
-          
+
           <div className="flex-1 space-y-2 min-w-0 w-full">
             <div className="flex flex-col gap-2 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -212,30 +211,32 @@ const QuestCard: React.FC<QuestCardProps> = ({
                   {quest.failed ? 'FALHA' : `RANK ${quest.difficulty}`}
                 </span>
                 {quest.isDaily && (
-                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${
-                    quest.failed ? colors.badgeFailed : colors.badge
-                  }`}>
+                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : colors.badge
+                    }`}>
                     <RefreshCw size={10} /> DIÁRIA
                   </span>
                 )}
+                {quest.isSpecial && (
+                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : 'text-purple-400 border-purple-500/30 bg-purple-950/60 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
+                    }`}>
+                    <Zap size={10} /> OP. URGENTE
+                  </span>
+                )}
                 {!quest.isDaily && quest.deadline && !quest.completed && !quest.failed && (
-                  <span className={`flex items-center gap-1 font-game text-[9px] px-2 py-0.5 rounded-sm font-bold border whitespace-nowrap ${
-                    isUrgent ? 'text-red-500 border-red-500 bg-red-950/60' : colors.badge
-                  }`}>
+                  <span className={`flex items-center gap-1 font-game text-[9px] px-2 py-0.5 rounded-sm font-bold border whitespace-nowrap ${isUrgent ? 'text-red-500 border-red-500 bg-red-950/60' : colors.badge
+                    }`}>
                     <Clock size={10} /> {timeLeft}
                   </span>
                 )}
               </div>
-              <h3 className={`font-game text-xl md:text-2xl tracking-tight transition-all duration-500 uppercase leading-tight break-words ${
-                quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-slate-100'
-              }`}>
+              <h3 className={`font-game text-xl md:text-2xl tracking-tight transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-slate-100'
+                }`}>
                 {quest.title}
               </h3>
             </div>
-            
-            <p className={`text-[13px] md:text-[14px] font-medium leading-relaxed transition-colors duration-500 break-words ${
-              quest.completed || quest.failed ? 'text-slate-700' : 'text-slate-400'
-            }`}>
+
+            <p className={`text-[13px] md:text-[14px] font-medium leading-relaxed transition-colors duration-500 break-words ${quest.completed || quest.failed ? 'text-slate-700' : 'text-slate-400'
+              }`}>
               {quest.failed ? 'Diretriz falha por descumprimento de prazo.' : quest.description}
             </p>
 
@@ -250,22 +251,22 @@ const QuestCard: React.FC<QuestCardProps> = ({
           </div>
 
           <div className="flex flex-row sm:flex-col items-center gap-2 self-end sm:self-center shrink-0">
-             <button 
-                onClick={() => setIsExpanded(!isExpanded)}
-                className={`p-2 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
-              >
-                <ChevronDown size={22} />
-              </button>
-             <button 
-              onClick={() => onEdit(quest)} 
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={`p-2 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
+            >
+              <ChevronDown size={22} />
+            </button>
+            <button
+              onClick={() => onEdit(quest)}
               disabled={quest.completed || quest.failed}
               className={`p-2 transition-all duration-300 ${quest.completed || quest.failed ? 'text-slate-800' : 'text-slate-600'}`}
               title="RECALIBRAR DIRETRIZ"
             >
               <Edit2 size={18} />
             </button>
-             <button 
-              onClick={() => onDelete(quest.id)} 
+            <button
+              onClick={() => onDelete(quest.id)}
               className="text-slate-800 hover:text-red-500 transition-all p-2"
             >
               <Trash2 size={18} />
@@ -278,11 +279,11 @@ const QuestCard: React.FC<QuestCardProps> = ({
             <h4 className={`font-game text-[9px] uppercase tracking-widest mb-3 flex items-center gap-2 font-bold ${quest.failed ? 'text-red-600' : colors.subHeader}`}>
               SUB-DIRETRIZES
             </h4>
-            
+
             <div className="space-y-2 mb-4">
               {quest.subQuests && quest.subQuests.map(sq => (
                 <div key={sq.id} className={`flex items-center gap-3 p-2.5 bg-black/40 border transition-all ${sq.completed ? 'border-slate-900 opacity-40' : quest.failed ? 'border-red-900/30' : colors.subBorder} min-w-0`}>
-                  <button 
+                  <button
                     disabled={quest.failed}
                     onClick={() => onToggleSubQuest(quest.id, sq.id)}
                     className={`shrink-0 w-4 h-4 border flex items-center justify-center transition-all ${sq.completed ? colors.subCheckActive : 'border-slate-700'}`}
@@ -292,7 +293,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
                   <span className={`text-[11px] md:text-xs font-medium flex-1 truncate ${sq.completed ? 'line-through text-slate-700' : 'text-slate-300'}`}>
                     {sq.title}
                   </span>
-                  <button 
+                  <button
                     onClick={() => onRemoveSubQuest(quest.id, sq.id)}
                     className="shrink-0 text-slate-800 hover:text-red-500"
                   >
@@ -307,14 +308,14 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
             {!quest.failed && (
               <form onSubmit={handleAddSub} className="flex gap-2 min-w-0">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={newSubTitle}
                   onChange={e => setNewSubTitle(e.target.value)}
                   placeholder="ADICIONAR..."
                   className={`flex-1 bg-black border p-2.5 text-[11px] font-game outline-none transition-all rounded-sm min-w-0 ${colors.inputBorder}`}
                 />
-                <button 
+                <button
                   type="submit"
                   className={`shrink-0 px-3 py-2 border font-game text-[10px] transition-all uppercase font-bold ${colors.addBtnClasses}`}
                 >

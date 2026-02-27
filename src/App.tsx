@@ -107,6 +107,7 @@ const App: React.FC = () => {
   const [newQuestTitle, setNewQuestTitle] = useState('');
   const [newQuestDifficulty, setNewQuestDifficulty] = useState<QuestDifficulty>(QuestDifficulty.E);
   const [newQuestIsDaily, setNewQuestIsDaily] = useState(false);
+  const [newQuestIsSpecial, setNewQuestIsSpecial] = useState(false);
   const [newQuestDeadline, setNewQuestDeadline] = useState<string>('');
   const [completingQuest, setCompletingQuest] = useState<{
     quest: Quest;
@@ -224,13 +225,33 @@ const App: React.FC = () => {
       let corruptionIncrease = 0;
       let goldPenaltyAtOnce = 0;
 
-      const updatedQuests = quests.map(q => {
-        if (!q.isDaily && !q.completed && !q.failed && q.deadline && now > q.deadline) {
+      const updatedQuests = quests.reduce((acc, q) => {
+        // Special Quests Expiration Logic
+        if (q.isSpecial && !q.completed && !q.failed) {
+          const lastReset = q.createdAt ? new Date(q.createdAt).toDateString() : '';
+          if (lastReset !== today) {
+            updateRequired = true;
+            corruptionIncrease += 10;
+            addSystemMessage(`OPERAÇÃO URGENTE FALHA: ${q.title}. PUNIÇÃO DE MANA APLICADA.`, "error");
+            // The quest just drops out of the array
+            return acc;
+          }
+        } else if (q.isSpecial && q.completed) {
+          const lastReset = q.createdAt ? new Date(q.createdAt).toDateString() : '';
+          if (lastReset !== today) {
+            updateRequired = true;
+            // Just drops out of the array quietly
+            return acc;
+          }
+        }
+
+        if (!q.isDaily && !q.completed && !q.failed && !q.isSpecial && q.deadline && now > q.deadline) {
           updateRequired = true;
           corruptionIncrease += 12;
           goldPenaltyAtOnce += Math.floor(profile.gold * 0.05);
           addSystemMessage(`DIRETRIZ FALHA: ${q.title}. PUNIÇÃO DE MANA APLICADA.`, "error");
-          return { ...q, failed: true };
+          acc.push({ ...q, failed: true });
+          return acc;
         }
 
         if (q.isDaily) {
@@ -244,17 +265,20 @@ const App: React.FC = () => {
               addSystemMessage(`SISTEMA: CICLO DIÁRIO REINICIADO PARA "${q.title}".`, "info");
             }
 
-            return {
+            acc.push({
               ...q,
               completed: false,
               failed: false,
               lastResetAt: now,
               subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
-            };
+            });
+            return acc;
           }
         }
-        return q;
-      });
+
+        acc.push(q);
+        return acc;
+      }, [] as Quest[]);
 
       if (updateRequired || corruptionIncrease > 0) {
         setQuests(updatedQuests);
@@ -832,6 +856,7 @@ const App: React.FC = () => {
     setNewQuestTitle(quest.title);
     setNewQuestDifficulty(quest.difficulty);
     setNewQuestIsDaily(!!quest.isDaily);
+    setNewQuestIsSpecial(!!quest.isSpecial);
     setNewQuestDeadline(quest.deadline ? new Date(quest.deadline).toISOString().slice(0, 16) : '');
     setQuestForm({ isOpen: true });
   };
@@ -839,7 +864,7 @@ const App: React.FC = () => {
   const handleSaveQuest = () => {
     if (!newQuestTitle.trim()) return;
 
-    if (!newQuestIsDaily && !newQuestDeadline) {
+    if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestDeadline) {
       addSystemMessage("SISTEMA: ERRO DE PROTOCOLO. QUESTS ÚNICAS EXIGEM UM PRAZO FINAL.", "error");
       return;
     }
@@ -850,12 +875,22 @@ const App: React.FC = () => {
       return;
     }
 
+    let resolvedDeadline: number | undefined;
+    if (newQuestIsSpecial) {
+      // Set to 23:59:59 of today
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      resolvedDeadline = endOfDay.getTime();
+    } else if (!newQuestIsDaily && newQuestDeadline) {
+      resolvedDeadline = new Date(newQuestDeadline).getTime();
+    }
+
     if (editingQuest) {
       setQuests(prev => prev.map(q => q.id === editingQuest.id ? {
         ...q,
         title: newQuestTitle.toUpperCase(),
         difficulty: newQuestDifficulty,
-        deadline: q.deadline,
+        deadline: resolvedDeadline,
         xpReward: DIFFICULTY_XP[newQuestDifficulty],
         goldReward: DIFFICULTY_GOLD[newQuestDifficulty],
       } : q));
@@ -864,20 +899,21 @@ const App: React.FC = () => {
       const newQuest: Quest = {
         id: Math.random().toString(36).substr(2, 9),
         title: newQuestTitle.toUpperCase(),
-        description: newQuestIsDaily ? "Treinamento diário de condicionamento." : "Desafio único de superação.",
+        description: newQuestIsSpecial ? "Operação urgente (como ir ao mercado, pagar contas, etc) que expira hoje." : newQuestIsDaily ? "Treinamento diário de condicionamento." : "Desafio único de superação.",
         difficulty: newQuestDifficulty,
         xpReward: DIFFICULTY_XP[newQuestDifficulty],
         goldReward: DIFFICULTY_GOLD[newQuestDifficulty],
         completed: false,
         failed: false,
         isDaily: newQuestIsDaily,
-        deadline: (!newQuestIsDaily && newQuestDeadline) ? new Date(newQuestDeadline).getTime() : undefined,
+        isSpecial: newQuestIsSpecial,
+        deadline: resolvedDeadline,
         lastResetAt: newQuestIsDaily ? Date.now() : undefined,
         createdAt: Date.now(),
         subQuests: []
       };
       setQuests(prev => [newQuest, ...prev]);
-      addSystemMessage("SISTEMA: NOVA DIRETRIZ REGISTRADA.", "success");
+      addSystemMessage(newQuestIsSpecial ? "SISTEMA: OPERAÇÃO URGENTE REGISTRADA." : "SISTEMA: NOVA DIRETRIZ REGISTRADA.", "success");
     }
 
     setQuestForm({ isOpen: false });
@@ -888,6 +924,7 @@ const App: React.FC = () => {
     setEditingQuest(null);
     setNewQuestTitle('');
     setNewQuestIsDaily(false);
+    setNewQuestIsSpecial(false);
     setNewQuestDeadline('');
     setNewQuestDifficulty(QuestDifficulty.E);
   };
@@ -896,7 +933,7 @@ const App: React.FC = () => {
   const nextRareDropProgress = (profile.totalXpGained % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
   const xpRemainingForDrop = XP_DROP_THRESHOLD - (profile.totalXpGained % XP_DROP_THRESHOLD);
 
-  const isFormInvalid = !newQuestTitle.trim() || (!newQuestIsDaily && !newQuestDeadline);
+  const isFormInvalid = !newQuestTitle.trim() || (!newQuestIsDaily && !newQuestIsSpecial && !newQuestDeadline);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -1204,22 +1241,41 @@ const App: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className={`flex items-center gap-4 bg-sky-950/10 p-4 border border-sky-900/20 rounded-lg transition-all ${editingQuest ? 'opacity-50 cursor-not-allowed' : 'hover:bg-sky-900/20 cursor-pointer'}`}
-                  onClick={() => !editingQuest && setNewQuestIsDaily(!newQuestIsDaily)}>
-                  <button
-                    disabled={!!editingQuest}
-                    type="button"
-                    className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsDaily ? 'bg-sky-900/40 border-sky-400 text-sky-300 shadow-[0_0_10px_#0ea5e9]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest ? 'cursor-not-allowed' : ''}`}
-                  >
-                    {editingQuest ? <Lock size={20} /> : <CalendarDays size={20} />}
-                  </button>
-                  <div className="min-w-0">
-                    <p className="font-game text-[11px] text-sky-400 uppercase font-bold truncate">Quest Diária</p>
-                    <p className="text-[10px] text-slate-500 uppercase font-medium">{editingQuest ? 'Sincronizado' : (newQuestIsDaily ? 'Reset Diário Ativado' : 'Ciclo Único')}</p>
+                <div className={`flex flex-col gap-2`}>
+                  <div className={`flex items-center gap-4 bg-sky-950/10 p-4 border border-sky-900/20 rounded-lg transition-all ${editingQuest || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-sky-900/20 cursor-pointer'}`}
+                    onClick={() => !editingQuest && !newQuestIsSpecial && setNewQuestIsDaily(!newQuestIsDaily)}>
+                    <button
+                      disabled={!!editingQuest || newQuestIsSpecial}
+                      type="button"
+                      className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsDaily ? 'bg-sky-900/40 border-sky-400 text-sky-300 shadow-[0_0_10px_#0ea5e9]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                    >
+                      {editingQuest ? <Lock size={20} /> : <CalendarDays size={20} />}
+                    </button>
+                    <div className="min-w-0">
+                      <p className="font-game text-[11px] text-sky-400 uppercase font-bold truncate">Quest Diária</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-medium">{editingQuest ? 'Sincronizado' : (newQuestIsDaily ? 'Reset Diário Ativado' : 'Ciclo Único')}</p>
+                    </div>
                   </div>
                 </div>
 
-                {!newQuestIsDaily && (
+                <div className={`flex flex-col gap-2`}>
+                  <div className={`flex items-center gap-4 p-4 border rounded-lg transition-all ${editingQuest || newQuestIsDaily ? 'opacity-50 cursor-not-allowed border-slate-800 bg-slate-900/10' : newQuestIsSpecial ? 'border-purple-500/50 bg-purple-900/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'border-purple-900/30 bg-purple-950/10 hover:border-purple-700/50 cursor-pointer'}`}
+                    onClick={() => !editingQuest && !newQuestIsDaily && setNewQuestIsSpecial(!newQuestIsSpecial)}>
+                    <button
+                      disabled={!!editingQuest || newQuestIsDaily}
+                      type="button"
+                      className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsSpecial ? 'bg-purple-900/40 border-purple-400 text-purple-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsDaily ? 'cursor-not-allowed' : ''}`}
+                    >
+                      {editingQuest ? <Lock size={20} /> : <Zap size={20} />}
+                    </button>
+                    <div className="min-w-0">
+                      <p className={`font-game text-[11px] uppercase font-bold truncate ${newQuestIsSpecial ? 'text-purple-400' : 'text-purple-600'}`}>Op. Urgente (Hoje)</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-medium">{newQuestIsSpecial ? 'Expira Meia-Noite' : 'Opcional'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {!newQuestIsDaily && !newQuestIsSpecial && (
                   <div className={`p-4 border rounded-lg flex flex-col justify-center transition-all bg-red-950/10 ${newQuestDeadline ? 'border-red-900/60' : 'border-red-600 animate-pulse'}`}>
                     <label className="block text-[9px] font-game text-red-500 uppercase font-bold mb-1 flex items-center gap-2">
                       <Clock size={12} /> Prazo Final {editingQuest ? '(IMUTÁVEL)' : '(OBRIGATÓRIO)'}
@@ -1231,6 +1287,15 @@ const App: React.FC = () => {
                       onChange={e => setNewQuestDeadline(e.target.value)}
                       className={`bg-black/40 border border-red-900/40 text-red-400 p-2 rounded text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${editingQuest ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                     />
+                  </div>
+                )}
+
+                {newQuestIsSpecial && (
+                  <div className="p-4 border border-purple-900/30 bg-purple-950/20 rounded-lg flex items-center gap-3 md:col-span-2">
+                    <AlertTriangle size={16} className="text-purple-500 shrink-0 animate-pulse" />
+                    <p className="text-[9px] text-purple-200 uppercase leading-tight font-medium font-game tracking-wider">
+                      Operações urgentes expiram e desaparecem às 23:59:59 do mesmo dia. Falhar gera uma punição (+10% Corrupção).
+                    </p>
                   </div>
                 )}
 
