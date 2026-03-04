@@ -28,11 +28,11 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
           </div>
         ) : (
           ownedItems.map(item => (
-            <div key={item.id} className="system-bg border border-sky-900/40 rounded-lg p-5 flex justify-between items-start group hover:border-sky-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(14,165,233,0.05)]">
+            <div key={item.id} className="system-bg border border-sky-800/50 shadow-[0_0_15px_rgba(56,189,248,0.1)] bg-slate-900/80 transition-all duration-300 rounded-lg p-5 flex justify-between items-start group hover:border-sky-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(14,165,233,0.05)]">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-game text-sky-100 text-lg group-hover:text-sky-400 transition-colors uppercase tracking-tight">{item.name}</h3>
-                  <span className="text-[10px] px-2 py-0.5 bg-sky-950 text-sky-400 border border-sky-800 rounded font-bold">
+                  <span className="text-[10px] px-2 py-0.5 bg-sky-900/40 text-sky-300 border border-sky-400/30 rounded font-bold shadow-[0_0_5px_rgba(56,189,248,0.2)]">
                     QTD: {item.purchasedCount}
                   </span>
                 </div>
@@ -43,9 +43,9 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
                   <Sparkles size={12} /> Item de Inventário
                 </div>
               </div>
-              
+
               <div className="flex flex-col items-end gap-3 ml-4">
-                <button 
+                <button
                   onClick={() => onUseItem(item)}
                   className="px-6 py-2.5 rounded font-game text-xs bg-sky-600 text-white hover:bg-sky-500 shadow-[0_0_15px_rgba(14,165,233,0.3)] transition-all flex items-center gap-2 group/btn"
                 >

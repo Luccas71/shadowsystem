@@ -2,8 +2,8 @@
 import React from 'react';
 import { HunterProfile, Rank } from '../types';
 import { RANK_COLORS } from '../constants';
-import { 
-  Sparkles, 
+import {
+  Sparkles,
   Clock,
   Lock,
   CheckCircle2,
@@ -34,7 +34,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
     const current = rankProgression.find(r => r.rank === profile.rank);
     if (!current) return 0;
     if (profile.rank === Rank.S) return 100;
-    
+
     const range = current.maxLevel - current.minLevel + 1;
     const progress = profile.level - current.minLevel;
     return Math.min(100, Math.max(0, (progress / range) * 100));
@@ -44,9 +44,9 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
-      
+
       {/* Registro de XP Acumulado */}
-      <div className="system-panel p-6 border-sky-900/40 bg-sky-950/5 relative overflow-hidden group">
+      <div className="system-panel p-6 border-sky-800/50 shadow-[0_0_10px_rgba(56,189,248,0.1)] bg-sky-950/5 relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-r from-sky-500/5 via-transparent to-transparent"></div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
@@ -58,17 +58,17 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
               <p className="font-game text-3xl text-white tracking-tighter">{profile.totalXpGained.toLocaleString()} <span className="text-xs text-sky-700">XP</span></p>
             </div>
           </div>
-          
+
           <div className="flex-1 max-w-md space-y-2">
             <div className="flex justify-between items-end">
-               <span className="text-[10px] font-game text-sky-600 uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
-               <span className="text-[10px] font-game text-sky-400">{Math.floor(nextRareDropProgress)}%</span>
+              <span className="text-[10px] font-game text-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.4)] uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
+              <span className="text-[10px] font-game text-sky-400">{Math.floor(nextRareDropProgress)}%</span>
             </div>
-            <div className="h-1.5 bg-black border border-sky-900/30 rounded-full overflow-hidden">
-               <div 
+            <div className="h-1.5 bg-black border border-sky-800/60 shadow-[0_0_10px_rgba(56,189,248,0.1)] rounded-full overflow-hidden">
+              <div
                 className="h-full bg-gradient-to-r from-sky-900 to-sky-400 transition-all duration-1000 shadow-[0_0_10px_#38bdf8]"
                 style={{ width: `${nextRareDropProgress}%` }}
-               ></div>
+              ></div>
             </div>
             <p className="text-[9px] text-slate-600 uppercase font-bold text-right">Faltam {xpRemainingForDrop.toLocaleString()} XP para o próximo drop</p>
           </div>
@@ -81,7 +81,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
           <h3 className="font-game text-[12px] text-cyan-500 uppercase flex items-center gap-2 border-b border-cyan-900/50 pb-2 font-bold tracking-widest">
             <Dna size={14} /> HIERARQUIA DO DESPERTAR
           </h3>
-          
+
           <div className="space-y-3">
             {rankProgression.map((item) => {
               const isCurrent = profile.rank === item.rank;
@@ -89,15 +89,14 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
               const isLocked = profile.level < item.minLevel;
 
               return (
-                <div 
-                  key={item.rank} 
-                  className={`system-bg border rounded-lg p-5 transition-all duration-500 relative overflow-hidden ${
-                    isCurrent 
-                    ? `border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.2)] bg-cyan-950/20` 
-                    : isAchieved 
-                      ? 'border-slate-800 opacity-60' 
-                      : 'border-slate-900 opacity-40 grayscale'
-                  }`}
+                <div
+                  key={item.rank}
+                  className={`system-bg border rounded-lg p-5 transition-all duration-500 relative overflow-hidden ${isCurrent
+                      ? `border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.2)] bg-cyan-950/20`
+                      : isAchieved
+                        ? 'border-slate-800 opacity-60'
+                        : 'border-slate-900 opacity-40 grayscale'
+                    }`}
                 >
                   {isCurrent && (
                     <div className="absolute top-0 right-0 p-2">
@@ -107,9 +106,8 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-5">
-                      <div className={`font-game text-3xl w-14 h-14 flex items-center justify-center border-2 rounded-lg font-black ${
-                        isCurrent ? `${RANK_COLORS[item.rank]} bg-slate-900 shadow-lg` : isAchieved ? 'text-slate-500 border-slate-700' : 'text-slate-800 border-slate-900'
-                      }`}>
+                      <div className={`font-game text-3xl w-14 h-14 flex items-center justify-center border-2 rounded-lg font-black ${isCurrent ? `${RANK_COLORS[item.rank]} bg-slate-900 shadow-lg` : isAchieved ? 'text-slate-500 border-slate-700' : 'text-slate-800 border-slate-900'
+                        }`}>
                         {item.rank}
                       </div>
                       <div>
@@ -142,8 +140,8 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                         <span>{Math.floor(progressToNext)}%</span>
                       </div>
                       <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-cyan-900/40">
-                        <div 
-                          className="h-full bg-cyan-500 shadow-[0_0_15px_#22d3ee] transition-all duration-1000" 
+                        <div
+                          className="h-full bg-cyan-500 shadow-[0_0_15px_#22d3ee] transition-all duration-1000"
                           style={{ width: `${progressToNext}%` }}
                         ></div>
                       </div>
@@ -163,17 +161,17 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
           <h3 className="font-game text-[12px] text-sky-500 uppercase flex items-center gap-2 border-b border-sky-900/50 pb-2 font-bold tracking-widest">
             <Sparkles size={14} /> EFEITOS ATIVOS (BUFFS)
           </h3>
-          
+
           <div className="space-y-3">
             {profile.activeBuffs.length === 0 ? (
-              <div className="py-24 flex flex-col items-center opacity-30 border border-dashed border-sky-900/30 rounded-xl text-center p-8">
+              <div className="py-24 flex flex-col items-center opacity-30 border border-dashed border-sky-800/60 shadow-[0_0_10px_rgba(56,189,248,0.1)] rounded-xl text-center p-8">
                 <Sparkles size={48} className="text-sky-900 mb-4" />
                 <p className="font-game text-sky-800 text-[11px] uppercase tracking-widest font-bold">NENHUM EFEITO DETECTADO</p>
                 <p className="text-[10px] text-slate-600 mt-2 uppercase font-medium">ADQUIRA RELÍQUIAS PARA MANIFESTAR NOVOS PODERES.</p>
               </div>
             ) : (
               profile.activeBuffs.map(buff => (
-                <div key={buff.id} className="system-bg border border-sky-900/40 p-5 rounded-lg relative overflow-hidden group">
+                <div key={buff.id} className="system-bg border border-sky-800/50 shadow-[0_0_10px_rgba(56,189,248,0.1)] p-5 rounded-lg relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500 group-hover:shadow-[0_0_15px_#38bdf8]"></div>
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-4">
@@ -191,10 +189,10 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                       </div>
                     )}
                   </div>
-                  
+
                   {buff.endTime && (
-                    <div className="flex items-center gap-2 mt-4 text-[10px] font-game text-sky-600 uppercase tracking-widest font-bold">
-                      <Clock size={12} /> TEMPO RESTANTE: 
+                    <div className="flex items-center gap-2 mt-4 text-[10px] font-game text-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.4)] uppercase tracking-widest font-bold">
+                      <Clock size={12} /> TEMPO RESTANTE:
                       <span className="text-sky-400">
                         {Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS
                       </span>
