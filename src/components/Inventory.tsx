@@ -14,8 +14,8 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center">
-        <h2 className="font-game text-2xl text-sky-400 flex items-center gap-3 uppercase tracking-tighter">
-          <Package className="text-sky-500" /> INVENTÁRIO DO SISTEMA
+        <h2 className="font-game text-2xl text-sky-400 flex items-center gap-3 uppercase tracking-tighter font-bold">
+          <Package className="text-sky-400" /> INVENTÁRIO DO SISTEMA
         </h2>
       </div>
 
@@ -28,11 +28,11 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
           </div>
         ) : (
           ownedItems.map(item => (
-            <div key={item.id} className="system-bg border border-sky-900/30 shadow-[0_0_5px_rgba(56,189,248,0.05)] bg-black/40 transition-all duration-300 rounded-lg p-5 flex justify-between items-start group hover:border-sky-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(14,165,233,0.05)]">
+            <div key={item.id} className="system-bg border border-sky-900/40 shadow-none bg-black/40 transition-all duration-300 rounded-lg p-5 flex justify-between items-start group hover:border-sky-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(14,165,233,0.05)]">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-game text-sky-100 text-lg group-hover:text-sky-400 transition-colors uppercase tracking-tight">{item.name}</h3>
-                  <span className="text-[10px] px-2 py-0.5 bg-sky-900/20 text-sky-400 border border-sky-800/40 rounded font-bold">
+                  <span className="text-[10px] px-2 py-0.5 bg-sky-950 text-sky-400 border border-sky-800 rounded font-bold">
                     QTD: {item.purchasedCount}
                   </span>
                 </div>

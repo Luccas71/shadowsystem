@@ -46,7 +46,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
 
       {/* Registro de XP Acumulado */}
-      <div className="system-panel p-6 border-sky-900/40 shadow-[0_0_5px_rgba(56,189,248,0.05)] bg-sky-950/5 relative overflow-hidden group">
+      <div className="system-panel p-6 border-sky-900/40 shadow-none bg-sky-950/5 relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-r from-sky-500/5 via-transparent to-transparent"></div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
@@ -61,10 +61,10 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
           <div className="flex-1 max-w-md space-y-2">
             <div className="flex justify-between items-end">
-              <span className="text-[10px] font-game text-sky-500/80 shadow-[0_0_5px_rgba(56,189,248,0.2)] uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
+              <span className="text-[10px] font-game text-sky-600 uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
               <span className="text-[10px] font-game text-sky-400">{Math.floor(nextRareDropProgress)}%</span>
             </div>
-            <div className="h-1.5 bg-black border border-sky-900/30 shadow-[0_0_5px_rgba(56,189,248,0.05)] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-black border border-sky-900/30 shadow-none rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-sky-900 to-sky-400 transition-all duration-1000 shadow-[0_0_10px_#38bdf8]"
                 style={{ width: `${nextRareDropProgress}%` }}
@@ -164,14 +164,14 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
           <div className="space-y-3">
             {profile.activeBuffs.length === 0 ? (
-              <div className="py-24 flex flex-col items-center opacity-30 border border-dashed border-sky-900/30 shadow-[0_0_5px_rgba(56,189,248,0.05)] rounded-xl text-center p-8">
+              <div className="py-24 flex flex-col items-center opacity-30 border border-dashed border-sky-900/30 shadow-none rounded-xl text-center p-8">
                 <Sparkles size={48} className="text-sky-900 mb-4" />
                 <p className="font-game text-sky-800 text-[11px] uppercase tracking-widest font-bold">NENHUM EFEITO DETECTADO</p>
                 <p className="text-[10px] text-slate-600 mt-2 uppercase font-medium">ADQUIRA RELÍQUIAS PARA MANIFESTAR NOVOS PODERES.</p>
               </div>
             ) : (
               profile.activeBuffs.map(buff => (
-                <div key={buff.id} className="system-bg border border-sky-900/40 shadow-[0_0_5px_rgba(56,189,248,0.05)] p-5 rounded-lg relative overflow-hidden group">
+                <div key={buff.id} className="system-bg border border-sky-900/40 shadow-none p-5 rounded-lg relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500 group-hover:shadow-[0_0_15px_#38bdf8]"></div>
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-4">
@@ -191,7 +191,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                   </div>
 
                   {buff.endTime && (
-                    <div className="flex items-center gap-2 mt-4 text-[10px] font-game text-sky-500/80 shadow-[0_0_5px_rgba(56,189,248,0.2)] uppercase tracking-widest font-bold">
+                    <div className="flex items-center gap-2 mt-4 text-[10px] font-game text-sky-600 uppercase tracking-widest font-bold">
                       <Clock size={12} /> TEMPO RESTANTE:
                       <span className="text-sky-400">
                         {Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS

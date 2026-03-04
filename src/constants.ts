@@ -2,12 +2,12 @@
 import { Rank, QuestDifficulty, StoreItem } from './types';
 
 export const RANK_COLORS: Record<Rank, string> = {
-  [Rank.E]: 'text-slate-400 border-slate-600',
-  [Rank.D]: 'text-emerald-400 border-emerald-500',
-  [Rank.C]: 'text-sky-400 border-sky-500',
-  [Rank.B]: 'text-violet-400 border-violet-500',
-  [Rank.A]: 'text-orange-400 border-orange-500',
-  [Rank.S]: 'text-rose-500 border-rose-500 font-bold neon-text-red animate-pulse',
+  [Rank.E]: 'text-slate-500 border-slate-500',
+  [Rank.D]: 'text-green-500 border-green-500',
+  [Rank.C]: 'text-blue-500 border-blue-500',
+  [Rank.B]: 'text-purple-500 border-purple-500',
+  [Rank.A]: 'text-orange-500 border-orange-500',
+  [Rank.S]: 'text-red-500 border-red-500 font-bold neon-text-red animate-pulse',
 };
 
 // Valores base sem o buff de 15%

@@ -58,8 +58,8 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
   return (
     <div className="space-y-6 animate-in fade-in duration-500 relative">
       <div className="flex justify-between items-center">
-        <h2 className="font-game text-2xl text-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.2)] flex items-center gap-3 uppercase tracking-tighter font-bold">
-          <Package className="text-sky-400" /> INVENTÁRIO DO SISTEMA
+        <h2 className="font-game text-2xl text-amber-400 flex items-center gap-3 uppercase tracking-tighter font-bold">
+          <Package className="text-amber-400" /> LOJA DO SISTEMA
         </h2>
         <button
           onClick={() => setIsAdding(true)}
@@ -70,7 +70,7 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
       </div>
 
       {isAdding && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)] border-slate-800/40 transition-all/90 backdrop-blur-md">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all/90 backdrop-blur-md">
           <form onSubmit={handleSubmit} className="system-bg border-2 border-sky-500/50 rounded-xl w-full max-w-md p-8 space-y-5 shadow-[0_0_50px_rgba(14,165,233,0.2)]">
             <h2 className="font-game text-xl text-sky-400 mb-4 uppercase tracking-tighter">Manifestar Nova Relíquia</h2>
             <div>
@@ -80,7 +80,7 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black/60 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)] border-slate-800/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-100 font-game text-xs focus:border-sky-500 outline-none transition-all"
+                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-100 font-game text-xs focus:border-sky-500 outline-none transition-all"
                 placeholder="Ex: ESSÊNCIA DA VONTADE"
               />
             </div>
@@ -89,7 +89,7 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-black/60 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)] border-slate-800/40 transition-all border border-slate-800 rounded px-4 py-3 text-slate-300 text-xs focus:border-sky-500 outline-none h-24 resize-none transition-all"
+                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-slate-300 text-xs focus:border-sky-500 outline-none h-24 resize-none transition-all"
                 placeholder="Descreva o poder deste item..."
               />
             </div>
@@ -99,7 +99,7 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
                 type="number"
                 value={cost}
                 onChange={(e) => setCost(parseInt(e.target.value) || 0)}
-                className="w-full bg-black/60 shadow-[inset_0_0_15px_rgba(0,0,0,0.5)] border-slate-800/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-400 font-game text-sm outline-none focus:border-sky-500"
+                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-400 font-game text-sm outline-none focus:border-sky-500"
               />
             </div>
             <div className="flex gap-4 pt-4">
@@ -112,7 +112,7 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
 
       <div className={`grid grid-cols-1 md:grid-cols-2 gap-4`}>
         {items.length === 0 && (
-          <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-dashed border-amber-900/30 shadow-[0_0_10px_rgba(251,191,36,0.05)] transition-all duration-500 bg-black/40 rounded-xl">
+          <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-sky-900/30 bg-sky-950/10 transition-all duration-300 shadow-none bg-amber-950/10 shadow-none rounded-xl">
             <Package size={64} className="text-amber-900 mb-4" />
             <p className="font-game text-amber-800 text-xs uppercase tracking-[0.2em]">Cofre do Sistema Vazio</p>
           </div>
@@ -151,7 +151,7 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
                     {item.description || 'Uma relíquia de poder incalculável, aguardando um mestre digno.'}
                   </p>
                   {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-amber-900/30 shadow-[0_0_10px_rgba(251,191,36,0.05)] transition-all duration-500 bg-black/40 animate-in fade-in slide-in-from-top-2">
+                    <div className="mt-4 pt-4 border-t border-amber-900/30 transition-all duration-500 bg-amber-950/10 shadow-none animate-in fade-in slide-in-from-top-2">
                       <div className="flex items-center gap-2 text-[8px] font-game text-amber-700 uppercase tracking-widest mb-1">
                         <Info size={10} /> Registro de Dados do Sistema
                       </div>
