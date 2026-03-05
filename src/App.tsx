@@ -1032,8 +1032,8 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-cyan-800 border-t-cyan-400 rounded-full animate-spin"></div>
-          <p className="font-game text-[11px] text-cyan-700 tracking-[0.3em] uppercase">INICIALIZANDO SISTEMA...</p>
+          <div className="w-8 h-8 border-2 border-emerald-800 border-t-emerald-400 rounded-full animate-spin"></div>
+          <p className="font-game text-[11px] text-emerald-700 tracking-[0.3em] uppercase">INICIALIZANDO SISTEMA...</p>
         </div>
       </div>
     );
@@ -1064,15 +1064,15 @@ const App: React.FC = () => {
 
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 opacity-30 hover:opacity-100 transition-opacity">
-          <Monitor size={14} className="text-cyan-500" />
-          <span className="font-game text-[10px] tracking-[0.3em] text-cyan-700">SHADOW SYSTEM // CORE V1.2.0</span>
+          <Monitor size={14} className="text-emerald-500" />
+          <span className="font-game text-[10px] tracking-[0.3em] text-emerald-700">SHADOW SYSTEM // CORE V1.2.0</span>
         </div>
 
         <div className="flex items-center gap-3">
           {isSyncing ? (
             <div className="flex items-center gap-2 animate-pulse">
-              <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-ping"></div>
-              <span className="font-game text-[9px] text-cyan-600 tracking-widest uppercase">Sincronizando...</span>
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></div>
+              <span className="font-game text-[9px] text-emerald-600 tracking-widest uppercase">Sincronizando...</span>
             </div>
           ) : lastSynced ? (
             <div className="flex items-center gap-2 opacity-40">
@@ -1083,7 +1083,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <header className={`mb-12 p-6 md:p-10 system-panel rounded-2xl flex flex-col lg:flex-row items-center gap-8 md:gap-10 transition-all duration-700 ${profile.isPenaltyZoneActive ? 'bg-red-950/20 border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.2)]' : 'border-sky-500/20 shadow-[0_0_30px_rgba(14,165,233,0.1)]'}`}>
+      <header className={`mb-12 p-6 md:p-10 system-panel rounded-2xl flex flex-col lg:flex-row items-center gap-8 md:gap-10 transition-all duration-700 ${profile.isPenaltyZoneActive ? 'bg-red-950/20 border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.2)]' : 'border-green-500/20 shadow-[0_0_30px_rgba(16,185,129,0.1)]'}`}>
         <div className="hud-tl hud-corner"></div><div className="hud-tr hud-corner"></div>
         <div className="hud-bl hud-corner"></div><div className="hud-br hud-corner"></div>
 
@@ -1101,9 +1101,9 @@ const App: React.FC = () => {
         <div className="flex-1 space-y-6 w-full min-w-0">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-1 min-w-0">
-              <h1 className="font-game text-2xl md:text-4xl text-slate-100 tracking-tight leading-none uppercase truncate neon-text-cyan">{profile.name}</h1>
+              <h1 className="font-game text-2xl md:text-4xl text-slate-100 tracking-tight leading-none uppercase truncate neon-text-green-strong">{profile.name}</h1>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] md:text-[11px] font-game text-cyan-400 bg-cyan-950/40 px-2 py-0.5 border border-cyan-500/20 whitespace-nowrap">{profile.title}</span>
+                <span className="text-[10px] md:text-[11px] font-game text-emerald-400 bg-emerald-950/40 px-2 py-0.5 border border-emerald-500/20 whitespace-nowrap">{profile.title}</span>
                 <span className="text-[9px] md:text-[10px] font-game text-slate-600 uppercase">Sistema Ativo: V1.2</span>
               </div>
             </div>
@@ -1112,7 +1112,7 @@ const App: React.FC = () => {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-cyan-400 transition-all group/btn rounded shadow-lg"
+                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-emerald-400 transition-all group/btn rounded shadow-lg"
                   title="CONFIGURAÇÕES"
                 >
                   <Settings size={18} className="group-hover/btn:rotate-45 transition-transform" />
@@ -1126,11 +1126,11 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-4 justify-center md:justify-end">
-                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 system-panel border-cyan-900/30 bg-cyan-950/10 rounded-lg group hover:border-cyan-500/50 transition-all relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Zap size={12} className="text-cyan-500 mb-1" />
-                  <p className="text-[8px] font-game text-cyan-700 mb-0.5 uppercase tracking-tighter">Nível</p>
-                  <p className="font-game text-xl md:text-2xl text-white leading-none neon-text-cyan">{profile.level}</p>
+                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 system-panel border-emerald-900/30 bg-emerald-950/10 rounded-lg group hover:border-emerald-500/50 transition-all relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <Zap size={12} className="text-emerald-500 mb-1" />
+                  <p className="text-[8px] font-game text-emerald-700 mb-0.5 uppercase tracking-tighter">Nível</p>
+                  <p className="font-game text-xl md:text-2xl text-white leading-none neon-text-green-strong">{profile.level}</p>
                 </div>
                 <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 system-panel border-amber-900/30 bg-amber-950/10 rounded-lg group hover:border-amber-500/50 transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -1150,12 +1150,12 @@ const App: React.FC = () => {
 
           <div className="space-y-2">
             <div className="flex justify-between items-end">
-              <span className="text-[10px] font-game text-cyan-600 tracking-wider">TAXA DE SINCRONIA</span>
-              <span className="text-[11px] font-game text-cyan-400">{xpPercentage}%</span>
+              <span className="text-[10px] font-game text-emerald-600 tracking-wider">TAXA DE SINCRONIA</span>
+              <span className="text-[11px] font-game text-emerald-400">{xpPercentage}%</span>
             </div>
             <div className="h-1.5 bg-black border border-slate-900 relative rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all duration-[1s] ease-out ${profile.isPenaltyZoneActive ? 'bg-red-500' : 'bg-gradient-to-r from-cyan-900 to-cyan-400'}`}
+                className={`h-full transition-all duration-[1s] ease-out ${profile.isPenaltyZoneActive ? 'bg-red-500' : 'bg-gradient-to-r from-emerald-900 to-emerald-400'}`}
                 style={{ width: `${xpPercentage}%` }}
               />
             </div>
@@ -1177,18 +1177,17 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-3 p-2 md:p-0 bg-slate-950/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-sky-500/20 md:border-none mb-0 md:mb-12">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-3 p-2 md:p-0 bg-slate-950/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-green-500/20 md:border-none mb-0 md:mb-12">
         {[
-          { id: 'quests', label: 'QUESTS', icon: Target, color: 'cyan' },
-          { id: 'status', label: 'STATUS', icon: Activity, color: 'cyan' },
-          { id: 'inventory', label: 'INVENTÁRIO', icon: Package, color: 'sky' },
-          { id: 'store', label: 'LOJA', icon: ShoppingBag, color: 'blue' },
+          { id: 'quests', label: 'QUESTS', icon: Target, color: 'emerald' },
+          { id: 'status', label: 'STATUS', icon: Activity, color: 'emerald' },
+          { id: 'inventory', label: 'INVENTÁRIO', icon: Package, color: 'green' },
+          { id: 'store', label: 'LOJA', icon: ShoppingBag, color: 'green' },
           { id: 'penalties', label: 'PURIFICAÇÃO', icon: HeartPulse, color: 'red' },
         ].map(tab => {
           const colorClasses: Record<string, string> = {
-            cyan: 'bg-cyan-600/10 text-cyan-400 border-cyan-500/50',
-            sky: 'bg-sky-600/10 text-sky-400 border-sky-500/50',
-            blue: 'bg-blue-600/10 text-blue-400 border-blue-500/50',
+            emerald: 'bg-emerald-600/10 text-emerald-400 border-emerald-500/50',
+            green: 'bg-green-600/10 text-green-400 border-green-500/50',
             red: 'bg-red-600/10 text-red-400 border-red-500/50',
           };
 
@@ -1209,11 +1208,11 @@ const App: React.FC = () => {
 
       <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         <aside className="lg:col-span-3 space-y-6">
-          <div className="system-panel p-6 min-h-[200px] lg:min-h-[300px] border-cyan-950/40">
-            <h2 className="font-game text-[11px] md:text-[12px] text-cyan-800 mb-6 flex items-center gap-2 border-b border-cyan-950 pb-4 uppercase tracking-widest font-bold"><Bell size={14} /> ALERTAS</h2>
+          <div className="system-panel p-6 min-h-[200px] lg:min-h-[300px] border-emerald-950/40">
+            <h2 className="font-game text-[11px] md:text-[12px] text-emerald-800 mb-6 flex items-center gap-2 border-b border-emerald-950 pb-4 uppercase tracking-widest font-bold"><Bell size={14} /> ALERTAS</h2>
             <div className="space-y-4">
               {messages.map((m: SystemMessage) => (
-                <div key={m.id} className={`text-[12px] md:text-[13px] font-medium animate-in slide-in-from-left duration-200 ${m.type === 'success' ? 'text-green-500' : m.type === 'error' ? 'text-red-500' : 'text-cyan-600'}`}>
+                <div key={m.id} className={`text-[12px] md:text-[13px] font-medium animate-in slide-in-from-left duration-200 ${m.type === 'success' ? 'text-green-500' : m.type === 'error' ? 'text-red-500' : 'text-emerald-600'}`}>
                   <span className="opacity-30 text-[9px]">[{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]</span> <br />
                   <span className="font-game uppercase tracking-tight break-words">&gt; {m.text}</span>
                 </div>
@@ -1228,11 +1227,11 @@ const App: React.FC = () => {
             <div className="space-y-8 animate-in fade-in duration-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <h2 className="font-game text-2xl md:text-3xl flex items-center gap-4 text-slate-200 uppercase tracking-tight">
-                  <ScrollText size={24} className="text-sky-500" /> Quests Ativas
+                  <ScrollText size={24} className="text-emerald-500" /> Quests Ativas
                 </h2>
                 <button
                   onClick={() => { resetForm(); setQuestForm({ isOpen: true }); }}
-                  className="w-full sm:w-auto px-6 py-3 system-panel border border-sky-900 text-sky-500 hover:bg-sky-950 hover:text-sky-400 font-game text-[12px] tracking-widest transition-all flex items-center justify-center gap-2 font-bold uppercase"
+                  className="w-full sm:w-auto px-6 py-3 system-panel border border-emerald-900 text-emerald-500 hover:bg-emerald-950 hover:text-emerald-400 font-game text-[12px] tracking-widest transition-all flex items-center justify-center gap-2 font-bold uppercase"
                 >
                   <Plus size={16} /> Nova Quest
                 </button>
@@ -1252,8 +1251,8 @@ const App: React.FC = () => {
                   />
                 ))}
                 {quests.filter(q => !q.completed && !q.failed).length === 0 && (
-                  <div className="text-center py-20 system-panel border-dashed border border-sky-900/30 rounded-xl opacity-40">
-                    <p className="font-game text-[12px] text-sky-700 tracking-widest uppercase">AGUARDANDO NOVAS QUESTS...</p>
+                  <div className="text-center py-20 system-panel border-dashed border border-emerald-900/30 rounded-xl opacity-40">
+                    <p className="font-game text-[12px] text-emerald-700 tracking-widest uppercase">AGUARDANDO NOVAS QUESTS...</p>
                   </div>
                 )}
               </div>
@@ -1316,22 +1315,22 @@ const App: React.FC = () => {
       {/* Modal de Criação / Edição */}
       {questForm.isOpen && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-start md:items-center justify-center p-0 md:p-4 backdrop-blur-md overflow-y-auto">
-          <div className="system-panel p-6 md:p-10 w-full max-w-2xl min-h-screen md:min-h-0 md:rounded-2xl shadow-2xl relative border-sky-900/50 flex flex-col">
+          <div className="system-panel p-6 md:p-10 w-full max-w-2xl min-h-screen md:min-h-0 md:rounded-2xl shadow-2xl relative border-emerald-900/50 flex flex-col">
             <div className="hidden md:block hud-tl hud-corner"></div><div className="hidden md:block hud-tr hud-corner"></div>
             <div className="hidden md:block hud-bl hud-corner"></div><div className="hidden md:block hud-br hud-corner"></div>
 
-            <div className="flex justify-between items-center mb-6 md:mb-8 border-b border-sky-900/30 pb-4 relative z-10">
+            <div className="flex justify-between items-center mb-6 md:mb-8 border-b border-emerald-900/30 pb-4 relative z-10">
               <h2 className="font-game text-xl md:text-2xl text-slate-100 uppercase font-bold tracking-tight">
                 {editingQuest ? "Recalibrar Diretriz" : "Manifestação de Nova Quest"}
               </h2>
-              <button onClick={() => { setQuestForm({ isOpen: false }); resetForm(); }} className="text-sky-600 hover:text-sky-400 md:hidden">
+              <button onClick={() => { setQuestForm({ isOpen: false }); resetForm(); }} className="text-emerald-600 hover:text-emerald-400 md:hidden">
                 <X size={24} />
               </button>
             </div>
 
             <div className="space-y-6 md:space-y-8 relative z-10 flex-1">
               <div className="space-y-2">
-                <label className="block text-[10px] md:text-[11px] font-game text-sky-600 uppercase tracking-widest font-bold">Identificador de Objetivo</label>
+                <label className="block text-[10px] md:text-[11px] font-game text-emerald-600 uppercase tracking-widest font-bold">Identificador de Objetivo</label>
                 <div className="relative">
                   <input
                     autoFocus
@@ -1339,24 +1338,24 @@ const App: React.FC = () => {
                     value={newQuestTitle}
                     onChange={e => setNewQuestTitle(e.target.value)}
                     placeholder="EX: EXTERMÍNIO DA PROCRASTINAÇÃO..."
-                    className="w-full bg-black border border-sky-900/30 p-3 md:p-4 text-slate-100 font-game text-base md:text-xl outline-none focus:border-sky-500 transition-all rounded"
+                    className="w-full bg-black border border-emerald-900/30 p-3 md:p-4 text-slate-100 font-game text-base md:text-xl outline-none focus:border-emerald-500 transition-all rounded"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 bg-sky-950/10 p-4 border border-sky-900/20 rounded-lg transition-all ${editingQuest || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-sky-900/20 cursor-pointer'}`}
+                  <div className={`flex items-center gap-4 bg-emerald-950/10 p-4 border border-emerald-900/20 rounded-lg transition-all ${editingQuest || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-900/20 cursor-pointer'}`}
                     onClick={() => !editingQuest && !newQuestIsSpecial && setNewQuestIsDaily(!newQuestIsDaily)}>
                     <button
                       disabled={!!editingQuest || newQuestIsSpecial}
                       type="button"
-                      className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsDaily ? 'bg-sky-900/40 border-sky-400 text-sky-300 shadow-[0_0_10px_#0ea5e9]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsDaily ? 'bg-emerald-900/40 border-emerald-400 text-emerald-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
                     >
                       {editingQuest ? <Lock size={20} /> : <CalendarDays size={20} />}
                     </button>
                     <div className="min-w-0">
-                      <p className="font-game text-[11px] text-sky-400 uppercase font-bold truncate">Quest Diária</p>
+                      <p className="font-game text-[11px] text-emerald-400 uppercase font-bold truncate">Quest Diária</p>
                       <p className="text-[10px] text-slate-500 uppercase font-medium">{editingQuest ? 'Sincronizado' : (newQuestIsDaily ? 'Reset Diário Ativado' : 'Ciclo Único')}</p>
                     </div>
                   </div>
@@ -1415,7 +1414,7 @@ const App: React.FC = () => {
 
               <div className="space-y-3">
                 <div className="flex justify-between items-end">
-                  <label className="block text-[10px] md:text-[11px] font-game text-sky-600 uppercase tracking-widest font-bold">Rank do Portal</label>
+                  <label className="block text-[10px] md:text-[11px] font-game text-emerald-600 uppercase tracking-widest font-bold">Rank do Portal</label>
                   <span className="text-[9px] md:text-[10px] font-game text-slate-600 uppercase font-bold">VOCÊ É {profile.rank}</span>
                 </div>
 
@@ -1433,15 +1432,15 @@ const App: React.FC = () => {
                         className={`rank-cell h-14 md:h-16 border flex flex-col items-center justify-center gap-1 transition-all ${isLocked
                           ? 'border-red-950/10 bg-red-950/5 text-red-900/20 cursor-not-allowed'
                           : isActive
-                            ? 'rank-cell-active border-sky-400 bg-sky-900/20 text-sky-400 shadow-[0_0_15px_rgba(14,165,233,0.3)]'
-                            : 'border-slate-800 bg-black/40 text-slate-600 hover:border-sky-700 hover:text-sky-300'
+                            ? 'rank-cell-active border-emerald-400 bg-emerald-900/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                            : 'border-slate-800 bg-black/40 text-slate-600 hover:border-emerald-700 hover:text-emerald-300'
                           }`}
                       >
                         {isLocked ? (
                           <Lock size={12} />
                         ) : (
                           <>
-                            <span className={`font-game text-lg md:text-xl font-black ${isActive ? 'text-sky-400' : 'text-slate-500'}`}>{d}</span>
+                            <span className={`font-game text-lg md:text-xl font-black ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>{d}</span>
                             <span className="font-game text-[8px] tracking-tighter font-bold uppercase hidden md:inline">RANK {d}</span>
                           </>
                         )}
@@ -1458,7 +1457,7 @@ const App: React.FC = () => {
                   disabled={isFormInvalid}
                   className={`flex-1 py-4 border-2 font-game text-[12px] md:text-[13px] transition-all rounded font-bold uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 ${isFormInvalid
                     ? 'bg-slate-900 border-slate-800 text-slate-700 cursor-not-allowed grayscale'
-                    : 'bg-slate-900 border-sky-800 text-sky-400 hover:bg-sky-800 hover:border-sky-400'
+                    : 'bg-slate-900 border-emerald-800 text-emerald-400 hover:bg-emerald-800 hover:border-emerald-400'
                     }`}
                 >
                   {isFormInvalid && <Lock size={14} />}

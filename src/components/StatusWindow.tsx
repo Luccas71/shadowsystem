@@ -46,27 +46,27 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
 
       {/* Registro de XP Acumulado */}
-      <div className="system-panel p-6 border-sky-900/40 shadow-none bg-sky-950/5 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-r from-sky-500/5 via-transparent to-transparent"></div>
+      <div className="system-panel p-6 border-green-900/40 shadow-none bg-green-950/5 relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-transparent"></div>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-sky-900/20 border border-sky-500/30 rounded-lg text-sky-400 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
+            <div className="p-3 bg-green-900/20 border border-green-500/30 rounded-lg text-green-400 shadow-[0_0_15px_rgba(34, 197, 94, 0.2)]">
               <Database size={24} className="group-hover:rotate-12 transition-transform" />
             </div>
             <div>
-              <h3 className="font-game text-xs text-sky-500 uppercase tracking-widest font-bold">Núcleo de Mana Total</h3>
-              <p className="font-game text-3xl text-white tracking-tighter">{profile.totalXpGained.toLocaleString()} <span className="text-xs text-sky-700">XP</span></p>
+              <h3 className="font-game text-xs text-green-500 uppercase tracking-widest font-bold">Núcleo de Mana Total</h3>
+              <p className="font-game text-3xl text-white tracking-tighter">{profile.totalXpGained.toLocaleString()} <span className="text-xs text-green-700">XP</span></p>
             </div>
           </div>
 
           <div className="flex-1 max-w-md space-y-2">
             <div className="flex justify-between items-end">
-              <span className="text-[10px] font-game text-sky-600 uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
-              <span className="text-[10px] font-game text-sky-400">{Math.floor(nextRareDropProgress)}%</span>
+              <span className="text-[10px] font-game text-green-600 uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
+              <span className="text-[10px] font-game text-green-400">{Math.floor(nextRareDropProgress)}%</span>
             </div>
-            <div className="h-1.5 bg-black border border-sky-900/30 shadow-none rounded-full overflow-hidden">
+            <div className="h-1.5 bg-black border border-green-900/30 shadow-none rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-sky-900 to-sky-400 transition-all duration-1000 shadow-[0_0_10px_#38bdf8]"
+                className="h-full bg-gradient-to-r from-green-900 to-green-400 transition-all duration-1000 shadow-[0_0_10px_#22c55e]"
                 style={{ width: `${nextRareDropProgress}%` }}
               ></div>
             </div>
@@ -78,7 +78,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Lógica de Rank do Sistema */}
         <div className="space-y-4">
-          <h3 className="font-game text-[12px] text-cyan-500 uppercase flex items-center gap-2 border-b border-cyan-900/50 pb-2 font-bold tracking-widest">
+          <h3 className="font-game text-[12px] text-emerald-500 uppercase flex items-center gap-2 border-b border-emerald-900/50 pb-2 font-bold tracking-widest">
             <Dna size={14} /> HIERARQUIA DO DESPERTAR
           </h3>
 
@@ -92,7 +92,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                 <div
                   key={item.rank}
                   className={`system-bg border rounded-lg p-5 transition-all duration-500 relative overflow-hidden ${isCurrent
-                    ? `border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.2)] bg-cyan-950/20`
+                    ? `border-emerald-500 shadow-[0_0_20px_rgba(16, 185, 129, 0.2)] bg-emerald-950/20`
                     : isAchieved
                       ? 'border-slate-800 opacity-60'
                       : 'border-slate-900 opacity-40 grayscale'
@@ -100,7 +100,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                 >
                   {isCurrent && (
                     <div className="absolute top-0 right-0 p-2">
-                      <div className="text-[10px] font-game text-cyan-400 animate-pulse uppercase tracking-widest font-bold">VOCÊ ESTÁ AQUI</div>
+                      <div className="text-[10px] font-game text-emerald-400 animate-pulse uppercase tracking-widest font-bold">VOCÊ ESTÁ AQUI</div>
                     </div>
                   )}
 
@@ -122,7 +122,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
                     <div>
                       {isCurrent ? (
-                        <div className="p-2.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                        <div className="p-2.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                           <Trophy size={24} />
                         </div>
                       ) : isAchieved ? (
@@ -135,13 +135,13 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
                   {isCurrent && profile.rank !== Rank.S && (
                     <div className="mt-5 space-y-2 animate-in fade-in duration-1000">
-                      <div className="flex justify-between text-[10px] font-game text-cyan-600 uppercase tracking-widest font-bold">
+                      <div className="flex justify-between text-[10px] font-game text-emerald-600 uppercase tracking-widest font-bold">
                         <span>EVOLUÇÃO DE MANA</span>
                         <span>{Math.floor(progressToNext)}%</span>
                       </div>
-                      <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-cyan-900/40">
+                      <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-emerald-900/40">
                         <div
-                          className="h-full bg-cyan-500 shadow-[0_0_15px_#22d3ee] transition-all duration-1000"
+                          className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981] transition-all duration-1000"
                           style={{ width: `${progressToNext}%` }}
                         ></div>
                       </div>

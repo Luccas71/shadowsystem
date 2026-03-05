@@ -73,10 +73,10 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-      <div className="system-bg border-2 border-cyan-500/50 rounded-xl w-full max-w-lg overflow-hidden flex flex-col shadow-[0_0_50px_rgba(34,211,238,0.2)]">
-        <div className="p-4 border-b border-cyan-900/50 flex justify-between items-center bg-cyan-950/20">
-          <h2 className="font-game text-xl neon-text-cyan uppercase tracking-widest">Modificação do Perfil de Caçador</h2>
-          <button onClick={() => { stopCamera(); onClose(); }} className="text-gray-500 hover:text-cyan-400">
+      <div className="system-bg border-2 border-emerald-500/50 rounded-xl w-full max-w-lg overflow-hidden flex flex-col shadow-[0_0_50px_rgba(16, 185, 129, 0.2)]">
+        <div className="p-4 border-b border-emerald-900/50 flex justify-between items-center bg-emerald-950/20">
+          <h2 className="font-game text-xl neon-text-green-strong uppercase tracking-widest">Modificação do Perfil de Caçador</h2>
+          <button onClick={() => { stopCamera(); onClose(); }} className="text-gray-500 hover:text-emerald-400">
             <X size={24} />
           </button>
         </div>
@@ -84,7 +84,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
         <div className="p-6 space-y-8 overflow-y-auto max-h-[85vh]">
           <div className="flex flex-col items-center gap-6">
             <div className="relative group">
-              <div className="w-40 h-40 rounded-full border-4 border-cyan-400 overflow-hidden shadow-[0_0_20px_rgba(34,211,238,0.4)] relative">
+              <div className="w-40 h-40 rounded-full border-4 border-emerald-400 overflow-hidden shadow-[0_0_20px_rgba(16, 185, 129, 0.4)] relative">
                 {isCameraActive ? (
                   <video
                     ref={videoRef}
@@ -105,14 +105,14 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
                 <div className="absolute -bottom-2 -right-2 flex gap-2">
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 bg-slate-900 border border-cyan-500 rounded-full text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all shadow-lg"
+                    className="p-2 bg-slate-900 border border-emerald-500 rounded-full text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all shadow-lg"
                     title="Carregar Arquivo Local"
                   >
                     <Upload size={18} />
                   </button>
                   <button
                     onClick={startCamera}
-                    className="p-2 bg-slate-900 border border-cyan-500 rounded-full text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all shadow-lg"
+                    className="p-2 bg-slate-900 border border-emerald-500 rounded-full text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all shadow-lg"
                     title="Acessar Sensores Ópticos"
                   >
                     <Camera size={18} />
@@ -125,7 +125,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
               <div className="flex gap-4 w-full">
                 <button
                   onClick={capturePhoto}
-                  className="flex-1 py-2 bg-cyan-600 text-white rounded font-game text-sm hover:bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.4)]"
+                  className="flex-1 py-2 bg-emerald-600 text-white rounded font-game text-sm hover:bg-emerald-500 shadow-[0_0_10px_rgba(16, 185, 129, 0.4)]"
                 >
                   Capturar Imagem
                 </button>
@@ -140,21 +140,21 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
 
             <div className="w-full space-y-4">
               <div className="relative">
-                <label className="block text-[10px] font-game text-cyan-500 mb-1 uppercase tracking-tighter">Fonte da Imagem de Identidade (URL)</label>
+                <label className="block text-[10px] font-game text-emerald-500 mb-1 uppercase tracking-tighter">Fonte da Imagem de Identidade (URL)</label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <Link className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-800" size={14} />
+                    <Link className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-800" size={14} />
                     <input
                       type="text"
                       value={avatar}
                       onChange={(e) => setAvatar(e.target.value)}
                       placeholder="Insira link de dados externo..."
-                      className="w-full bg-slate-900/80 border border-slate-700 rounded pl-9 pr-4 py-2 text-xs text-cyan-100 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full bg-slate-900/80 border border-slate-700 rounded pl-9 pr-4 py-2 text-xs text-emerald-100 focus:outline-none focus:border-emerald-500 transition-colors"
                     />
                   </div>
                   <button
                     onClick={() => setAvatar(`https://picsum.photos/seed/${Math.random()}/300`)}
-                    className="p-2 bg-slate-800 text-cyan-400 rounded hover:bg-slate-700 border border-slate-600"
+                    className="p-2 bg-slate-800 text-emerald-400 rounded hover:bg-slate-700 border border-slate-600"
                     title="Aleatorizar Aparência"
                   >
                     <RefreshCcw size={16} />
@@ -173,21 +173,21 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
             </div>
           </div>
 
-          <div className="space-y-4 pt-4 border-t border-cyan-900/30">
+          <div className="space-y-4 pt-4 border-t border-emerald-900/30">
             <div>
-              <label className="block text-xs font-game text-cyan-500 mb-2 uppercase tracking-widest">Codinome do Caçador</label>
+              <label className="block text-xs font-game text-emerald-500 mb-2 uppercase tracking-widest">Codinome do Caçador</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-cyan-100 font-game text-xl focus:outline-none focus:border-cyan-500 shadow-inner"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-emerald-100 font-game text-xl focus:outline-none focus:border-emerald-500 shadow-inner"
                 placeholder="Insira seu nome..."
               />
             </div>
           </div>
         </div>
 
-        <div className="p-4 border-t border-cyan-900/50 flex flex-col gap-4 bg-cyan-950/10">
+        <div className="p-4 border-t border-emerald-900/50 flex flex-col gap-4 bg-emerald-950/10">
           {showResetConfirm ? (
             <div className="flex flex-col gap-3 animate-in zoom-in-95 duration-300">
               <div className="flex items-center gap-3 p-3 bg-red-950/30 border border-red-500/50 rounded-lg">
@@ -222,7 +222,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onReset,
                 </button>
                 <button
                   onClick={handleSave}
-                  className="flex-1 py-3 rounded bg-cyan-600 text-white hover:bg-cyan-500 font-game text-xs tracking-widest uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all"
+                  className="flex-1 py-3 rounded bg-emerald-600 text-white hover:bg-emerald-500 font-game text-xs tracking-widest uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16, 185, 129, 0.3)] transition-all"
                 >
                   <Save size={16} /> Atualizar Dados
                 </button>

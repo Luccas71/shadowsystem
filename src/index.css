@@ -5,8 +5,8 @@
 :root {
     font-size: 16px;
     --void-deep: #050d2b;
-    --shadow-energy: #0ea5e9;
-    --system-blue: #38bdf8;
+    --shadow-energy: #10b981;
+    --system-blue: #22c55e;
     --penalty-red: #ef4444;
     --system-purple: #a855f7;
     --neon-green: #10b981;
@@ -25,9 +25,9 @@ body {
     margin: 0;
     -webkit-font-smoothing: antialiased;
     background-image:
-        linear-gradient(rgba(14, 165, 233, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(14, 165, 233, 0.08) 1px, transparent 1px),
-        radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
+        linear-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 185, 129, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
     background-size: 40px 40px, 40px 40px, 100% 100%;
     background-attachment: fixed;
     user-select: none;
@@ -60,15 +60,15 @@ body::after {
 .system-panel {
     background: rgba(5, 13, 43, 0.7);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     box-shadow: 0 4px 25px rgba(0, 0, 0, 0.45);
     position: relative;
 }
 
 .holographic-border-top {
     height: 2px;
-    background: linear-gradient(90deg, transparent, #00d2ff, #3a7bd5, transparent);
-    box-shadow: 0 0 15px #00d2ff;
+    background: linear-gradient(90deg, transparent, #10b981, #22c55e, transparent);
+    box-shadow: 0 0 15px #10b981;
     position: relative;
 }
 
@@ -79,8 +79,8 @@ body::after {
     top: -2px;
     width: 40px;
     height: 6px;
-    background: #00d2ff;
-    box-shadow: 0 0 15px #00d2ff;
+    background: #10b981;
+    box-shadow: 0 0 15px #10b981;
 }
 
 .holographic-border-top::before {
@@ -91,9 +91,9 @@ body::after {
     right: 10%;
 }
 
-.neon-text-cyan {
-    color: #38bdf8;
-    text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+.neon-text-green-strong {
+    color: #10b981;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
 }
 
 .neon-text-red {
@@ -130,7 +130,7 @@ body::after {
     position: absolute;
     width: 14px;
     height: 14px;
-    border-color: rgba(56, 189, 248, 0.3);
+    border-color: rgba(16, 185, 129, 0.3);
     pointer-events: none;
 }
 

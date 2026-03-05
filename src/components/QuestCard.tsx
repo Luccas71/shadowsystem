@@ -102,15 +102,15 @@ const QuestCard: React.FC<QuestCardProps> = ({
       addBtnClasses: 'bg-green-900/20 border-green-900 text-green-500 hover:bg-green-600 hover:text-white',
       flameIcon: 'text-green-600',
     },
-    blue: {
-      badge: 'text-blue-400 border-blue-500/30 bg-blue-950/60',
+    emerald: {
+      badge: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
-      subHeader: 'text-blue-600',
-      subBorder: 'border-blue-900/30',
-      subCheckActive: 'bg-blue-600 border-blue-500 text-white',
-      inputBorder: 'border-blue-900/40 text-blue-100 focus:border-blue-500',
-      addBtnClasses: 'bg-blue-900/20 border-blue-900 text-blue-500 hover:bg-blue-600 hover:text-white',
-      flameIcon: 'text-blue-600',
+      subHeader: 'text-emerald-600',
+      subBorder: 'border-emerald-900/30',
+      subCheckActive: 'bg-emerald-600 border-emerald-500 text-white',
+      inputBorder: 'border-emerald-900/40 text-emerald-100 focus:border-emerald-500',
+      addBtnClasses: 'bg-emerald-900/20 border-emerald-900 text-emerald-500 hover:bg-emerald-600 hover:text-white',
+      flameIcon: 'text-emerald-600',
     },
     purple: {
       badge: 'text-purple-400 border-purple-500/30 bg-purple-950/60',
@@ -253,7 +253,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
           <div className="flex flex-row sm:flex-col items-center gap-2 self-end sm:self-center shrink-0">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className={`p-2 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
+              className={`p-2 transition-all duration-300 ${isExpanded ? 'text-emerald-400 rotate-180' : 'text-slate-600'}`}
             >
               <ChevronDown size={22} />
             </button>

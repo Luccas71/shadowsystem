@@ -71,40 +71,42 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
 
       {isAdding && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all/90 backdrop-blur-md">
-          <form onSubmit={handleSubmit} className="system-bg border-2 border-sky-500/50 rounded-xl w-full max-w-md p-8 space-y-5 shadow-[0_0_50px_rgba(14,165,233,0.2)]">
-            <h2 className="font-game text-xl text-sky-400 mb-4 uppercase tracking-tighter">Manifestar Nova Relíquia</h2>
+          <form onSubmit={handleSubmit} className="system-bg border-2 border-green-500/50 rounded-xl w-full max-w-md p-8 space-y-5 shadow-[0_0_50px_rgba(34, 197, 94, 0.2)
+]">
+            <h2 className="font-game text-xl text-green-400 mb-4 uppercase tracking-tighter">Manifestar Nova Relíquia</h2>
             <div>
-              <label className="block text-[9px] font-game text-sky-600 mb-1 uppercase tracking-widest">Nome do Artefato</label>
+              <label className="block text-[9px] font-game text-green-600 mb-1 uppercase tracking-widest">Nome do Artefato</label>
               <input
                 autoFocus
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-100 font-game text-xs focus:border-sky-500 outline-none transition-all"
+                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-100 font-game text-xs focus:border-green-500 outline-none transition-all"
                 placeholder="Ex: ESSÊNCIA DA VONTADE"
               />
             </div>
             <div>
-              <label className="block text-[9px] font-game text-sky-600 mb-1 uppercase tracking-widest">Inscrição (Descrição)</label>
+              <label className="block text-[9px] font-game text-green-600 mb-1 uppercase tracking-widest">Inscrição (Descrição)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-slate-300 text-xs focus:border-sky-500 outline-none h-24 resize-none transition-all"
+                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-slate-300 text-xs focus:border-green-500 outline-none h-24 resize-none transition-all"
                 placeholder="Descreva o poder deste item..."
               />
             </div>
             <div>
-              <label className="block text-[9px] font-game text-sky-600 mb-1 uppercase tracking-widest">Custo em Pedras de Ouro</label>
+              <label className="block text-[9px] font-game text-green-600 mb-1 uppercase tracking-widest">Custo em Pedras de Ouro</label>
               <input
                 type="number"
                 value={cost}
                 onChange={(e) => setCost(parseInt(e.target.value) || 0)}
-                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-sky-400 font-game text-sm outline-none focus:border-sky-500"
+                className="w-full bg-black/40 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border-amber-900/40 transition-all border border-slate-800 rounded px-4 py-3 text-green-400 font-game text-sm outline-none focus:border-green-500"
               />
             </div>
             <div className="flex gap-4 pt-4">
               <button type="button" onClick={() => setIsAdding(false)} className="flex-1 py-3 font-game text-[10px] text-slate-500 hover:text-slate-300 uppercase tracking-widest">ABORTAR</button>
-              <button type="submit" className="flex-1 py-3 font-game text-[10px] bg-sky-600 text-white rounded shadow-[0_0_15px_rgba(14,165,233,0.4)] uppercase tracking-widest active:scale-95 transition-transform">FORJAR</button>
+              <button type="submit" className="flex-1 py-3 font-game text-[10px] bg-green-600 text-white rounded shadow-[0_0_15px_rgba(34, 197, 94, 0.4)
+] uppercase tracking-widest active:scale-95 transition-transform">FORJAR</button>
             </div>
           </form>
         </div>
