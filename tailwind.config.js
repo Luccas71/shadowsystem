@@ -11,7 +11,7 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
-        void: '#06080e',
+        void: '#0a1125',
       }
     },
   },

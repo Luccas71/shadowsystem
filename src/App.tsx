@@ -120,6 +120,9 @@ const App: React.FC = () => {
     localStore: StoreItem[];
     localVices: Vice[];
   } | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const processingQuestIds = React.useRef<Set<string>>(new Set());
 
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
@@ -321,6 +324,7 @@ const App: React.FC = () => {
 
       const savedVices = localStorage.getItem('hunter_vices');
       setVices(savedVices ? JSON.parse(savedVices) : []);
+      setDataLoaded(true);
       return;
     }
 
@@ -414,12 +418,12 @@ const App: React.FC = () => {
       }
     };
 
-    loadFromCloud();
+    loadFromCloud().finally(() => setDataLoaded(true));
   }, [session, authLoading]);
 
   // Save Data
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || !dataLoaded) return;
 
     // Sempre salva no localStorage como fallback
     localStorage.setItem('hunter_profile', JSON.stringify(profile));
@@ -431,25 +435,31 @@ const App: React.FC = () => {
     if (session?.user) {
       const saveToCloud = async () => {
         try {
-          await supabase
+          setIsSyncing(true);
+          const { error } = await supabase
             .from('user_saves')
-            .update({
+            .upsert({
+              user_id: session.user.id,
               profile,
               quests,
               store_items: storeItems,
               vices,
               updated_at: new Date().toISOString()
-            })
-            .eq('user_id', session.user.id);
+            });
+
+          if (error) throw error;
+          setLastSynced(new Date());
         } catch (err) {
           console.error("SISTEMA ERRO: Falha ao salvar na nuvem.", err);
+        } finally {
+          setIsSyncing(false);
         }
       };
 
       const handler = setTimeout(saveToCloud, 1000);
       return () => clearTimeout(handler);
     }
-  }, [profile, quests, storeItems, vices, session, authLoading]);
+  }, [profile, quests, storeItems, vices, session, authLoading, dataLoaded]);
 
   const handleToggleComplete = (id: string) => {
     if (processingQuestIds.current.has(id)) return;
@@ -1052,9 +1062,25 @@ const App: React.FC = () => {
       />
 
 
-      <div className="flex items-center gap-2 mb-4 opacity-30 hover:opacity-100 transition-opacity">
-        <Monitor size={14} className="text-cyan-500" />
-        <span className="font-game text-[10px] tracking-[0.3em] text-cyan-700">SHADOW SYSTEM // CORE V1.2.0</span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 opacity-30 hover:opacity-100 transition-opacity">
+          <Monitor size={14} className="text-cyan-500" />
+          <span className="font-game text-[10px] tracking-[0.3em] text-cyan-700">SHADOW SYSTEM // CORE V1.2.0</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {isSyncing ? (
+            <div className="flex items-center gap-2 animate-pulse">
+              <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-ping"></div>
+              <span className="font-game text-[9px] text-cyan-600 tracking-widest uppercase">Sincronizando...</span>
+            </div>
+          ) : lastSynced ? (
+            <div className="flex items-center gap-2 opacity-40">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+              <span className="font-game text-[9px] text-green-600 tracking-widest uppercase">Sincronizado {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <header className={`mb-12 p-6 md:p-10 system-panel rounded-2xl flex flex-col lg:flex-row items-center gap-8 md:gap-10 transition-all duration-700 ${profile.isPenaltyZoneActive ? 'bg-red-950/20 border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.2)]' : 'border-sky-500/20 shadow-[0_0_30px_rgba(14,165,233,0.1)]'}`}>
