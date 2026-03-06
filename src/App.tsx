@@ -114,12 +114,6 @@ const App: React.FC = () => {
     rewards: { gold: number; xp: number; items: StoreItem[] };
   } | null>(null);
   const [activeEffect, setActiveEffect] = useState<EffectData | null>(null);
-  const [showMigrationModal, setShowMigrationModal] = useState<{
-    localProfile: HunterProfile;
-    localQuests: Quest[];
-    localStore: StoreItem[];
-    localVices: Vice[];
-  } | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
@@ -303,28 +297,7 @@ const App: React.FC = () => {
     if (authLoading) return;
 
     if (!session?.user) {
-      // Fallback para localStorage se deslogado
-      const savedProfile = localStorage.getItem('hunter_profile');
-      let parsedProfile = savedProfile ? JSON.parse(savedProfile) : INITIAL_PROFILE;
-      if (parsedProfile.totalXpGained === undefined) parsedProfile.totalXpGained = 0;
-      if (parsedProfile.dailyItemDropsCount === undefined) parsedProfile.dailyItemDropsCount = 0;
-      if (parsedProfile.lastItemDropDate === undefined) parsedProfile.lastItemDropDate = "";
-      setProfile(parsedProfile);
-
-      const savedQuests = localStorage.getItem('hunter_quests');
-      setQuests(savedQuests ? JSON.parse(savedQuests) : []);
-
-      const savedStore = localStorage.getItem('system_store');
-      const parsedStore: StoreItem[] = savedStore ? JSON.parse(savedStore) : DEFAULT_STORE_ITEMS;
-      const mergedStore = [...parsedStore];
-      DEFAULT_STORE_ITEMS.forEach(defaultItem => {
-        if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
-      });
-      setStoreItems(mergedStore);
-
-      const savedVices = localStorage.getItem('hunter_vices');
-      setVices(savedVices ? JSON.parse(savedVices) : []);
-      setDataLoaded(true);
+      setDataLoaded(false);
       return;
     }
 
@@ -342,24 +315,7 @@ const App: React.FC = () => {
           return;
         }
 
-        const savedProfile = localStorage.getItem('hunter_profile');
-        const hasLocalData = savedProfile && JSON.parse(savedProfile).level > 1;
-
         if (data) {
-          if (hasLocalData && !localStorage.getItem('migration_ignored')) {
-            // Existe conflito: dados locais vs dados na nuvem
-            const localQuests = JSON.parse(localStorage.getItem('hunter_quests') || '[]');
-            const localStore = JSON.parse(localStorage.getItem('system_store') || '[]');
-            const localVices = JSON.parse(localStorage.getItem('hunter_vices') || '[]');
-
-            setShowMigrationModal({
-              localProfile: JSON.parse(savedProfile!),
-              localQuests,
-              localStore,
-              localVices
-            });
-          }
-
           const cloudProfile = data.profile || INITIAL_PROFILE;
           if (cloudProfile.totalXpGained === undefined) cloudProfile.totalXpGained = 0;
           if (cloudProfile.dailyItemDropsCount === undefined) cloudProfile.dailyItemDropsCount = 0;
@@ -379,39 +335,19 @@ const App: React.FC = () => {
 
           addSystemMessage("SISTEMA: DADOS DE SINCRONIZAÇÃO NUVEM CARREGADOS.", "success");
         } else {
-          // Se não tem dados na nuvem mas tem locais, salva os locais na nuvem direto
-          if (hasLocalData) {
-            const localProfile = JSON.parse(savedProfile!);
-            const localQuests = JSON.parse(localStorage.getItem('hunter_quests') || '[]');
-            const localStore = JSON.parse(localStorage.getItem('system_store') || '[]');
-            const localVices = JSON.parse(localStorage.getItem('hunter_vices') || '[]');
-
-            await supabase.from('user_saves').insert({
-              user_id: session.user.id,
-              profile: localProfile,
-              quests: localQuests,
-              store_items: localStore,
-              vices: localVices
-            });
-            setProfile(localProfile);
-            setQuests(localQuests);
-            setStoreItems(localStore);
-            setVices(localVices);
-            addSystemMessage("SISTEMA: DADOS LOCAIS SINCRONIZADOS COM A NUVEM.", "success");
-          } else {
-            // Cria o primeiro save limpo
-            await supabase.from('user_saves').insert({
-              user_id: session.user.id,
-              profile: INITIAL_PROFILE,
-              quests: [],
-              store_items: DEFAULT_STORE_ITEMS,
-              vices: []
-            });
-            setProfile(INITIAL_PROFILE);
-            setQuests([]);
-            setStoreItems(DEFAULT_STORE_ITEMS);
-            setVices([]);
-          }
+          // Cria o primeiro save limpo
+          await supabase.from('user_saves').insert({
+            user_id: session.user.id,
+            profile: INITIAL_PROFILE,
+            quests: [],
+            store_items: DEFAULT_STORE_ITEMS,
+            vices: []
+          });
+          setProfile(INITIAL_PROFILE);
+          setQuests([]);
+          setStoreItems(DEFAULT_STORE_ITEMS);
+          setVices([]);
+          addSystemMessage("SISTEMA: NOVO REGISTRO DE CAÇADOR INICIALIZADO NA NUVEM.", "success");
         }
       } catch (err) {
         console.error("SISTEMA ERRO", err);
@@ -424,12 +360,6 @@ const App: React.FC = () => {
   // Save Data
   useEffect(() => {
     if (authLoading || !dataLoaded) return;
-
-    // Sempre salva no localStorage como fallback
-    localStorage.setItem('hunter_profile', JSON.stringify(profile));
-    localStorage.setItem('hunter_quests', JSON.stringify(quests));
-    localStorage.setItem('system_store', JSON.stringify(storeItems));
-    localStorage.setItem('hunter_vices', JSON.stringify(vices));
 
     // Salva no Supabase se logado (com debounce básico)
     if (session?.user) {
@@ -981,11 +911,6 @@ const App: React.FC = () => {
       setStoreItems(DEFAULT_STORE_ITEMS.map(item => ({ ...item, purchasedCount: 0 })));
       setVices([]);
 
-      localStorage.removeItem('hunter_profile');
-      localStorage.removeItem('hunter_quests');
-      localStorage.removeItem('system_store');
-      localStorage.removeItem('hunter_vices');
-
       if (session?.user) {
         await supabase
           .from('user_saves')
@@ -1482,49 +1407,6 @@ const App: React.FC = () => {
           onReset={handleResetSystem}
           onClose={() => setIsEditingProfile(false)}
         />
-      )}
-
-      {showMigrationModal && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="system-bg border-2 border-amber-500/50 p-8 rounded-xl max-w-md w-full shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-            <h3 className="font-game text-xl text-amber-500 mb-4 uppercase flex items-center gap-3">
-              <Database size={24} /> Conflito de Sincronização
-            </h3>
-            <p className="text-sm text-slate-300 mb-6 font-medium leading-relaxed">
-              Detectamos dados em seu dispositivo que são diferentes da sua conta na nuvem. Como deseja prosseguir?
-            </p>
-            <div className="space-y-4">
-              <button
-                onClick={async () => {
-                  if (session?.user) {
-                    await supabase.from('user_saves').update({
-                      profile: showMigrationModal.localProfile,
-                      quests: showMigrationModal.localQuests,
-                      store_items: showMigrationModal.localStore,
-                      vices: showMigrationModal.localVices,
-                      updated_at: new Date().toISOString()
-                    }).eq('user_id', session.user.id);
-                  }
-                  setShowMigrationModal(null);
-                  addSystemMessage("SISTEMA: DADOS LOCAIS ENVIADOS PARA A NUVEM.", "success");
-                }}
-                className="w-full py-4 bg-amber-600/20 border border-amber-500 text-amber-500 rounded font-game text-xs uppercase hover:bg-amber-600 hover:text-white transition-all"
-              >
-                Usar Dados Locais (Sobrescrever Nuvem)
-              </button>
-              <button
-                onClick={() => {
-                  localStorage.setItem('migration_ignored', 'true');
-                  setShowMigrationModal(null);
-                  addSystemMessage("SISTEMA: MANTENDO DADOS DA NUVEM.", "info");
-                }}
-                className="w-full py-4 bg-slate-900 border border-slate-700 text-slate-400 rounded font-game text-xs uppercase hover:bg-slate-800 transition-all"
-              >
-                Usar Dados da Nuvem
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
