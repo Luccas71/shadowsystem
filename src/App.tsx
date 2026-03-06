@@ -49,8 +49,12 @@ import {
   X,
   Monitor,
   AlertTriangle,
-  LogOut
+  LogOut,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
+import { persistenceService, AppData } from './services/persistenceService';
 
 const INITIAL_PROFILE: HunterProfile = {
   name: "MONARCA ADORMECIDO",
@@ -117,7 +121,9 @@ const App: React.FC = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const isOnline = useNetworkStatus();
   const processingQuestIds = React.useRef<Set<string>>(new Set());
+  const hasUnsavedChanges = React.useRef(false);
 
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
     setMessages(prev => {
@@ -292,104 +298,181 @@ const App: React.FC = () => {
     return () => clearInterval(checkInterval);
   }, [quests, profile, updateCorruption, addSystemMessage]);
 
-  // Load Initial Data
+  // Load Initial Data (Offline First)
   useEffect(() => {
     if (authLoading) return;
 
-    if (!session?.user) {
-      setDataLoaded(false);
-      return;
-    }
+    const initializeData = async () => {
+      // 1. Load from local storage immediately for fast start
+      const localData = persistenceService.loadLocal();
+      if (localData) {
+        setProfile(localData.profile);
+        setQuests(localData.quests);
+        setStoreItems(localData.storeItems);
+        setVices(localData.vices);
+        addSystemMessage("SISTEMA: DADOS LOCAIS RESTAURADOS.", "info");
+      }
 
-    // Busca no Supabase
-    const loadFromCloud = async () => {
+      if (!session?.user) {
+        setDataLoaded(true);
+        return;
+      }
+
+      // 2. If online, sync with cloud
+      if (isOnline) {
+        await syncWithCloud(localData);
+      } else {
+        addSystemMessage("SISTEMA: MODO OFFLINE ATIVADO. AS ALTERAÇÕES SERÃO SINCRONIZADAS POSTERIORMENTE.", "warning");
+      }
+      setDataLoaded(true);
+    };
+
+    const syncWithCloud = async (localData: AppData | null) => {
+      if (!session?.user) return;
+
       try {
-        const { data, error } = await supabase
+        setIsSyncing(true);
+        const { data: cloudData, error } = await supabase
           .from('user_saves')
           .select('*')
           .eq('user_id', session.user.id)
           .single();
 
         if (error && error.code !== 'PGRST116') {
-          console.error("SISTEMA ERRO: Falha ao sincronizar dados", error);
+          console.error("SISTEMA ERRO: Falha ao buscar dados na nuvem", error);
           return;
         }
 
-        if (data) {
-          const cloudProfile = data.profile || INITIAL_PROFILE;
-          if (cloudProfile.totalXpGained === undefined) cloudProfile.totalXpGained = 0;
-          if (cloudProfile.dailyItemDropsCount === undefined) cloudProfile.dailyItemDropsCount = 0;
-          if (cloudProfile.lastItemDropDate === undefined) cloudProfile.lastItemDropDate = "";
-          setProfile(cloudProfile);
+        if (cloudData) {
+          const cloudTimestamp = cloudData.updated_at ? new Date(cloudData.updated_at).getTime() : 0;
+          const localTimestamp = localData?.lastUpdate ? new Date(localData.lastUpdate).getTime() : 0;
 
-          setQuests(data.quests || []);
+          // Conflict resolution: Cloud is newer
+          if (cloudTimestamp > localTimestamp) {
+            const cloudProfile = cloudData.profile || INITIAL_PROFILE;
+            setProfile(cloudProfile);
+            setQuests(cloudData.quests || []);
 
-          const cloudStore: StoreItem[] = data.store_items || DEFAULT_STORE_ITEMS;
-          const mergedStore = [...cloudStore];
-          DEFAULT_STORE_ITEMS.forEach(defaultItem => {
-            if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
-          });
-          setStoreItems(mergedStore);
+            const cloudStore: StoreItem[] = cloudData.store_items || DEFAULT_STORE_ITEMS;
+            const mergedStore = [...cloudStore];
+            DEFAULT_STORE_ITEMS.forEach(defaultItem => {
+              if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
+            });
+            setStoreItems(mergedStore);
+            setVices(cloudData.vices || []);
 
-          setVices(data.vices || []);
+            persistenceService.saveLocal({
+              profile: cloudProfile,
+              quests: cloudData.quests || [],
+              storeItems: mergedStore,
+              vices: cloudData.vices || [],
+              lastUpdate: cloudData.updated_at
+            });
 
-          addSystemMessage("SISTEMA: DADOS DE SINCRONIZAÇÃO NUVEM CARREGADOS.", "success");
+            addSystemMessage("SISTEMA: DADOS SINCRONIZADOS COM A NUVEM (MAIS RECENTES).", "success");
+          } else if (localTimestamp > cloudTimestamp) {
+            // Local is newer: Push to cloud
+            await saveToCloud();
+            addSystemMessage("SISTEMA: DADOS LOCAIS SINCRONIZADOS COM A NUVEM.", "success");
+          } else {
+            addSystemMessage("SISTEMA: DADOS JÁ SINCRONIZADOS.", "info");
+          }
+        } else if (localData) {
+          // No cloud data, but have local data: push local to cloud
+          await saveToCloud();
+          addSystemMessage("SISTEMA: DADOS LOCAIS REGISTRADOS NA NUVEM.", "success");
         } else {
-          // Cria o primeiro save limpo
-          await supabase.from('user_saves').insert({
+          // Neither exist: Initialize new clean save
+          const initialData = {
             user_id: session.user.id,
             profile: INITIAL_PROFILE,
             quests: [],
             store_items: DEFAULT_STORE_ITEMS,
-            vices: []
-          });
+            vices: [],
+            updated_at: new Date().toISOString()
+          };
+          await supabase.from('user_saves').insert(initialData);
           setProfile(INITIAL_PROFILE);
           setQuests([]);
           setStoreItems(DEFAULT_STORE_ITEMS);
           setVices([]);
-          addSystemMessage("SISTEMA: NOVO REGISTRO DE CAÇADOR INICIALIZADO NA NUVEM.", "success");
+          persistenceService.saveLocal({
+            profile: INITIAL_PROFILE,
+            quests: [],
+            storeItems: DEFAULT_STORE_ITEMS as StoreItem[],
+            vices: [],
+            lastUpdate: initialData.updated_at
+          });
+          addSystemMessage("SISTEMA: NOVO REGISTRO DE CAÇADOR INICIALIZADO.", "success");
         }
       } catch (err) {
         console.error("SISTEMA ERRO", err);
+      } finally {
+        setIsSyncing(false);
       }
     };
 
-    loadFromCloud().finally(() => setDataLoaded(true));
+    initializeData();
   }, [session, authLoading]);
 
-  // Save Data
+  // Handle auto-sync when back online
   useEffect(() => {
-    if (authLoading || !dataLoaded) return;
+    if (isOnline && dataLoaded && session?.user && hasUnsavedChanges.current) {
+      addSystemMessage("SISTEMA: CONEXÃO RESTAURADA. SINCRONIZANDO...", "info");
+      saveToCloud();
+    }
+  }, [isOnline, dataLoaded, session]);
 
-    // Salva no Supabase se logado (com debounce básico)
+  // Save to Cloud Function
+  const saveToCloud = async () => {
+    if (!session?.user) return;
+    try {
+      setIsSyncing(true);
+      const now = new Date().toISOString();
+      const { error } = await supabase
+        .from('user_saves')
+        .upsert({
+          user_id: session.user.id,
+          profile: { ...profile, lastUpdate: now },
+          quests,
+          store_items: storeItems,
+          vices,
+          updated_at: now
+        });
+
+      if (error) throw error;
+      setLastSynced(new Date());
+      hasUnsavedChanges.current = false;
+    } catch (err) {
+      console.error("SISTEMA ERRO: Falha ao salvar na nuvem.", err);
+      hasUnsavedChanges.current = true;
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Local Save + Mark for Cloud Sync
+  useEffect(() => {
+    if (!dataLoaded) return;
+
+    persistenceService.saveLocal({
+      profile,
+      quests,
+      storeItems,
+      vices,
+      lastUpdate: new Date().toISOString()
+    });
+
     if (session?.user) {
-      const saveToCloud = async () => {
-        try {
-          setIsSyncing(true);
-          const { error } = await supabase
-            .from('user_saves')
-            .upsert({
-              user_id: session.user.id,
-              profile,
-              quests,
-              store_items: storeItems,
-              vices,
-              updated_at: new Date().toISOString()
-            });
-
-          if (error) throw error;
-          setLastSynced(new Date());
-        } catch (err) {
-          console.error("SISTEMA ERRO: Falha ao salvar na nuvem.", err);
-        } finally {
-          setIsSyncing(false);
+      hasUnsavedChanges.current = true;
+      const handler = setTimeout(() => {
+        if (isOnline) {
+          saveToCloud();
         }
-      };
-
-      const handler = setTimeout(saveToCloud, 1000);
+      }, 2000); // 2 second debounce for cloud sync
       return () => clearTimeout(handler);
     }
-  }, [profile, quests, storeItems, vices, session, authLoading, dataLoaded]);
+  }, [profile, quests, storeItems, vices]);
 
   const handleToggleComplete = (id: string) => {
     if (processingQuestIds.current.has(id)) return;
@@ -1400,12 +1483,34 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {isEditingProfile && (
-        <ProfileEditor
-          profile={profile}
-          onSave={(updates) => setProfile(p => ({ ...p, ...updates }))}
-          onReset={handleResetSystem}
-          onClose={() => setIsEditingProfile(false)}
+      {/* Sync and Connection Overlay */}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 pointer-events-none">
+        {isSyncing && (
+          <div className="bg-blue-500/10 border border-blue-500/50 backdrop-blur-md px-3 py-1 flex items-center gap-2 animate-pulse">
+            <Database size={14} className="text-blue-400" />
+            <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest text-shadow-glow-blue">Sincronizando...</span>
+          </div>
+        )}
+        {!isOnline && (
+          <div className="bg-red-500/10 border border-red-500/50 backdrop-blur-md px-3 py-1 flex items-center gap-2">
+            <WifiOff size={14} className="text-red-400" />
+            <span className="text-[10px] text-red-400 font-bold uppercase tracking-widest text-shadow-glow-red">Modo Offline</span>
+          </div>
+        )}
+        {isOnline && lastSynced && (
+          <div className="bg-emerald-500/10 border border-emerald-500/50 backdrop-blur-md px-3 py-1 flex items-center gap-2">
+            <Wifi size={14} className="text-emerald-400" />
+            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest text-shadow-glow-emerald">
+              Sincronizado {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {activeEffect && (
+        <SystemEffectOverlay
+          effect={activeEffect}
+          onComplete={() => setActiveEffect(null)}
         />
       )}
     </div>

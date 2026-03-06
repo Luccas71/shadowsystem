@@ -46,6 +46,7 @@ export interface HunterProfile {
   activeBuffs: ActiveBuff[];
   dailyItemDropsCount?: number;
   lastItemDropDate?: string;
+  lastUpdate?: string; // ISO timestamp
 }
 
 export interface SubQuest {
