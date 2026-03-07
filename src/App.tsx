@@ -29,6 +29,8 @@ import PenaltySystem from './components/PenaltySystem';
 import StatusWindow from './components/StatusWindow';
 import QuestCompletionOverlay from './components/QuestCompletionOverlay';
 import SystemEffectOverlay, { EffectData } from './components/SystemEffectOverlay';
+import LevelUpOverlay from './components/LevelUpOverlay';
+import RankUpOverlay from './components/RankUpOverlay';
 import AuthScreen from './components/AuthScreen';
 import {
   Bell,
@@ -117,6 +119,8 @@ const App: React.FC = () => {
     quest: Quest;
     rewards: { gold: number; xp: number; items: StoreItem[] };
   } | null>(null);
+  const [levelUpData, setLevelUpData] = useState<{ oldLevel: number; newLevel: number } | null>(null);
+  const [rankUpData, setRankUpData] = useState<{ oldRank: Rank; newRank: Rank } | null>(null);
   const [activeEffect, setActiveEffect] = useState<EffectData | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -125,6 +129,28 @@ const App: React.FC = () => {
   const processingQuestIds = React.useRef<Set<string>>(new Set());
   const hasUnsavedChanges = React.useRef(false);
   const isInitializing = React.useRef(true);
+  const prevLevel = React.useRef<number>(profile.level);
+  const prevRank = React.useRef<Rank>(profile.rank);
+
+  // Watch for Level and Rank changes
+  useEffect(() => {
+    if (isInitializing.current || !dataLoaded) {
+      prevLevel.current = profile.level;
+      prevRank.current = profile.rank;
+      return;
+    }
+
+    if (profile.level > prevLevel.current) {
+      setLevelUpData({ oldLevel: prevLevel.current, newLevel: profile.level });
+      prevLevel.current = profile.level;
+    }
+
+    if (profile.rank !== prevRank.current) {
+      // Check if it's a rank UP (using simple logic or constants if needed, but here simple != is enough for trigger)
+      setRankUpData({ oldRank: prevRank.current, newRank: profile.rank });
+      prevRank.current = profile.rank;
+    }
+  }, [profile.level, profile.rank, dataLoaded]);
 
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
     setMessages(prev => {
@@ -1087,6 +1113,22 @@ const App: React.FC = () => {
         effect={activeEffect}
         onComplete={() => setActiveEffect(null)}
       />
+
+      {levelUpData && (
+        <LevelUpOverlay
+          oldLevel={levelUpData.oldLevel}
+          newLevel={levelUpData.newLevel}
+          onComplete={() => setLevelUpData(null)}
+        />
+      )}
+
+      {rankUpData && (
+        <RankUpOverlay
+          oldRank={rankUpData.oldRank}
+          newRank={rankUpData.newRank}
+          onComplete={() => setRankUpData(null)}
+        />
+      )}
 
 
       <div className="flex items-center justify-between mb-4">
