@@ -96,7 +96,7 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                                 transition={{ delay: 0.8 }}
                                 className="font-game text-5xl md:text-7xl text-white tracking-[0.3em] uppercase neon-text-green-strong"
                             >
-                                LEVEL UP
+                                SUBIU DE NÍVEL
                             </motion.h2>
 
                             <motion.div

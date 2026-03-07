@@ -144,7 +144,7 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
                                 transition={{ delay: 0.8, type: "spring", stiffness: 200 }}
                                 className={`font-game text-7xl md:text-9xl text-white tracking-[0.2em] uppercase ${config.neon}`}
                             >
-                                RANK UP
+                                ASCENSÃO DE RANK
                             </motion.h2>
 
                             <div className="flex items-center justify-center gap-12 mt-8">

@@ -35,7 +35,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           color: '#ef4444',
           bgGradient: 'from-red-950/40 via-black/95 to-red-950/40',
           textColor: 'text-red-500',
-          title: 'S-RANK MONARCH CLEAR',
+          title: 'MISSÃO DE RANK S CONCLUÍDA',
           subtitle: 'A ESCURIDÃO SE CURVA À SUA VONTADE',
           icon: <Skull size={80} className="text-red-600" />,
           glowColor: 'rgba(239, 68, 68, 0.5)',
@@ -58,7 +58,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           color: '#f97316',
           bgGradient: 'from-orange-950/30 via-black/95 to-orange-950/30',
           textColor: 'text-orange-500',
-          title: 'A-RANK ELITE CLEAR',
+          title: 'MISSÃO DE RANK A CONCLUÍDA',
           subtitle: 'UM PODER QUE DESAFIA O DESTINO',
           icon: <Trophy size={70} className="text-orange-400" />,
           glowColor: 'rgba(249, 115, 22, 0.4)',
@@ -80,7 +80,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           color: '#a855f7',
           bgGradient: 'from-purple-950/20 via-black/95 to-purple-950/20',
           textColor: 'text-purple-500',
-          title: 'B-RANK VETERAN CLEAR',
+          title: 'MISSÃO DE RANK B CONCLUÍDA',
           subtitle: 'EXPERIÊNCIA TRANSFORMADA EM FORÇA',
           icon: <Zap size={60} className="text-purple-400" />,
           glowColor: 'rgba(168, 85, 247, 0.3)',
@@ -102,7 +102,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           color: '#10b981',
           bgGradient: 'from-emerald-950/20 via-black/95 to-emerald-950/20',
           textColor: 'text-emerald-500',
-          title: 'C-RANK ADVANCED CLEAR',
+          title: 'MISSÃO DE RANK C CONCLUÍDA',
           subtitle: 'PROGRESSO DO SISTEMA OTIMIZADO',
           icon: <Sword size={50} className="text-emerald-400" />,
           glowColor: 'rgba(16, 185, 129, 0.3)',
@@ -124,7 +124,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           color: '#22c55e',
           bgGradient: 'from-green-950/20 via-black/95 to-green-950/20',
           textColor: 'text-green-500',
-          title: 'D-RANK HUNTER CLEAR',
+          title: 'MISSÃO DE RANK D CONCLUÍDA',
           subtitle: 'NÚCLEO DE MANA ESTABILIZADO',
           icon: <ShieldCheck size={45} className="text-green-500" />,
           glowColor: 'rgba(34, 197, 94, 0.2)',
@@ -146,7 +146,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           color: '#94a3b8',
           bgGradient: 'from-slate-900/40 via-black/95 to-slate-900/40',
           textColor: 'text-slate-400',
-          title: 'QUEST COMPLETE',
+          title: 'MISSÃO CONCLUÍDA',
           subtitle: 'REGISTRO BÁSICO SINCRONIZADO',
           icon: <Sparkles size={40} className="text-slate-400" />,
           glowColor: 'rgba(148, 163, 184, 0.1)',
@@ -206,13 +206,13 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
                     <Monitor size={24} className={config.headerIcon} />
                   </div>
                   <h1 className={`font-game text-2xl md:text-3xl text-white tracking-[0.4em] uppercase ${config.neonClass}`}>
-                    NOTIFICATION
+                    NOTIFICAÇÃO
                   </h1>
                 </div>
 
                 <div className="space-y-6 text-center">
                   <p className={`font-game text-sm md:text-lg ${config.subtitleText} tracking-widest leading-relaxed`}>
-                    You have successfully completed the objective:
+                    Você completou o objetivo com sucesso:
                   </p>
                   <h2 className={`font-game text-xl md:text-3xl text-white tracking-[0.2em] uppercase ${config.neonClass} py-4`}>
                     {title}
@@ -226,17 +226,17 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
                 <div className="mt-12 grid grid-cols-3 gap-4">
                   <div className="flex flex-col items-center gap-1">
                     <Database size={16} className={config.xpIcon} />
-                    <span className={`text-[8px] font-game ${config.xpLabel}`}>XP</span>
+                    <span className={`text-[8px] font-game ${config.xpLabel}`}>EXP</span>
                     <span className="font-game text-lg text-white">+{rewards.xp}</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <Coins size={16} className="text-amber-400" />
-                    <span className="text-[8px] font-game text-amber-600">GOLD</span>
+                    <span className="text-[8px] font-game text-amber-600">OURO</span>
                     <span className="font-game text-lg text-amber-400">+{rewards.gold}</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <Package size={16} className="text-purple-400" />
-                    <span className="text-[8px] font-game text-purple-600">ITEMS</span>
+                    <span className="text-[8px] font-game text-purple-600">ITENS</span>
                     <span className="font-game text-lg text-white">{rewards.items.length}</span>
                   </div>
                 </div>
