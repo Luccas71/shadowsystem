@@ -124,6 +124,7 @@ const App: React.FC = () => {
   const isOnline = useNetworkStatus();
   const processingQuestIds = React.useRef<Set<string>>(new Set());
   const hasUnsavedChanges = React.useRef(false);
+  const isInitializing = React.useRef(true);
 
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
     setMessages(prev => {
@@ -303,6 +304,9 @@ const App: React.FC = () => {
     if (authLoading) return;
 
     const initializeData = async () => {
+      isInitializing.current = true;
+      setDataLoaded(false);
+
       // 1. Load from local storage immediately for fast start
       const localData = persistenceService.loadLocal();
       if (localData) {
@@ -310,10 +314,11 @@ const App: React.FC = () => {
         setQuests(localData.quests);
         setStoreItems(localData.storeItems);
         setVices(localData.vices);
-        addSystemMessage("SISTEMA: DADOS LOCAIS RESTAURADOS.", "info");
+        addSystemMessage("SISTEMA: DADOS LOCAIS CARREGADOS.", "info");
       }
 
       if (!session?.user) {
+        isInitializing.current = false;
         setDataLoaded(true);
         return;
       }
@@ -324,6 +329,8 @@ const App: React.FC = () => {
       } else {
         addSystemMessage("SISTEMA: MODO OFFLINE ATIVADO. AS ALTERAÇÕES SERÃO SINCRONIZADAS POSTERIORMENTE.", "warning");
       }
+
+      isInitializing.current = false;
       setDataLoaded(true);
     };
 
@@ -347,8 +354,10 @@ const App: React.FC = () => {
           const cloudTimestamp = cloudData.updated_at ? new Date(cloudData.updated_at).getTime() : 0;
           const localTimestamp = localData?.lastUpdate ? new Date(localData.lastUpdate).getTime() : 0;
 
-          // Conflict resolution: Cloud is newer
-          if (cloudTimestamp > localTimestamp) {
+          // Conflict resolution: Cloud is newer OR Local is blank
+          const isLocalInitial = !localData || (localData.profile.level === 1 && localData.quests.length === 0);
+
+          if (cloudTimestamp > localTimestamp || isLocalInitial) {
             const cloudProfile = cloudData.profile || INITIAL_PROFILE;
             setProfile(cloudProfile);
             setQuests(cloudData.quests || []);
@@ -369,11 +378,11 @@ const App: React.FC = () => {
               lastUpdate: cloudData.updated_at
             });
 
-            addSystemMessage("SISTEMA: DADOS SINCRONIZADOS COM A NUVEM (MAIS RECENTES).", "success");
+            addSystemMessage("SISTEMA: DADOS SINCRONIZADOS COM A NUVEM.", "success");
           } else if (localTimestamp > cloudTimestamp) {
             // Local is newer: Push to cloud
             await saveToCloud();
-            addSystemMessage("SISTEMA: DADOS LOCAIS SINCRONIZADOS COM A NUVEM.", "success");
+            addSystemMessage("SISTEMA: NUVEM ATUALIZADA COM DADOS LOCAIS.", "success");
           } else {
             addSystemMessage("SISTEMA: DADOS JÁ SINCRONIZADOS.", "info");
           }
@@ -427,7 +436,15 @@ const App: React.FC = () => {
 
   // Save to Cloud Function
   const saveToCloud = async () => {
-    if (!session?.user) return;
+    if (!session?.user || isInitializing.current) return;
+
+    // Safety check: Don't overwrite if local data is Level 1 but we suspect we have cloud data
+    // This is a secondary guard in case sync failed or is still pending
+    if (profile.level === 1 && quests.length === 0) {
+      console.warn("SISTEMA: Tentativa de salvar perfil inicial bloqueada por segurança.");
+      return;
+    }
+
     try {
       setIsSyncing(true);
       const now = new Date().toISOString();
@@ -455,7 +472,7 @@ const App: React.FC = () => {
 
   // Local Save + Mark for Cloud Sync
   useEffect(() => {
-    if (!dataLoaded) return;
+    if (!dataLoaded || isInitializing.current || isSyncing) return;
 
     persistenceService.saveLocal({
       profile,
