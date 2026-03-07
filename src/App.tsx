@@ -420,6 +420,8 @@ const App: React.FC = () => {
     if (isOnline && dataLoaded && session?.user && hasUnsavedChanges.current) {
       addSystemMessage("SISTEMA: CONEXÃO RESTAURADA. SINCRONIZANDO...", "info");
       saveToCloud();
+    } else if (!isOnline && dataLoaded) {
+      addSystemMessage("SISTEMA: CONEXÃO PERDIDA. MODO OFFLINE ATIVADO.", "warning");
     }
   }, [isOnline, dataLoaded, session]);
 
@@ -1077,17 +1079,6 @@ const App: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          {isSyncing ? (
-            <div className="flex items-center gap-2 animate-pulse">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></div>
-              <span className="font-game text-[9px] text-emerald-600 tracking-widest uppercase">Sincronizando...</span>
-            </div>
-          ) : lastSynced ? (
-            <div className="flex items-center gap-2 opacity-40">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-              <span className="font-game text-[9px] text-green-600 tracking-widest uppercase">Sincronizado {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
-          ) : null}
         </div>
       </div>
 
@@ -1483,29 +1474,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Sync and Connection Overlay */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 pointer-events-none">
-        {isSyncing && (
-          <div className="bg-blue-500/10 border border-blue-500/50 backdrop-blur-md px-3 py-1 flex items-center gap-2 animate-pulse">
-            <Database size={14} className="text-blue-400" />
-            <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest text-shadow-glow-blue">Sincronizando...</span>
-          </div>
-        )}
-        {!isOnline && (
-          <div className="bg-red-500/10 border border-red-500/50 backdrop-blur-md px-3 py-1 flex items-center gap-2">
-            <WifiOff size={14} className="text-red-400" />
-            <span className="text-[10px] text-red-400 font-bold uppercase tracking-widest text-shadow-glow-red">Modo Offline</span>
-          </div>
-        )}
-        {isOnline && lastSynced && (
-          <div className="bg-emerald-500/10 border border-emerald-500/50 backdrop-blur-md px-3 py-1 flex items-center gap-2">
-            <Wifi size={14} className="text-emerald-400" />
-            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest text-shadow-glow-emerald">
-              Sincronizado {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Sync and Connection Overlay Removed */}
 
       {activeEffect && (
         <SystemEffectOverlay
