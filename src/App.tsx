@@ -1109,6 +1109,15 @@ const App: React.FC = () => {
         />
       )}
 
+      {isEditingProfile && (
+        <ProfileEditor
+          profile={profile}
+          onSave={(updates) => setProfile(p => ({ ...p, ...updates }))}
+          onReset={handleResetSystem}
+          onClose={() => setIsEditingProfile(false)}
+        />
+      )}
+
       <SystemEffectOverlay
         effect={activeEffect}
         onComplete={() => setActiveEffect(null)}
@@ -1134,7 +1143,7 @@ const App: React.FC = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 opacity-30 hover:opacity-100 transition-opacity">
           <Monitor size={14} className="text-emerald-500" />
-          <span className="font-game text-[10px] tracking-[0.3em] text-emerald-700">SHADOW SYSTEM // CORE V1.2.0</span>
+          <span className="font-game text-[10px] tracking-[0.3em] text-emerald-700">SHADOW SYSTEM // NÚCLEO V1.2.0</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -1148,7 +1157,7 @@ const App: React.FC = () => {
         <div className="relative shrink-0 flex flex-col items-center">
           <div className="relative group">
             <div className="w-40 h-40 md:w-52 md:h-52 bg-slate-900 border border-slate-800 p-1.5 overflow-hidden shadow-2xl relative rounded">
-              <img src={profile.avatar} alt="Hunter" className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700" />
+              <img src={profile.avatar} alt="Caçador" className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700" />
             </div>
             <div className={`absolute -bottom-4 -right-4 font-game text-4xl md:text-6xl px-4 py-1.5 bg-black border border-slate-800 shadow-2xl rank-label ${RANK_COLORS[profile.rank]}`}>
               {profile.rank}
@@ -1237,7 +1246,7 @@ const App: React.FC = () => {
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-3 p-2 md:p-0 bg-slate-950/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-green-500/20 md:border-none mb-0 md:mb-12">
         {[
-          { id: 'quests', label: 'QUESTS', icon: Target, color: 'emerald' },
+          { id: 'quests', label: 'MISSÕES', icon: Target, color: 'emerald' },
           { id: 'status', label: 'STATUS', icon: Activity, color: 'emerald' },
           { id: 'inventory', label: 'INVENTÁRIO', icon: Package, color: 'green' },
           { id: 'store', label: 'LOJA', icon: ShoppingBag, color: 'green' },
@@ -1285,13 +1294,13 @@ const App: React.FC = () => {
             <div className="space-y-8 animate-in fade-in duration-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <h2 className="font-game text-2xl md:text-3xl flex items-center gap-4 text-slate-200 uppercase tracking-tight">
-                  <ScrollText size={24} className="text-emerald-500" /> Quests Ativas
+                  <ScrollText size={24} className="text-emerald-500" /> Missões Ativas
                 </h2>
                 <button
                   onClick={() => { resetForm(); setQuestForm({ isOpen: true }); }}
                   className="w-full sm:w-auto px-6 py-3 system-panel border border-emerald-900 text-emerald-500 hover:bg-emerald-950 hover:text-emerald-400 font-game text-[12px] tracking-widest transition-all flex items-center justify-center gap-2 font-bold uppercase"
                 >
-                  <Plus size={16} /> Nova Quest
+                  <Plus size={16} /> Nova Missão
                 </button>
               </div>
 
@@ -1310,7 +1319,7 @@ const App: React.FC = () => {
                 ))}
                 {quests.filter(q => !q.completed && !q.failed).length === 0 && (
                   <div className="text-center py-20 system-panel border-dashed border border-emerald-900/30 rounded-xl opacity-40">
-                    <p className="font-game text-[12px] text-emerald-700 tracking-widest uppercase">AGUARDANDO NOVAS QUESTS...</p>
+                    <p className="font-game text-[12px] text-emerald-700 tracking-widest uppercase">AGUARDANDO NOVAS MISSÕES...</p>
                   </div>
                 )}
               </div>
@@ -1519,7 +1528,7 @@ const App: React.FC = () => {
                     }`}
                 >
                   {isFormInvalid && <Lock size={14} />}
-                  {editingQuest ? "Atualizar Diretriz" : "Iniciar Quest"}
+                  {editingQuest ? "Atualizar Diretriz" : "Iniciar Missão"}
                 </button>
               </div>
 
