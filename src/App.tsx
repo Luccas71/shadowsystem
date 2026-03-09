@@ -333,7 +333,8 @@ const App: React.FC = () => {
       isInitializing.current = true;
       setDataLoaded(false);
 
-      // 1. Load from local storage immediately for fast start
+      // 1. skip local storage immediately to ensure cloud data is the only source
+      /* 
       const localData = persistenceService.loadLocal();
       if (localData) {
         setProfile(localData.profile);
@@ -342,8 +343,17 @@ const App: React.FC = () => {
         setVices(localData.vices);
         addSystemMessage("SISTEMA: DADOS LOCAIS CARREGADOS.", "info");
       }
+      */
 
       if (!session?.user) {
+        // For guest users, we still use local data but clearly it's not "cloud"
+        const localData = persistenceService.loadLocal();
+        if (localData) {
+          setProfile(localData.profile);
+          setQuests(localData.quests);
+          setStoreItems(localData.storeItems);
+          setVices(localData.vices);
+        }
         isInitializing.current = false;
         setDataLoaded(true);
         return;
@@ -351,8 +361,15 @@ const App: React.FC = () => {
 
       // 2. If online, sync with cloud
       if (isOnline) {
-        await syncWithCloud(localData);
+        await syncWithCloud();
       } else {
+        const localData = persistenceService.loadLocal();
+        if (localData) {
+          setProfile(localData.profile);
+          setQuests(localData.quests);
+          setStoreItems(localData.storeItems);
+          setVices(localData.vices);
+        }
         addSystemMessage("SISTEMA: MODO OFFLINE ATIVADO. AS ALTERAÇÕES SERÃO SINCRONIZADAS POSTERIORMENTE.", "warning");
       }
 
@@ -360,7 +377,7 @@ const App: React.FC = () => {
       setDataLoaded(true);
     };
 
-    const syncWithCloud = async (localData: AppData | null) => {
+    const syncWithCloud = async () => {
       if (!session?.user) return;
 
       try {
@@ -377,47 +394,30 @@ const App: React.FC = () => {
         }
 
         if (cloudData) {
-          const cloudTimestamp = cloudData.updated_at ? new Date(cloudData.updated_at).getTime() : 0;
-          const localTimestamp = localData?.lastUpdate ? new Date(localData.lastUpdate).getTime() : 0;
+          // Cloud is the absolute source of truth
+          const cloudProfile = cloudData.profile || INITIAL_PROFILE;
+          setProfile(cloudProfile);
+          setQuests(cloudData.quests || []);
 
-          // Conflict resolution: Cloud is newer OR Local is blank
-          const isLocalInitial = !localData || (localData.profile.level === 1 && localData.quests.length === 0);
+          const cloudStore: StoreItem[] = cloudData.store_items || DEFAULT_STORE_ITEMS;
+          const mergedStore = [...cloudStore];
+          DEFAULT_STORE_ITEMS.forEach(defaultItem => {
+            if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
+          });
+          setStoreItems(mergedStore);
+          setVices(cloudData.vices || []);
 
-          if (cloudTimestamp > localTimestamp || isLocalInitial) {
-            const cloudProfile = cloudData.profile || INITIAL_PROFILE;
-            setProfile(cloudProfile);
-            setQuests(cloudData.quests || []);
+          persistenceService.saveLocal({
+            profile: cloudProfile,
+            quests: cloudData.quests || [],
+            storeItems: mergedStore,
+            vices: cloudData.vices || [],
+            lastUpdate: cloudData.updated_at
+          });
 
-            const cloudStore: StoreItem[] = cloudData.store_items || DEFAULT_STORE_ITEMS;
-            const mergedStore = [...cloudStore];
-            DEFAULT_STORE_ITEMS.forEach(defaultItem => {
-              if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
-            });
-            setStoreItems(mergedStore);
-            setVices(cloudData.vices || []);
-
-            persistenceService.saveLocal({
-              profile: cloudProfile,
-              quests: cloudData.quests || [],
-              storeItems: mergedStore,
-              vices: cloudData.vices || [],
-              lastUpdate: cloudData.updated_at
-            });
-
-            addSystemMessage("SISTEMA: DADOS SINCRONIZADOS COM A NUVEM.", "success");
-          } else if (localTimestamp > cloudTimestamp) {
-            // Local is newer: Push to cloud
-            await saveToCloud();
-            addSystemMessage("SISTEMA: NUVEM ATUALIZADA COM DADOS LOCAIS.", "success");
-          } else {
-            addSystemMessage("SISTEMA: DADOS JÁ SINCRONIZADOS.", "info");
-          }
-        } else if (localData) {
-          // No cloud data, but have local data: push local to cloud
-          await saveToCloud();
-          addSystemMessage("SISTEMA: DADOS LOCAIS REGISTRADOS NA NUVEM.", "success");
+          addSystemMessage("SISTEMA: DADOS SINCRONIZADOS COM A NUVEM.", "success");
         } else {
-          // Neither exist: Initialize new clean save
+          // No cloud data exists: Initialize new clean save
           const initialData = {
             user_id: session.user.id,
             profile: INITIAL_PROFILE,

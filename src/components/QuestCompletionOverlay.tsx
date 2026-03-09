@@ -23,7 +23,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
     const timer = setTimeout(() => {
       setShowContent(false);
       setTimeout(onComplete, 500); // Wait for exit animation
-    }, 4000); // Increased duration to show rewards
+    }, 2200); // Reduced duration for snappier feel
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -248,7 +248,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.5 }}
+                transition={{ delay: 0.8 }}
                 className="mt-8 flex flex-wrap justify-center gap-3"
               >
                 {rewards.items.map((item, idx) => (
@@ -264,7 +264,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.3 }}
-              transition={{ delay: 2.5 }}
+              transition={{ delay: 1.5 }}
               className="mt-16 font-game text-[8px] text-white uppercase tracking-[0.8em]"
             >
               Sincronização concluída. Retornando ao sistema...
