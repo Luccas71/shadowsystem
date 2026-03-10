@@ -49,6 +49,7 @@ import {
   Database,
   Clock,
   X,
+  Check,
   Monitor,
   AlertTriangle,
   LogOut,
@@ -645,7 +646,7 @@ const App: React.FC = () => {
         lastItemDropDate: today
       }));
 
-      setQuests(prev => prev.map(qu => qu.id === id ? { ...qu, completed: true } : qu));
+      setQuests(prev => prev.map(qu => qu.id === id ? { ...qu, completed: true, completedAt: Date.now() } : qu));
       addSystemMessage(`QUEST CONCLUÍDA. RECOMPENSA: +${finalGoldReward} OURO.`, 'success');
     }
   };
@@ -1323,6 +1324,44 @@ const App: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Seção de Missões Concluídas Hoje */}
+              {quests.filter(q => {
+                if (!q.completed || !q.completedAt) return false;
+                const today = new Date().toDateString();
+                const completedDate = new Date(q.completedAt).toDateString();
+                return today === completedDate;
+              }).length > 0 && (
+                  <div className="mt-12 space-y-8 animate-in fade-in duration-700">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 opacity-60">
+                      <h2 className="font-game text-xl md:text-2xl flex items-center gap-4 text-slate-400 uppercase tracking-tight">
+                        <Check size={20} className="text-emerald-800" /> Missões Concluídas (Hoje)
+                      </h2>
+                    </div>
+
+                    <div className="space-y-4 opacity-40 hover:opacity-100 transition-opacity duration-500">
+                      {quests.filter(q => {
+                        if (!q.completed || !q.completedAt) return false;
+                        const today = new Date().toDateString();
+                        const completedDate = new Date(q.completedAt).toDateString();
+                        return today === completedDate;
+                      })
+                        .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
+                        .map(q => (
+                          <QuestCard
+                            key={q.id}
+                            quest={q}
+                            onToggleComplete={handleToggleComplete}
+                            onToggleSubQuest={handleToggleSubQuest}
+                            onDelete={handleDeleteQuest}
+                            onEdit={handleEditQuest}
+                            onAddSubQuest={handleAddSubQuest}
+                            onRemoveSubQuest={handleRemoveSubQuest}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                )}
             </div>
           ) : activeTab === 'status' ? (
             <StatusWindow profile={profile} />
