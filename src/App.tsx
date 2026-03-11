@@ -130,6 +130,7 @@ const App: React.FC = () => {
   const processingQuestIds = React.useRef<Set<string>>(new Set());
   const hasUnsavedChanges = React.useRef(false);
   const isInitializing = React.useRef(true);
+  const justLoaded = React.useRef(true);
   const prevLevel = React.useRef<number>(profile.level);
   const prevRank = React.useRef<Rank>(profile.rank);
 
@@ -138,6 +139,14 @@ const App: React.FC = () => {
     if (isInitializing.current || !dataLoaded) {
       prevLevel.current = profile.level;
       prevRank.current = profile.rank;
+      return;
+    }
+
+    // On the very first run after dataLoaded is true, we just sync the refs
+    if (justLoaded.current) {
+      prevLevel.current = profile.level;
+      prevRank.current = profile.rank;
+      justLoaded.current = false;
       return;
     }
 
