@@ -23,7 +23,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
     const timer = setTimeout(() => {
       setShowContent(false);
       setTimeout(onComplete, 500); // Wait for exit animation
-    }, 2200); // Reduced duration for snappier feel
+    }, 1500); // Duration adjusted to 1.5s per USER request
 
     return () => clearTimeout(timer);
   }, [onComplete]);

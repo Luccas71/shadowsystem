@@ -130,37 +130,6 @@ const App: React.FC = () => {
   const processingQuestIds = React.useRef<Set<string>>(new Set());
   const hasUnsavedChanges = React.useRef(false);
   const isInitializing = React.useRef(true);
-  const justLoaded = React.useRef(true);
-  const prevLevel = React.useRef<number>(profile.level);
-  const prevRank = React.useRef<Rank>(profile.rank);
-
-  // Watch for Level and Rank changes
-  useEffect(() => {
-    if (isInitializing.current || !dataLoaded) {
-      prevLevel.current = profile.level;
-      prevRank.current = profile.rank;
-      return;
-    }
-
-    // On the very first run after dataLoaded is true, we just sync the refs
-    if (justLoaded.current) {
-      prevLevel.current = profile.level;
-      prevRank.current = profile.rank;
-      justLoaded.current = false;
-      return;
-    }
-
-    if (profile.level > prevLevel.current) {
-      setLevelUpData({ oldLevel: prevLevel.current, newLevel: profile.level });
-      prevLevel.current = profile.level;
-    }
-
-    if (profile.rank !== prevRank.current) {
-      // Check if it's a rank UP (using simple logic or constants if needed, but here simple != is enough for trigger)
-      setRankUpData({ oldRank: prevRank.current, newRank: profile.rank });
-      prevRank.current = profile.rank;
-    }
-  }, [profile.level, profile.rank, dataLoaded]);
 
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
     setMessages(prev => {
@@ -642,6 +611,15 @@ const App: React.FC = () => {
         }
       });
 
+      // Trigger Animations Imperatively
+      if (newLevel > profile.level) {
+        setLevelUpData({ oldLevel: profile.level, newLevel: newLevel });
+      }
+      const newRank = getRankByLevel(newLevel);
+      if (newRank !== profile.rank) {
+        setRankUpData({ oldRank: profile.rank, newRank: newRank });
+      }
+
       setProfile(p => ({
         ...p,
         xp: newXp,
@@ -839,8 +817,18 @@ const App: React.FC = () => {
           updates.xp = newXp;
           updates.level = newLevel;
           updates.maxXp = newMaxXp;
-          updates.rank = getRankByLevel(newLevel);
+          const newRank = getRankByLevel(newLevel);
+          updates.rank = newRank;
           updates.stats = calculateStats(newLevel);
+
+          // Trigger Animations Imperatively
+          if (newLevel > p.level) {
+            setLevelUpData({ oldLevel: p.level, newLevel: newLevel });
+          }
+          if (newRank !== p.rank) {
+            setRankUpData({ oldRank: p.rank, newRank: newRank });
+          }
+
           addSystemMessage("SISTEMA: CRISTAL DE MANA CONSUMIDO (+5.000 XP).", "success");
           break;
         }
@@ -860,13 +848,23 @@ const App: React.FC = () => {
           updates.xp = Math.min(p.maxXp, p.xp + Math.floor(p.maxXp * 0.25));
           addSystemMessage("SISTEMA: PENA DE FÊNIX CONSUMIDA. SINCRONIA RESTAURADA.", "success");
           break;
-        case 'courage-1':
-          updates.level = p.level + 1;
-          updates.maxXp = calculateMaxXp(updates.level);
-          updates.rank = getRankByLevel(updates.level);
-          updates.stats = calculateStats(updates.level);
+        case 'courage-1': {
+          const newLevel = p.level + 1;
+          const newRank = getRankByLevel(newLevel);
+          updates.level = newLevel;
+          updates.maxXp = calculateMaxXp(newLevel);
+          updates.rank = newRank;
+          updates.stats = calculateStats(newLevel);
+
+          // Trigger Animations Imperatively
+          setLevelUpData({ oldLevel: p.level, newLevel: newLevel });
+          if (newRank !== p.rank) {
+            setRankUpData({ oldRank: p.rank, newRank: newRank });
+          }
+
           addSystemMessage("SISTEMA: PROVA DE CORAGEM SUPERADA. NÍVEL AUMENTADO.", "success");
           break;
+        }
         case 'stone-1': {
           const randXp = Math.floor(Math.random() * 9001) + 1000;
           let sXp = p.xp + randXp;
@@ -880,8 +878,18 @@ const App: React.FC = () => {
           updates.xp = sXp;
           updates.level = sLevel;
           updates.maxXp = sMaxXp;
-          updates.rank = getRankByLevel(sLevel);
+          const newRank = getRankByLevel(sLevel);
+          updates.rank = newRank;
           updates.stats = calculateStats(sLevel);
+
+          // Trigger Animations Imperatively
+          if (sLevel > p.level) {
+            setLevelUpData({ oldLevel: p.level, newLevel: sLevel });
+          }
+          if (newRank !== p.rank) {
+            setRankUpData({ oldRank: p.rank, newRank: newRank });
+          }
+
           addSystemMessage(`SISTEMA: PEDRA INSTÁVEL CONSUMIDA (+${randXp.toLocaleString()} XP).`, "warning");
           break;
         }
@@ -898,8 +906,18 @@ const App: React.FC = () => {
           updates.xp = eXp;
           updates.level = eLevel;
           updates.maxXp = eMaxXp;
-          updates.rank = getRankByLevel(eLevel);
+          const newRank = getRankByLevel(eLevel);
+          updates.rank = newRank;
           updates.stats = calculateStats(eLevel);
+
+          // Trigger Animations Imperatively
+          if (eLevel > p.level) {
+            setLevelUpData({ oldLevel: p.level, newLevel: eLevel });
+          }
+          if (newRank !== p.rank) {
+            setRankUpData({ oldRank: p.rank, newRank: newRank });
+          }
+
           addSystemMessage("SISTEMA: ELIXIR DO CAÇADOR CONSUMIDO.", "success");
           break;
         }
