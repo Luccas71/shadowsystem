@@ -92,26 +92,6 @@ const QuestCard: React.FC<QuestCardProps> = ({
       addBtnClasses: 'bg-slate-900/20 border-slate-900 text-slate-500 hover:bg-slate-600 hover:text-white',
       flameIcon: 'text-slate-600',
     },
-    green: {
-      badge: 'text-cyan-400 border-cyan-500/30 bg-cyan-950/60',
-      badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
-      subHeader: 'text-cyan-600',
-      subBorder: 'border-cyan-900/30',
-      subCheckActive: 'bg-cyan-600 border-cyan-500 text-white',
-      inputBorder: 'border-cyan-900/40 text-cyan-100 focus:border-cyan-500',
-      addBtnClasses: 'bg-cyan-900/20 border-cyan-900 text-cyan-500 hover:bg-cyan-600 hover:text-white',
-      flameIcon: 'text-cyan-600',
-    },
-    emerald: {
-      badge: 'text-cyan-400 border-cyan-500/30 bg-cyan-950/60',
-      badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
-      subHeader: 'text-cyan-600',
-      subBorder: 'border-cyan-900/30',
-      subCheckActive: 'bg-cyan-600 border-cyan-500 text-white',
-      inputBorder: 'border-cyan-900/40 text-cyan-100 focus:border-cyan-500',
-      addBtnClasses: 'bg-cyan-900/20 border-cyan-900 text-cyan-500 hover:bg-cyan-600 hover:text-white',
-      flameIcon: 'text-cyan-600',
-    },
     cyan: {
       badge: 'text-cyan-400 border-cyan-500/30 bg-cyan-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
@@ -122,7 +102,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
       addBtnClasses: 'bg-cyan-900/20 border-cyan-900 text-cyan-500 hover:bg-cyan-600 hover:text-white',
       flameIcon: 'text-cyan-600',
     },
-    purple: {
+    orange: {
       badge: 'text-orange-400 border-orange-500/30 bg-orange-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
       subHeader: 'text-orange-600',
@@ -132,7 +112,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
       addBtnClasses: 'bg-orange-900/20 border-orange-900 text-orange-500 hover:bg-orange-600 hover:text-white',
       flameIcon: 'text-orange-600',
     },
-    orange: {
+    purple: {
       badge: 'text-orange-400 border-orange-500/30 bg-orange-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
       subHeader: 'text-orange-600',
@@ -263,7 +243,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
           <div className="flex flex-row sm:flex-col items-center gap-2 self-end sm:self-center shrink-0">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className={`p-2 transition-all duration-300 ${isExpanded ? 'text-emerald-400 rotate-180' : 'text-slate-600'}`}
+              className={`p-2 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
             >
               <ChevronDown size={22} />
             </button>

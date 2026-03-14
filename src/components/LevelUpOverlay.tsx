@@ -31,7 +31,7 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                     className="fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none overflow-hidden backdrop-blur-md bg-black/60"
                 >
                     {/* Fundo radiante */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.15)_0%,transparent_70%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.15)_0%,transparent_70%)]" />
 
                     {/* Partículas de luz */}
                     <div className="absolute inset-0">
@@ -81,9 +81,9 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                                     initial={{ rotateY: 180, opacity: 0 }}
                                     animate={{ rotateY: 0, opacity: 1 }}
                                     transition={{ delay: 0.5, duration: 1 }}
-                                    className="p-6 bg-cyan-950/40 border border-cyan-500/50 rounded-2xl shadow-[0_0_50px_rgba(0,229,255,0.3)] backdrop-blur-xl"
+                                    className="p-6 bg-cyan-950/40 border border-cyan-500/50 rounded-2xl shadow-[0_0_50px_rgba(16,185,129,0.3)] backdrop-blur-xl"
                                 >
-                                    <Zap size={64} className="text-cyan-400 drop-shadow-[0_0_15px_rgba(0,229,255,0.8)]" />
+                                    <Zap size={64} className="text-cyan-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]" />
                                 </motion.div>
                             </div>
                         </div>

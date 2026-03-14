@@ -67,7 +67,7 @@ const AuthScreen: React.FC = () => {
             </div>
 
             {/* Fixed header bar */}
-            <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent shadow-[0_0_15px_rgba(0,229,255,0.5)] z-50 opacity-30"></div>
+            <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent shadow-[0_0_15px_rgba(6,182,212,0.5)] z-50 opacity-30"></div>
 
             <div className="w-full max-w-md relative z-10">
                 {/* System Header */}
@@ -78,10 +78,10 @@ const AuthScreen: React.FC = () => {
                     </div>
 
                     <div className="relative inline-block">
-                        <Skull size={64} className="text-cyan-500 mx-auto drop-shadow-[0_0_20px_rgba(0,229,255,0.5)]" />
+                        <Skull size={64} className="text-cyan-500 mx-auto drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]" />
                     </div>
 
-                    <h1 className="font-game text-3xl md:text-4xl text-slate-100 neon-text-cyan
+                    <h1 className="font-game text-3xl md:text-4xl text-slate-100 neon-text-cyan-strong
  tracking-tight">
                         SHADOW SYSTEM
                     </h1>
@@ -91,7 +91,7 @@ const AuthScreen: React.FC = () => {
                 </div>
 
                 {/* Auth Card */}
-                <div className="system-panel p-8 border-cyan-500/20 shadow-[0_0_50px_rgba(0,229,255,0.1)
+                <div className="system-panel p-8 border-cyan-500/20 shadow-[0_0_50px_rgba(6, 182, 212, 0.1)
 ] relative">
                     <div className="hud-tl hud-corner"></div>
                     <div className="hud-tr hud-corner"></div>
@@ -103,7 +103,7 @@ const AuthScreen: React.FC = () => {
                         <button
                             onClick={() => { setMode('login'); setError(null); setSuccess(null); }}
                             className={`py-3 font-game text-[11px] tracking-widest uppercase transition-all border ${mode === 'login'
-                                ? 'bg-cyan-600/10 text-cyan-400 border-cyan-500/50 shadow-[0_0_15px_rgba(14,165,233,0.15)]'
+                                ? 'bg-orange-600/10 text-orange-400 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
                                 : 'text-slate-500 border-slate-900 hover:text-slate-300 bg-black/40'
                                 }`}
                         >
@@ -113,7 +113,7 @@ const AuthScreen: React.FC = () => {
                         <button
                             onClick={() => { setMode('register'); setError(null); setSuccess(null); }}
                             className={`py-3 font-game text-[11px] tracking-widest uppercase transition-all border ${mode === 'register'
-                                ? 'bg-cyan-600/10 text-cyan-400 border-cyan-500/50 shadow-[0_0_15px_rgba(14,165,233,0.15)]'
+                                ? 'bg-orange-600/10 text-orange-400 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
                                 : 'text-slate-500 border-slate-900 hover:text-slate-300 bg-black/40'
                                 }`}
                         >
@@ -194,12 +194,12 @@ const AuthScreen: React.FC = () => {
                             disabled={loading}
                             className={`w-full py-4 border-2 font-game text-[12px] tracking-widest transition-all rounded font-bold uppercase flex items-center justify-center gap-3 ${loading
                                 ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-wait'
-                                : 'bg-slate-900 border-cyan-800 text-cyan-400 hover:bg-cyan-800 hover:border-cyan-400 hover:text-white shadow-[0_0_20px_rgba(14,165,233,0.15)]'
+                                : 'bg-slate-900 border-orange-800 text-orange-400 hover:bg-orange-800 hover:border-orange-400 hover:text-white shadow-[0_0_20px_rgba(249,115,22,0.15)]'
                                 }`}
                         >
                             {loading ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-cyan-800 border-t-cyan-400 rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-orange-800 border-t-orange-400 rounded-full animate-spin"></div>
                                     SINCRONIZANDO...
                                 </>
                             ) : mode === 'login' ? (
