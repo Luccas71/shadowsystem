@@ -81,6 +81,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
     inputBorder: string;
     addBtnClasses: string;
     flameIcon: string;
+    checkboxFill: string;
   }> = {
     slate: {
       badge: 'text-slate-400 border-slate-500/30 bg-slate-950/60',
@@ -91,16 +92,40 @@ const QuestCard: React.FC<QuestCardProps> = ({
       inputBorder: 'border-slate-900/40 text-slate-100 focus:border-slate-500',
       addBtnClasses: 'bg-slate-900/20 border-slate-900 text-slate-500 hover:bg-slate-600 hover:text-white',
       flameIcon: 'text-slate-600',
+      checkboxFill: 'bg-slate-400 shadow-[0_0_15px_#94a3b8]',
     },
-    cyan: {
-      badge: 'text-cyan-400 border-cyan-500/30 bg-cyan-950/60',
+    teal: {
+      badge: 'text-teal-400 border-teal-500/30 bg-teal-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
-      subHeader: 'text-cyan-600',
-      subBorder: 'border-cyan-900/30',
-      subCheckActive: 'bg-cyan-600 border-cyan-500 text-white',
-      inputBorder: 'border-cyan-900/40 text-cyan-100 focus:border-cyan-500',
-      addBtnClasses: 'bg-cyan-900/20 border-cyan-900 text-cyan-500 hover:bg-cyan-600 hover:text-white',
-      flameIcon: 'text-cyan-600',
+      subHeader: 'text-teal-600',
+      subBorder: 'border-teal-900/30',
+      subCheckActive: 'bg-teal-600 border-teal-500 text-white',
+      inputBorder: 'border-teal-900/40 text-teal-100 focus:border-teal-500',
+      addBtnClasses: 'bg-teal-900/20 border-teal-900 text-teal-500 hover:bg-teal-600 hover:text-white',
+      flameIcon: 'text-teal-600',
+      checkboxFill: 'bg-teal-400 shadow-[0_0_15px_#2dd4bf]',
+    },
+    blue: {
+      badge: 'text-blue-400 border-blue-500/30 bg-blue-950/60',
+      badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
+      subHeader: 'text-blue-600',
+      subBorder: 'border-blue-900/30',
+      subCheckActive: 'bg-blue-600 border-blue-500 text-white',
+      inputBorder: 'border-blue-900/40 text-blue-100 focus:border-blue-500',
+      addBtnClasses: 'bg-blue-900/20 border-blue-900 text-blue-500 hover:bg-blue-600 hover:text-white',
+      flameIcon: 'text-blue-600',
+      checkboxFill: 'bg-blue-400 shadow-[0_0_15px_#60a5fa]',
+    },
+    amber: {
+      badge: 'text-amber-400 border-amber-500/30 bg-amber-950/60',
+      badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
+      subHeader: 'text-amber-600',
+      subBorder: 'border-amber-900/30',
+      subCheckActive: 'bg-amber-600 border-amber-500 text-white',
+      inputBorder: 'border-amber-900/40 text-amber-100 focus:border-amber-500',
+      addBtnClasses: 'bg-amber-900/20 border-amber-900 text-amber-500 hover:bg-amber-600 hover:text-white',
+      flameIcon: 'text-amber-600',
+      checkboxFill: 'bg-amber-400 shadow-[0_0_15px_#fbbf24]',
     },
     orange: {
       badge: 'text-orange-400 border-orange-500/30 bg-orange-950/60',
@@ -111,16 +136,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
       inputBorder: 'border-orange-900/40 text-orange-100 focus:border-orange-500',
       addBtnClasses: 'bg-orange-900/20 border-orange-900 text-orange-500 hover:bg-orange-600 hover:text-white',
       flameIcon: 'text-orange-600',
-    },
-    purple: {
-      badge: 'text-orange-400 border-orange-500/30 bg-orange-950/60',
-      badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
-      subHeader: 'text-orange-600',
-      subBorder: 'border-orange-900/30',
-      subCheckActive: 'bg-orange-600 border-orange-500 text-white',
-      inputBorder: 'border-orange-900/40 text-orange-100 focus:border-orange-500',
-      addBtnClasses: 'bg-orange-900/20 border-orange-900 text-orange-500 hover:bg-orange-600 hover:text-white',
-      flameIcon: 'text-orange-600',
+      checkboxFill: 'bg-orange-400 shadow-[0_0_15px_#fb923c]',
     },
     red: {
       badge: 'text-red-400 border-red-500/30 bg-red-950/60',
@@ -131,6 +147,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
       inputBorder: 'border-red-900/40 text-red-100 focus:border-red-500',
       addBtnClasses: 'bg-red-900/20 border-red-900 text-red-500 hover:bg-red-600 hover:text-white',
       flameIcon: 'text-red-600',
+      checkboxFill: 'bg-red-400 shadow-[0_0_15px_#f87171]',
     },
   };
 
@@ -151,44 +168,39 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
       <div className={`absolute -inset-[1px] opacity-20 ${quest.failed ? 'border-red-600' : rankBorderClass} border`}></div>
 
-      <div className={`system-panel border overflow-hidden transition-all duration-500 ${quest.completed
-        ? 'border-slate-900 bg-slate-950/40'
+      <div className={`hud-board border overflow-hidden transition-all duration-500 ${quest.completed
+        ? 'border-slate-800 bg-slate-950/40 opacity-50'
         : quest.failed
-          ? 'border-red-900 bg-red-950/20'
-          : `${rankBorderClass} border-opacity-30 shadow-[0_0_30px_rgba(0,0,0,0.6)]`
+          ? 'border-red-600/50 bg-red-950/20 shadow-[0_0_20px_rgba(220,38,38,0.2)]'
+          : `hud-board-glow ${rankBorderClass} border-opacity-50`
         }`}>
-
-        <div className={`hud-tl hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
-        <div className={`hud-tr hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
-        <div className={`hud-bl hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
-        <div className={`hud-br hud-corner transition-all duration-500 ${quest.failed ? 'border-red-600' : rankBorderClass} opacity-60`}></div>
 
         <div className="p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 relative z-10 min-w-0">
 
-          <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-20 md:h-20 self-center sm:self-auto">
+          <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-20 md:h-20 self-center sm:self-auto group/check">
             {!quest.completed && !quest.failed && (
               <>
-                <div className={`absolute w-10 h-10 md:w-14 md:h-14 rotate-45 border border-current opacity-20 ${rankTextClass}`}></div>
+                <div className={`checkbox-ring absolute w-10 h-10 md:w-14 md:h-14 rotate-45 border border-current opacity-20 ${rankTextClass} transition-all duration-500`}></div>
               </>
             )}
 
             <button
               disabled={quest.failed}
               onClick={() => onToggleComplete(quest.id)}
-              className={`w-10 h-10 md:w-11 md:h-11 rotate-45 border-2 transition-all duration-700 flex items-center justify-center relative group/check overflow-hidden ${quest.completed
+              className={`w-10 h-10 md:w-11 md:h-11 rotate-45 border-2 transition-all duration-500 flex items-center justify-center relative overflow-hidden hover:scale-110 hover:border-opacity-100 hover:shadow-[0_0_25px_currentColor] ${quest.completed
                 ? 'bg-slate-900 border-slate-800 text-slate-700'
                 : quest.failed
-                  ? 'bg-red-950 border-red-900 text-red-900 cursor-not-allowed'
+                  ? 'bg-red-950 border-red-900 text-red-900 cursor-not-allowed hover:scale-100 hover:shadow-none'
                   : `bg-black ${rankBorderClass} border-opacity-60 ${rankTextClass} shadow-[0_0_15px_rgba(0,0,0,0.6)]`
                 }`}
             >
-              <div className="-rotate-45 flex items-center justify-center relative z-20">
+              <div className="flex items-center justify-center relative z-20">
                 {quest.completed ? (
-                  <Check size={20} className="text-slate-500" />
+                  <div className={`w-3.5 h-3.5 ${colors.checkboxFill}`}></div>
                 ) : quest.failed ? (
-                  <AlertCircle size={20} className="text-red-900" />
+                  <AlertCircle size={20} className="text-red-900 -rotate-45" />
                 ) : (
-                  <div className={`w-3 h-3 rounded-full bg-current transition-all duration-500 shadow-[0_0_12px_currentColor]`}></div>
+                  <div className={`w-2.5 h-2.5 bg-current transition-all duration-500 shadow-[0_0_12px_currentColor] group-hover/check:w-3.5 group-hover/check:h-3.5 group-hover/check:shadow-[0_0_20px_currentColor]`}></div>
                 )}
               </div>
             </button>
@@ -197,7 +209,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
           <div className="flex-1 space-y-2 min-w-0 w-full">
             <div className="flex flex-col gap-2 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-game text-[10px] px-2 py-0.5 border leading-none font-bold tracking-widest ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/80 rounded-sm whitespace-nowrap`}>
+                <span className={`font-game text-[10px] px-2 py-0.5 border leading-none font-bold tracking-widest ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/80 whitespace-nowrap`}>
                   {quest.failed ? 'FALHA' : `RANK ${quest.difficulty}`}
                 </span>
                 {quest.isDaily && (
@@ -272,13 +284,13 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
             <div className="space-y-2 mb-4">
               {quest.subQuests && quest.subQuests.map(sq => (
-                <div key={sq.id} className={`flex items-center gap-3 p-2.5 bg-slate-900/80 shadow-[inset_0_0_15px_rgba(148,163,184,0.05)] border-slate-800/60 transition-all border transition-all ${sq.completed ? 'border-slate-900 opacity-40' : quest.failed ? 'border-red-900/30' : colors.subBorder} min-w-0`}>
+                <div key={sq.id} className={`flex items-center gap-3 p-2.5 bg-slate-950/40 system-border transition-all ${sq.completed ? 'border-slate-800 opacity-40' : quest.failed ? 'border-red-900/40' : colors.subBorder} min-w-0`}>
                   <button
                     disabled={quest.failed}
                     onClick={() => onToggleSubQuest(quest.id, sq.id)}
-                    className={`shrink-0 w-4 h-4 border flex items-center justify-center transition-all ${sq.completed ? colors.subCheckActive : 'border-slate-700'}`}
+                    className={`shrink-0 w-3.5 h-3.5 rotate-45 border flex items-center justify-center transition-all ${sq.completed ? colors.subCheckActive : 'border-slate-700'}`}
                   >
-                    {sq.completed && <Check size={10} />}
+                    {sq.completed && <div className="w-1.5 h-1.5 bg-white shadow-[0_0_8px_white]"></div>}
                   </button>
                   <span className={`text-[11px] md:text-xs font-medium flex-1 truncate ${sq.completed ? 'line-through text-slate-700' : 'text-slate-300'}`}>
                     {sq.title}
@@ -303,7 +315,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
                   value={newSubTitle}
                   onChange={e => setNewSubTitle(e.target.value)}
                   placeholder="ADICIONAR..."
-                  className={`flex-1 bg-black border p-2.5 text-[11px] font-game outline-none transition-all rounded-sm min-w-0 ${colors.inputBorder}`}
+                  className={`flex-1 bg-black border p-2.5 text-[11px] font-game outline-none transition-all min-w-0 ${colors.inputBorder}`}
                 />
                 <button
                   type="submit"

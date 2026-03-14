@@ -3,10 +3,10 @@ import { Rank, QuestDifficulty, StoreItem } from './types';
 
 export const RANK_COLORS: Record<Rank, string> = {
   [Rank.E]: 'text-slate-500 border-slate-500',
-  [Rank.D]: 'text-cyan-500 border-cyan-500',
-  [Rank.C]: 'text-cyan-500 border-cyan-500',
-  [Rank.B]: 'text-orange-500 border-orange-500',
-  [Rank.A]: 'text-orange-500 border-orange-500',
+  [Rank.D]: 'text-teal-500 border-teal-500 neon-text-green',
+  [Rank.C]: 'text-blue-500 border-blue-500 neon-text-blue',
+  [Rank.B]: 'text-amber-500 border-amber-500 neon-text-lime',
+  [Rank.A]: 'text-orange-500 border-orange-500 neon-text-orange',
   [Rank.S]: 'text-red-500 border-red-500 font-bold neon-text-red animate-pulse',
 };
 

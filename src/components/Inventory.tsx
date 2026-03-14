@@ -21,36 +21,50 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {ownedItems.length === 0 ? (
-          <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-dashed border-cyan-900/30 rounded-xl">
+          <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-dashed border-cyan-900/30">
             <Package size={64} className="text-cyan-900 mb-4" />
             <p className="font-game text-cyan-800 text-sm uppercase tracking-widest">Seu inventário está vazio.</p>
             <p className="text-[10px] text-slate-600 mt-2">ADQUIRA RELÍQUIAS NA LOJA PARA FORTALECER SEU DESPERTAR.</p>
           </div>
         ) : (
-          ownedItems.map(item => (
-            <div key={item.id} className="system-bg border border-cyan-900/40 shadow-none bg-black/40 transition-all duration-300 rounded-lg p-5 flex justify-between items-start group hover:border-cyan-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(0,229,255,0.05)]">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-game text-cyan-100 text-lg group-hover:text-cyan-400 transition-colors uppercase tracking-tight">{item.name}</h3>
-                  <span className="text-[10px] px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-800 rounded font-bold">
-                    QTD: {item.purchasedCount}
-                  </span>
+          ownedItems.map((item, index) => (
+            <div key={item.id} className="hud-board border-cyan-500/20 transition-all duration-300 group hover:hud-board-glow flex flex-col min-h-[160px] bg-slate-950/40 p-5 overflow-hidden relative">
+              {/* Background Grid Accent */}
+              <div className="absolute inset-0 opacity-5 pointer-events-none [background-image:linear-gradient(rgba(0,229,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.1)_1px,transparent_1px)] [background-size:10px_10px]"></div>
+              
+              <div className="relative z-10 flex flex-col h-full justify-between">
+                <div>
+                  <div className="flex justify-between items-start gap-4 mb-3 border-b border-cyan-900/10 pb-2">
+                    <div className="min-w-0">
+                      <div className="text-[8px] font-game text-cyan-700 tracking-[0.2em] mb-1 opacity-60">ARMAZÉM_SLOT.{String(index + 1).padStart(2, '0')}</div>
+                      <h3 className="font-game text-lg text-white group-hover:text-cyan-400 transition-all duration-300 uppercase tracking-widest truncate font-black leading-tight">
+                        {item.name}
+                      </h3>
+                    </div>
+                    <div className="flex flex-col items-end shrink-0">
+                      <div className="text-[7px] font-game text-slate-600 uppercase tracking-tighter">QUANTIDADE</div>
+                      <div className="text-sm font-game text-cyan-400 font-bold bg-cyan-950/20 px-2 border border-cyan-500/10">
+                        {String(item.purchasedCount).padStart(2, '0')}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p className="text-[11px] text-slate-400 italic leading-snug line-clamp-2">
+                    {item.description || "Relíquia processada e armazenada no cofre do sistema."}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-400 mb-4 italic leading-relaxed">
-                  {item.description || 'Uma relíquia de poder contido, aguardando o comando do Caçador.'}
-                </p>
-                <div className="flex items-center gap-2 text-[10px] font-game text-cyan-500 uppercase tracking-widest">
-                  <Sparkles size={12} /> Item de Inventário
-                </div>
-              </div>
 
-              <div className="flex flex-col items-end gap-3 ml-4">
-                <button
-                  onClick={() => onUseItem(item)}
-                  className="px-6 py-2.5 rounded font-game text-xs bg-cyan-600 text-white hover:bg-cyan-500 shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all flex items-center gap-2 group/btn"
-                >
-                  <Zap size={14} className="group-hover/btn:animate-pulse" /> USAR
-                </button>
+                <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center gap-2 text-[8px] font-game text-cyan-900 uppercase font-bold tracking-widest opacity-80">
+                    <div className="w-1.5 h-1.5 bg-cyan-500/50"></div> SINCR_CORE
+                  </div>
+                  <button
+                    onClick={() => onUseItem(item)}
+                    className="flex items-center gap-2 px-6 py-2 bg-cyan-600/10 border border-cyan-500/30 text-cyan-400 font-game text-[10px] hover:bg-cyan-500 hover:text-white transition-all duration-300 uppercase tracking-[0.1em] font-bold shadow-lg active:scale-95 group/btn"
+                  >
+                    <Zap size={12} className="group-hover/btn:animate-pulse" /> USAR
+                  </button>
+                </div>
               </div>
             </div>
           ))
@@ -58,7 +72,7 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
       </div>
 
       {ownedItems.length > 0 && (
-        <div className="p-4 bg-cyan-950/10 border border-cyan-900/30 rounded-lg">
+        <div className="p-4 bg-cyan-950/10 border border-cyan-900/30">
           <p className="text-[10px] font-game text-cyan-600 uppercase tracking-[0.2em] text-center">
             "A FORÇA DE UM CAÇADOR NÃO ESTÁ APENAS EM SEUS ATRIBUTOS, MAS NO USO ESTRATÉGICO DE SEUS RECURSOS."
           </p>

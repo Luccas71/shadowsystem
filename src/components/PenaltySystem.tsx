@@ -55,7 +55,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
   return (
     <div className="space-y-8">
       {/* Header Perigo */}
-      <div className={`relative p-6 border-2 rounded-xl overflow-hidden ${profile.corruption >= 100 ? 'border-red-600 bg-red-950/40' : 'border-cyan-900/50 bg-cyan-950/10'}`}>
+      <div className={`relative p-6 border-2 overflow-hidden ${profile.corruption >= 100 ? 'border-red-600 bg-red-950/40' : 'border-cyan-900/50 bg-cyan-950/10'}`}>
         <div className={`absolute top-0 left-0 w-full h-1 bg-cyan-600 shadow-[0_0_10px_#06b6d4]`} style={{ width: `${profile.corruption}%` }}></div>
         <div className="flex items-center justify-between mb-4">
           <h2 className={`font-game text-2xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-cyan-400'}`}>
@@ -72,7 +72,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
             <span>Nível de Instabilidade</span>
             <span className={profile.corruption >= 100 ? "text-red-600 font-bold" : ""}>{profile.corruption}%</span>
           </div>
-          <div className="h-8 bg-black border border-cyan-900 rounded-sm overflow-hidden p-1">
+          <div className="h-8 bg-black border border-cyan-900 overflow-hidden p-1">
             <div
               className={`h-full ${profile.corruption >= 100 ? 'bg-red-600' : profile.corruption > 50 ? 'bg-cyan-800' : 'bg-cyan-950'}`}
               style={{ width: `${profile.corruption}%` }}
@@ -83,7 +83,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
 
       {profile.isPenaltyZoneActive ? (
         /* Zona de Penalidade Ativa */
-        <div className="system-panel border-2 border-red-600 p-8 rounded-xl text-center space-y-6 bg-black/80">
+        <div className="hud-board border-2 border-red-600 p-8 text-center space-y-6 bg-black/80">
           <div className="relative inline-block">
             <Ghost size={80} className="text-red-600 mx-auto" />
             <AlertTriangle className="absolute -bottom-2 -right-2 text-red-500" />
@@ -95,7 +95,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
             {timeLeft}
           </div>
 
-          <div className="p-4 bg-red-950/40 border border-red-800 rounded-lg max-w-lg mx-auto">
+          <div className="p-4 bg-red-950/40 border border-red-800 max-w-lg mx-auto">
             <div className="font-game text-[10px] text-red-500 mb-1 uppercase tracking-widest flex items-center justify-center gap-2">
               <ShieldAlert size={14} /> Penalidade Ativa
             </div>
@@ -110,7 +110,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
             </p>
           </div>
 
-          <div className="p-4 bg-red-900/20 border border-red-900 rounded-lg text-[10px] font-game text-red-500 uppercase leading-relaxed text-center">
+          <div className="p-4 bg-red-900/20 border border-red-900 text-[10px] font-game text-red-500 uppercase leading-relaxed text-center">
             O SISTEMA CONTINUA OPERANTE, MAS O PREÇO DA FALHA DEVE SER PAGO.
           </div>
         </div>
@@ -125,19 +125,19 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
               </h3>
               <button
                 onClick={() => setIsAdding(true)}
-                className="p-2 bg-red-950/20 hover:bg-red-500/10 border border-red-900/50 rounded-full text-red-600 hover:text-red-400 transition-colors"
+                className="p-2 bg-red-950/20 hover:bg-red-500/10 border border-red-900/50 text-red-600 hover:text-red-400 transition-colors"
               >
                 <Plus size={20} />
               </button>
             </div>
 
             {vices.length === 0 ? (
-              <div className="system-panel p-8 border border-dashed border-red-900/30 rounded-lg text-center bg-black/40">
+              <div className="hud-board p-8 border border-dashed border-red-900/30 text-center bg-black/40">
                 <p className="text-[10px] text-slate-600 italic uppercase font-game tracking-widest">A alma permanece imaculada.</p>
               </div>
             ) : (
               vices.map(vice => (
-                <div key={vice.id} className="system-panel border border-red-900/40 p-5 rounded-lg flex justify-between items-center group hover:border-red-500/50 bg-black/40">
+                <div key={vice.id} className="hud-board border border-red-900/40 p-5 flex justify-between items-center group hover:border-red-500/50 bg-black/40">
                   <div>
                     <h4 className="font-game text-sm text-red-100 uppercase tracking-tight">{vice.title}</h4>
                     <div className="flex items-center gap-2 mt-1">
@@ -149,7 +149,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => onSuccumb(vice)}
-                      className="px-4 py-2 bg-red-900/20 border border-red-900 text-red-500 font-game text-[9px] hover:bg-red-600 hover:text-white rounded uppercase tracking-widest"
+                      className="px-4 py-2 bg-red-900/20 border border-red-900 text-red-500 font-game text-[9px] hover:bg-red-600 hover:text-white uppercase tracking-widest"
                     >
                       CEDER
                     </button>
@@ -166,7 +166,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
           </div>
 
           {/* Coluna de Sobrevivência */}
-          <div className="system-panel border border-red-900/30 p-6 rounded-xl space-y-4 flex flex-col justify-between bg-black/60">
+          <div className="hud-board border border-red-900/30 p-6 space-y-4 flex flex-col justify-between bg-black/60">
             <div>
               <div className="flex items-center gap-2 text-red-500 mb-4 border-b border-red-900 pb-2">
                 <ShieldAlert size={20} />
@@ -186,7 +186,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
             <button
               disabled={profile.corruption < 100}
               onClick={() => onStartSurvival()}
-              className={`w-full py-5 font-game text-sm uppercase rounded-lg border-2 flex flex-col items-center justify-center gap-1 ${profile.corruption >= 100
+              className={`w-full py-5 font-game text-sm uppercase border-2 flex flex-col items-center justify-center gap-1 ${profile.corruption >= 100
                   ? 'bg-red-600 border-red-400 text-white'
                   : 'bg-slate-950 border-red-900 text-red-900 opacity-50 cursor-not-allowed'
                 }`}
@@ -206,7 +206,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
       {/* Modal Adicionar Vício */}
       {isAdding && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
-          <div className="system-panel border-2 border-red-600 w-full max-w-sm p-8 rounded-xl bg-black">
+          <div className="hud-board border-2 border-red-600 w-full max-w-sm p-8 bg-black">
             <h3 className="font-game text-red-500 mb-8 uppercase text-center text-xl tracking-tighter">Registrar Fraqueza</h3>
             <div className="space-y-6">
               <div>
@@ -216,7 +216,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
                   type="text"
                   value={newViceTitle}
                   onChange={e => setNewViceTitle(e.target.value)}
-                  className="w-full bg-slate-950 border border-red-950 rounded p-4 text-red-100 outline-none focus:border-red-600 font-game text-sm"
+                  className="w-full bg-slate-950 border border-red-950 p-4 text-red-100 outline-none focus:border-red-600 font-game text-sm"
                   placeholder="EX: PROCRASTINAÇÃO DIGITAL..."
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && newViceTitle.trim()) {

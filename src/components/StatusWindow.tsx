@@ -9,68 +9,164 @@ import {
   CheckCircle2,
   Trophy,
   Dna,
-  Database
+  Database,
+  Zap
 } from 'lucide-react';
 
 interface StatusWindowProps {
   profile: HunterProfile;
 }
 
+const CircularProgress: React.FC<{
+  progress: number;
+  label: string;
+  subLabel?: string;
+  color: string;
+  icon: React.ReactNode;
+}> = ({ progress, label, color }) => {
+  const radius = 80;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+  const uniqueId = label.replace(/\s+/g, '-').toLowerCase();
+
+  return (
+    <div className="hud-board p-6 flex flex-col items-center justify-center relative overflow-hidden bg-slate-950/40 transition-all duration-700 border-white/5 min-h-[380px] w-full">
+      <div className="relative w-60 h-60 mb-8 flex items-center justify-center">
+        <svg className="w-full h-full -rotate-90 relative z-10 p-2" viewBox="0 0 200 200">
+          <defs>
+            <mask id={`mask-${uniqueId}`}>
+              <circle
+                cx="100"
+                cy="100"
+                r={radius}
+                fill="none"
+                stroke="white"
+                strokeWidth="14"
+                strokeDasharray="5 2.5"
+              />
+            </mask>
+          </defs>
+
+          {/* Background Ring (Static Gray Ticks) */}
+          <circle
+            cx="100"
+            cy="100"
+            r={radius}
+            className="fill-none stroke-white/[0.05]"
+            strokeWidth="14"
+            strokeDasharray="5.5 2.5"
+          />
+          
+          {/* Functional Progress Ring (Masked Solid Color) */}
+          <circle
+            cx="100"
+            cy="100"
+            r={radius}
+            className={`fill-none transition-all duration-[1500ms] ease-out ${color.split(' ')[0]}`}
+            strokeWidth="14"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="butt"
+            mask={`url(#mask-${uniqueId})`}
+          />
+
+          {/* Solid Inner Border */}
+          <circle
+            cx="100"
+            cy="100"
+            r={radius - 14}
+            className="fill-none stroke-white/10"
+            strokeWidth="1"
+          />
+        </svg>
+
+        {/* Center Content - Ultra Tight Alignment */}
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="flex items-baseline justify-center">
+            <span className="font-game text-6xl text-white font-black tracking-[-0.1em] text-shadow-glow">
+              {Math.floor(progress)}
+            </span>
+            <span className="font-game text-2xl text-white/40 font-bold -ml-1.5">
+              %
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-center relative z-10 w-full px-4">
+        <h4 className="font-game text-[16px] text-white uppercase tracking-[0.5em] font-black drop-shadow-2xl opacity-90 transition-opacity">
+          {label}
+        </h4>
+      </div>
+    </div>
+  );
+};
+
 const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
   const rankProgression = [
-    { rank: Rank.E, minLevel: 1, maxLevel: 19, label: 'CAÇADOR RANK E (O MAIS FRACO)' },
+    { rank: Rank.E, minLevel: 1, maxLevel: 19, label: 'CAÇADOR RANK E' },
     { rank: Rank.D, minLevel: 20, maxLevel: 39, label: 'CAÇADOR DESPERTO' },
     { rank: Rank.C, minLevel: 40, maxLevel: 59, label: 'MEMBRO DE ELITE' },
     { rank: Rank.B, minLevel: 60, maxLevel: 79, label: 'CAÇADOR DE ALTO NÍVEL' },
     { rank: Rank.A, minLevel: 80, maxLevel: 99, label: 'REI DOS CAÇADORES' },
-    { rank: Rank.S, minLevel: 100, maxLevel: 999, label: 'NÍVEL NACIONAL / MONARCA' },
+    { rank: Rank.S, minLevel: 100, maxLevel: 999, label: 'MONARCA DAS SOMBRAS' },
   ];
 
   const XP_DROP_THRESHOLD = 50000;
-  const nextRareDropProgress = (profile.totalXpGained % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
+  const levelProgress = (profile.xp / profile.maxXp) * 100;
+
+  const currentRankIdx = rankProgression.findIndex(r => r.rank === profile.rank);
+  const nextRank = rankProgression[currentRankIdx + 1];
+  const rankProgress = nextRank 
+    ? ((profile.level - (rankProgression[currentRankIdx].minLevel)) / (nextRank.minLevel - rankProgression[currentRankIdx].minLevel)) * 100 
+    : 100;
+
+  const rareDropProgress = (profile.totalXpGained % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
   const xpRemainingForDrop = XP_DROP_THRESHOLD - (profile.totalXpGained % XP_DROP_THRESHOLD);
-
-  const getCurrentRankProgress = () => {
-    const current = rankProgression.find(r => r.rank === profile.rank);
-    if (!current) return 0;
-    if (profile.rank === Rank.S) return 100;
-
-    const range = current.maxLevel - current.minLevel + 1;
-    const progress = profile.level - current.minLevel;
-    return Math.min(100, Math.max(0, (progress / range) * 100));
-  };
-
-  const progressToNext = getCurrentRankProgress();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
+      {/* HUD Circular Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CircularProgress 
+          progress={Math.min(100, rankProgress)} 
+          label="PRÓXIMO RANK" 
+          subLabel={nextRank ? `EVOLUÇÃO PARA RANK ${nextRank.rank}` : "RANK MÁXIMO ATINGIDO"}
+          color="stroke-orange-500"
+          icon={<Trophy size={16} />} 
+        />
+        <CircularProgress 
+          progress={rareDropProgress} 
+          label="ITEM RARO" 
+          subLabel={`${Math.floor(xpRemainingForDrop / 1000)}K XP PARA O DROP`}
+          color="stroke-purple-500"
+          icon={<Sparkles size={16} />} 
+        />
+      </div>
 
       {/* Registro de XP Acumulado */}
-      <div className="system-panel p-6 border-cyan-900/40 shadow-none bg-cyan-950/5 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent"></div>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-cyan-900/20 border border-cyan-500/30 rounded-lg text-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.2)]">
-              <Database size={24} className="group-hover:rotate-12 transition-transform" />
+      <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-slate-950/20">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+          <div className="flex items-center gap-6">
+            <div className="relative p-4 bg-black/40 border border-white/10 text-cyan-400">
+              <Database size={28} />
             </div>
             <div>
-              <h3 className="font-game text-xs text-cyan-500 uppercase tracking-widest font-bold">Núcleo de Mana Total</h3>
-              <p className="font-game text-3xl text-white tracking-tighter">{profile.totalXpGained.toLocaleString()} <span className="text-xs text-cyan-700">XP</span></p>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-1 h-3 bg-cyan-600"></div>
+                <h3 className="font-game text-[10px] text-cyan-700 uppercase tracking-[0.4em] font-black opacity-80">RESERVA_ESTÁVEL_DE_MANA</h3>
+              </div>
+              <p className="font-game text-4xl text-white tracking-widest font-black">
+                {profile.totalXpGained.toLocaleString()} <span className="text-sm text-cyan-900 font-bold ml-1 opacity-50">XP_TOTAL</span>
+              </p>
             </div>
           </div>
 
-          <div className="flex-1 max-w-md space-y-2">
-            <div className="flex justify-between items-end">
-              <span className="text-[10px] font-game text-cyan-600 uppercase tracking-widest font-bold">Próximo Artefato Raro</span>
-              <span className="text-[10px] font-game text-cyan-400">{Math.floor(nextRareDropProgress)}%</span>
+          <div className="flex items-center gap-4">
+            <div className="px-5 py-2 border border-white/5 text-cyan-600 font-game text-[11px] uppercase tracking-[0.3em] font-black flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-cyan-900 rounded-full"></span>
+              CONEXÃO_ATIVA
             </div>
-            <div className="h-1.5 bg-black border border-cyan-900/30 shadow-none rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-900 to-cyan-400 transition-all duration-1000 shadow-[0_0_10px_#00e5ff]"
-                style={{ width: `${nextRareDropProgress}%` }}
-              ></div>
-            </div>
-            <p className="text-[9px] text-slate-600 uppercase font-bold text-right">Faltam {xpRemainingForDrop.toLocaleString()} XP para o próximo drop</p>
           </div>
         </div>
       </div>
@@ -78,7 +174,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Lógica de Rank do Sistema */}
         <div className="space-y-4">
-          <h3 className="font-game text-[12px] text-cyan-500 uppercase flex items-center gap-2 border-b border-cyan-900/50 pb-2 font-bold tracking-widest">
+          <h3 className="font-game text-[12px] text-slate-500 uppercase flex items-center gap-2 border-b border-white/5 pb-2 font-bold tracking-widest">
             <Dna size={14} /> HIERARQUIA DO DESPERTAR
           </h3>
 
@@ -91,65 +187,56 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
               return (
                 <div
                   key={item.rank}
-                  className={`system-bg border rounded-lg p-5 transition-all duration-500 relative overflow-hidden ${isCurrent
-                    ? `border-cyan-500 shadow-[0_0_20px_rgba(0,229,255,0.2)] bg-cyan-950/20`
+                  className={`hud-board p-5 transition-all duration-500 relative overflow-hidden ${isCurrent
+                    ? `border-white/20 bg-white/5`
                     : isAchieved
-                      ? 'border-slate-800 opacity-60'
-                      : 'border-slate-900 opacity-40 grayscale'
+                      ? 'border-white/5 opacity-60 bg-slate-900/20'
+                      : 'border-white/5 opacity-20'
                     }`}
                 >
-                  {isCurrent && (
-                    <div className="absolute top-0 right-0 p-2">
-                      <div className="text-[10px] font-game text-cyan-400 animate-pulse uppercase tracking-widest font-bold">VOCÊ ESTÁ AQUI</div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-5">
-                      <div className={`font-game text-3xl w-14 h-14 flex items-center justify-center border-2 rounded-lg font-black ${isCurrent ? `${RANK_COLORS[item.rank]} bg-slate-900 shadow-lg` : isAchieved ? 'text-slate-500 border-slate-700' : 'text-slate-800 border-slate-900'
-                        }`}>
-                        {item.rank}
+                  <div className="flex items-center justify-between relative z-10">
+                    <div className="flex items-center gap-6">
+                      <div className="relative">
+                        <div className={`font-game text-3xl w-16 h-16 flex flex-col items-center justify-center border font-black relative overflow-hidden ${isCurrent 
+                          ? `text-white border-white/40 bg-white/5` 
+                          : isAchieved 
+                            ? 'text-slate-500 border-white/10 bg-slate-800/20' 
+                            : 'text-slate-900 border-white/5 bg-black/10'
+                          }`}>
+                          <span className="relative z-10">{item.rank}</span>
+                        </div>
                       </div>
                       <div>
-                        <h4 className={`font-game text-[14px] uppercase tracking-tight font-bold ${isCurrent ? 'text-white' : 'text-slate-500'}`}>
-                          {item.label}
-                        </h4>
-                        <p className="text-[10px] font-game text-slate-600 uppercase font-medium">
-                          {isLocked ? `REQUISITO: NÍVEL ${item.minLevel}` : `STATUS: ALCANÇADO`}
-                        </p>
+                        <div className="flex items-center gap-3 mb-1">
+                          <h4 className={`font-game text-[14px] uppercase tracking-[0.1em] font-black ${isCurrent ? 'text-white' : 'text-slate-600'}`}>
+                            {item.label}
+                          </h4>
+                          {isCurrent && (
+                            <span className="text-[8px] font-game bg-white/20 text-white px-1.5 py-0.5 font-black uppercase tracking-widest">
+                              ATUAL
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-1 h-2 ${isLocked ? 'bg-slate-900' : 'bg-slate-700'}`}></div>
+                          <p className={`text-[10px] font-game uppercase font-black tracking-widest ${isLocked ? 'text-slate-800' : 'text-slate-700'}`}>
+                            {isLocked ? `REQUISITO: NÍVEL ${item.minLevel}` : `STATUS: CLASSIFICAÇÃO_CONFIRMADA`}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    <div>
+                    <div className="flex flex-col items-end gap-2">
                       {isCurrent ? (
-                        <div className="p-2.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
-                          <Trophy size={24} />
+                        <div className="flex flex-col items-end">
                         </div>
                       ) : isAchieved ? (
-                        <CheckCircle2 size={24} className="text-slate-600" />
+                        <CheckCircle2 size={24} className="text-slate-700 opacity-50" />
                       ) : (
-                        <Lock size={24} className="text-slate-800" />
+                        <Lock size={20} className="text-slate-800" />
                       )}
                     </div>
                   </div>
-
-                  {isCurrent && profile.rank !== Rank.S && (
-                    <div className="mt-5 space-y-2 animate-in fade-in duration-1000">
-                      <div className="flex justify-between text-[10px] font-game text-cyan-600 uppercase tracking-widest font-bold">
-                        <span>EVOLUÇÃO DE MANA</span>
-                        <span>{Math.floor(progressToNext)}%</span>
-                      </div>
-                      <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-cyan-900/40">
-                        <div
-                          className="h-full bg-cyan-500 shadow-[0_0_15px_#00e5ff] transition-all duration-1000"
-                          style={{ width: `${progressToNext}%` }}
-                        ></div>
-                      </div>
-                      <p className="text-[9px] text-slate-500 italic text-right uppercase font-bold tracking-tight">
-                        FALTAM {item.maxLevel - profile.level + 1} NÍVEIS PARA A PRÓXIMA REAVALIAÇÃO
-                      </p>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -158,33 +245,32 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
 
         {/* Efeitos Ativos (Buffs) */}
         <div className="space-y-4">
-          <h3 className="font-game text-[12px] text-sky-500 uppercase flex items-center gap-2 border-b border-sky-900/50 pb-2 font-bold tracking-widest">
+          <h3 className="font-game text-[12px] text-slate-500 uppercase flex items-center gap-2 border-b border-white/5 pb-2 font-bold tracking-widest">
             <Sparkles size={14} /> EFEITOS ATIVOS (BUFFS)
           </h3>
 
           <div className="space-y-3">
             {profile.activeBuffs.length === 0 ? (
-              <div className="py-24 flex flex-col items-center opacity-30 border border-dashed border-sky-900/30 shadow-none rounded-xl text-center p-8">
+              <div className="py-24 flex flex-col items-center opacity-30 border border-dashed border-sky-900/30 shadow-none text-center p-8">
                 <Sparkles size={48} className="text-sky-900 mb-4" />
                 <p className="font-game text-sky-800 text-[11px] uppercase tracking-widest font-bold">NENHUM EFEITO DETECTADO</p>
                 <p className="text-[10px] text-slate-600 mt-2 uppercase font-medium">ADQUIRA RELÍQUIAS PARA MANIFESTAR NOVOS PODERES.</p>
               </div>
             ) : (
               profile.activeBuffs.map(buff => (
-                <div key={buff.id} className="system-bg border border-sky-900/40 shadow-none p-5 rounded-lg relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500 group-hover:shadow-[0_0_15px_#38bdf8]"></div>
+                <div key={buff.id} className="hud-board border-white/10 p-5 relative overflow-hidden group">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-sky-950/40 rounded-lg border border-sky-500/30 text-sky-400 font-game">
+                      <div className="p-2.5 bg-black/40 border border-white/10 text-slate-400 font-game">
                         {buff.icon || '✨'}
                       </div>
                       <div>
-                        <h4 className="font-game text-[14px] text-sky-100 uppercase tracking-tight font-bold">{buff.name}</h4>
-                        <p className="text-[11px] text-slate-400 italic leading-tight font-medium">{buff.description}</p>
+                        <h4 className="font-game text-[14px] text-white uppercase tracking-tight font-bold">{buff.name}</h4>
+                        <p className="text-[11px] text-slate-500 italic leading-tight font-medium">{buff.description}</p>
                       </div>
                     </div>
                     {buff.value && (
-                      <div className="font-game text-[12px] text-sky-400 border border-sky-500/30 px-2.5 py-0.5 rounded bg-sky-950/20 font-bold">
+                      <div className="font-game text-[12px] text-sky-400 border border-sky-500/30 px-2.5 py-0.5 bg-sky-950/20 font-bold">
                         {buff.value}
                       </div>
                     )}

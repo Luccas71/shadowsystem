@@ -32,6 +32,7 @@ import SystemEffectOverlay, { EffectData } from './components/SystemEffectOverla
 import LevelUpOverlay from './components/LevelUpOverlay';
 import RankUpOverlay from './components/RankUpOverlay';
 import AuthScreen from './components/AuthScreen';
+import BackgroundHUD from './components/BackgroundHUD';
 import {
   Bell,
   Plus,
@@ -1113,7 +1114,7 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-cyan-800 border-t-cyan-400 rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-2 border-cyan-800 border-t-cyan-400 animate-spin"></div>
           <p className="font-game text-[11px] text-cyan-700 tracking-[0.3em] uppercase">INICIALIZANDO SISTEMA...</p>
         </div>
       </div>
@@ -1127,17 +1128,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 select-none flex items-center justify-center mix-blend-screen">
-        <svg viewBox="0 0 1000 1000" className="w-[120%] h-[120%] md:w-[80vw] md:h-[80vw] text-cyan-500/10 animate-[spin_120s_linear_infinite]" fill="none" stroke="currentColor">
-          <circle cx="500" cy="500" r="400" strokeWidth="1" strokeDasharray="10 20" />
-          <circle cx="500" cy="500" r="300" strokeWidth="4" strokeDasharray="50 30" className="text-cyan-500/20" />
-          <circle cx="500" cy="500" r="480" strokeWidth="1" strokeDasharray="4 8" />
-          <circle cx="500" cy="500" r="100" strokeWidth="2" strokeDasharray="20 40" className="text-orange-500/20 animate-[spin_10s_linear_infinite_reverse]" />
-          {[...Array(12)].map((_, i) => (
-            <line key={`line-${i}`} x1="500" y1="100" x2="500" y2="120" stroke="currentColor" strokeWidth="2" transform={`rotate(${i * 30} 500 500)`} />
-          ))}
-        </svg>
-      </div>
+      <BackgroundHUD />
 
       <div className="min-h-screen pb-24 pt-6 md:pt-10 px-4 md:px-12 max-w-[95%] lg:max-w-[1300px] mx-auto relative z-10 overflow-x-hidden">
 
@@ -1191,13 +1182,12 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <header className={`mb-12 p-6 md:p-10 system-panel rounded-2xl flex flex-col lg:flex-row items-center gap-8 md:gap-10 transition-all duration-700 ${profile.isPenaltyZoneActive ? 'bg-red-950/20 border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.2)]' : 'border-cyan-500/20 shadow-[0_0_30px_rgba(16,185,129,0.1)]'}`}>
-        <div className="hud-tl hud-corner"></div><div className="hud-tr hud-corner"></div>
-        <div className="hud-bl hud-corner"></div><div className="hud-br hud-corner"></div>
+      <header className={`mb-12 p-6 md:p-10 hud-board hud-board-glow flex flex-col lg:flex-row items-center gap-8 md:gap-10 transition-all duration-700 ${profile.isPenaltyZoneActive ? 'border-red-500 shadow-[0_0_50px_rgba(220,38,38,0.2)]' : 'border-cyan-500/30'}`}>
+        {/* Usando cantos internos apenas se necessário, mas o painel principal já tem bordas HUD */}
 
         <div className="relative shrink-0 flex flex-col items-center">
           <div className="relative group">
-            <div className="w-40 h-40 md:w-52 md:h-52 bg-slate-900 border border-slate-800 p-1.5 overflow-hidden shadow-2xl relative rounded">
+            <div className="w-40 h-40 md:w-52 md:h-52 bg-slate-900 border border-slate-800 p-1.5 overflow-hidden shadow-2xl relative">
               <img src={profile.avatar} alt="Caçador" className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700" />
             </div>
             <div className={`absolute -bottom-4 -right-4 font-game text-4xl md:text-6xl px-4 py-1.5 bg-black border border-slate-800 shadow-2xl rank-label ${RANK_COLORS[profile.rank]}`}>
@@ -1220,33 +1210,33 @@ const App: React.FC = () => {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-cyan-400 transition-all group/btn rounded shadow-lg"
+                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-cyan-400 transition-all group/btn shadow-lg"
                   title="CONFIGURAÇÕES"
                 >
                   <Settings size={18} className="group-hover/btn:rotate-45 transition-transform" />
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-red-400 transition-all rounded shadow-lg"
+                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-red-400 transition-all shadow-lg"
                   title="DESCONECTAR DO SISTEMA"
                 >
                   <LogOut size={18} />
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-4 justify-center md:justify-end">
-                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 system-panel border-cyan-900/30 bg-cyan-950/10 rounded-lg group hover:border-cyan-500/50 transition-all relative overflow-hidden">
+                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-cyan-500/20 bg-cyan-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <Zap size={12} className="text-cyan-500 mb-1" />
                   <p className="text-[8px] font-game text-cyan-700 mb-0.5 uppercase tracking-tighter">Nível</p>
                   <p className="font-game text-xl md:text-2xl text-white leading-none neon-text-cyan-strong">{profile.level}</p>
                 </div>
-                <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 system-panel border-orange-900/30 bg-orange-950/10 rounded-lg group hover:border-orange-500/50 transition-all relative overflow-hidden">
+                <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 hud-board border-orange-500/20 bg-orange-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <Coins size={12} className="text-orange-500 mb-1" />
                   <p className="text-[8px] font-game text-orange-700 mb-0.5 uppercase tracking-tighter">Ouro</p>
                   <p className="font-game text-xl md:text-2xl text-orange-500 leading-none">{profile.gold.toLocaleString()}</p>
                 </div>
-                <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 system-panel border-orange-900/30 bg-orange-950/10 rounded-lg group hover:border-orange-500/50 transition-all relative overflow-hidden">
+                <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 hud-board border-orange-500/20 bg-orange-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <Database size={12} className="text-orange-500 mb-1" />
                   <p className="text-[8px] font-game text-orange-700 mb-0.5 uppercase tracking-tighter">XP Total</p>
@@ -1256,31 +1246,23 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between items-end">
-              <span className="text-[10px] font-game text-cyan-600 tracking-wider">TAXA DE SINCRONIA</span>
-              <span className="text-[11px] font-game text-cyan-400">{xpPercentage}%</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-end mb-1">
+              <span className="text-[11px] font-game text-cyan-500 tracking-[0.2em] font-black drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]">ESTADO DE SINCRONIA</span>
+              <span className="text-[13px] font-game text-cyan-400 font-bold drop-shadow-[0_0_5px_rgba(0,229,255,0.3)]">{xpPercentage}%</span>
             </div>
-            <div className="h-1.5 bg-black border border-slate-900 relative rounded-full overflow-hidden">
+            <div className="h-3 bg-black/80 border border-cyan-900/50 relative overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.05)]">
               <div
-                className={`h-full transition-all duration-[1s] ease-out ${profile.isPenaltyZoneActive ? 'bg-red-500' : 'bg-gradient-to-r from-cyan-900 to-cyan-400'}`}
+                className={`h-full transition-all duration-[1s] ease-out shadow-[0_0_20px_rgba(0,229,255,0.2)] ${profile.isPenaltyZoneActive ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-gradient-to-r from-cyan-900 via-cyan-500 to-cyan-300'}`}
                 style={{ width: `${xpPercentage}%` }}
-              />
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.1)_50%,transparent_100%)] animate-[shimmer_2s_infinite]"></div>
+              </div>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between items-end">
-              <span className="text-[9px] font-game text-orange-600 tracking-wider">PRÓXIMA RECOMPENSA RARA</span>
-              <span className="text-[10px] font-game text-orange-400">{Math.floor(nextRareDropProgress)}%</span>
+            <div className="flex justify-between items-center text-[8px] font-game text-cyan-900/60 uppercase tracking-tighter italic">
+              <span>SISTEMA_ESTÁVEL</span>
+              <span>VÍNCULO_NEURAL_ATIVO</span>
             </div>
-            <div className="h-1 bg-black border border-slate-900 relative rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-900 to-purple-400 transition-all duration-[1s] ease-out"
-                style={{ width: `${nextRareDropProgress}%` }}
-              />
-            </div>
-            <p className="text-[8px] text-slate-600 uppercase text-right tracking-tighter">Faltam {xpRemainingForDrop.toLocaleString()} XP para o próximo drop</p>
           </div>
         </div>
       </header>
@@ -1308,8 +1290,6 @@ const App: React.FC = () => {
                 : 'text-slate-500 border-cyan-900/30 hover:text-cyan-300 bg-black/40'
                 }`}
             >
-              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500/50 pointer-events-none hidden md:block" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500/50 pointer-events-none hidden md:block" />
               <tab.icon size={18} className="shrink-0" /> <span className="truncate max-w-full tracking-widest">{tab.label}</span>
             </button>
           );
@@ -1318,8 +1298,8 @@ const App: React.FC = () => {
 
       <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         <aside className="lg:col-span-3 space-y-6">
-          <div className="system-panel p-6 min-h-[200px] lg:min-h-[300px] border-cyan-950/40">
-            <h2 className="font-game text-[11px] md:text-[12px] text-cyan-800 mb-6 flex items-center gap-2 border-b border-cyan-950 pb-4 uppercase tracking-widest font-bold"><Bell size={14} /> ALERTAS</h2>
+          <div className="hud-board p-6 min-h-[200px] lg:min-h-[300px] border-cyan-500/20">
+            <h2 className="font-game text-[11px] md:text-[12px] text-cyan-500 mb-6 flex items-center gap-2 border-b border-cyan-900/40 pb-4 uppercase tracking-widest font-bold"><Bell size={14} /> ALERTAS</h2>
             <div className="space-y-4">
               {messages.map((m: SystemMessage) => (
                 <div key={m.id} className={`text-[12px] md:text-[13px] font-medium animate-in slide-in-from-left duration-200 ${m.type === 'success' ? 'text-cyan-500' : m.type === 'error' ? 'text-red-500' : 'text-cyan-600'}`}>
@@ -1341,7 +1321,7 @@ const App: React.FC = () => {
                 </h2>
                 <button
                   onClick={() => { resetForm(); setQuestForm({ isOpen: true }); }}
-                  className="w-full sm:w-auto px-6 py-3 system-panel border border-cyan-900 text-cyan-500 hover:bg-cyan-950 hover:text-cyan-400 font-game text-[12px] tracking-widest transition-all flex items-center justify-center gap-2 font-bold uppercase"
+                  className="w-full sm:w-auto px-6 py-3 hud-board border border-cyan-900 text-cyan-500 hover:hud-board-glow hover:text-cyan-400 font-game text-[12px] tracking-widest transition-all flex items-center justify-center gap-2 font-bold uppercase"
                 >
                   <Plus size={16} /> Nova Missão
                 </button>
@@ -1361,7 +1341,7 @@ const App: React.FC = () => {
                   />
                 ))}
                 {quests.filter(q => !q.completed && !q.failed).length === 0 && (
-                  <div className="text-center py-20 system-panel border-dashed border border-cyan-900/30 rounded-xl opacity-40">
+                  <div className="text-center py-20 hud-board border-dashed border border-cyan-900/30 opacity-40">
                     <p className="font-game text-[12px] text-cyan-700 tracking-widest uppercase">AGUARDANDO NOVAS MISSÕES...</p>
                   </div>
                 )}
@@ -1463,7 +1443,7 @@ const App: React.FC = () => {
       {/* Modal de Criação / Edição */}
       {questForm.isOpen && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-start md:items-center justify-center p-0 md:p-4 backdrop-blur-md overflow-y-auto">
-          <div className="system-panel p-6 md:p-10 w-full max-w-2xl min-h-screen md:min-h-0 md:rounded-2xl shadow-2xl relative border-cyan-900/50 flex flex-col">
+          <div className="hud-board hud-board-glow p-6 md:p-10 w-full max-w-2xl min-h-screen md:min-h-0 md:border-2 shadow-2xl relative border-cyan-900/50 flex flex-col">
             <div className="hidden md:block hud-tl hud-corner"></div><div className="hidden md:block hud-tr hud-corner"></div>
             <div className="hidden md:block hud-bl hud-corner"></div><div className="hidden md:block hud-br hud-corner"></div>
 
@@ -1486,7 +1466,7 @@ const App: React.FC = () => {
                     value={newQuestTitle}
                     onChange={e => setNewQuestTitle(e.target.value)}
                     placeholder="EX: EXTERMÍNIO DA PROCRASTINAÇÃO..."
-                    className="w-full bg-black border border-cyan-900/30 p-3 md:p-4 text-slate-100 font-game text-base md:text-xl outline-none focus:border-cyan-500 transition-all rounded"
+                    className="w-full bg-black border border-cyan-900/30 p-3 md:p-4 text-slate-100 font-game text-base md:text-xl outline-none focus:border-cyan-500 transition-all"
                   />
                 </div>
               </div>
@@ -1498,7 +1478,7 @@ const App: React.FC = () => {
                     <button
                       disabled={!!editingQuest || newQuestIsSpecial}
                       type="button"
-                      className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsDaily ? 'bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsDaily ? 'bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
                     >
                       {editingQuest ? <Lock size={20} /> : <CalendarDays size={20} />}
                     </button>
@@ -1515,7 +1495,7 @@ const App: React.FC = () => {
                     <button
                       disabled={!!editingQuest || newQuestIsDaily}
                       type="button"
-                      className={`p-3 border-2 transition-all rounded-lg flex items-center justify-center ${newQuestIsSpecial ? 'bg-orange-900/40 border-orange-400 text-orange-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsDaily ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsSpecial ? 'bg-orange-900/40 border-orange-400 text-orange-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsDaily ? 'cursor-not-allowed' : ''}`}
                     >
                       {editingQuest ? <Lock size={20} /> : <Zap size={20} />}
                     </button>
@@ -1527,7 +1507,7 @@ const App: React.FC = () => {
                 </div>
 
                 {!newQuestIsDaily && !newQuestIsSpecial && (
-                  <div className={`p-4 border rounded-lg flex flex-col justify-center transition-all bg-red-950/10 ${newQuestDeadline ? 'border-red-900/60' : 'border-red-600 animate-pulse'}`}>
+                  <div className={`p-4 border flex flex-col justify-center transition-all bg-red-950/10 ${newQuestDeadline ? 'border-red-900/60' : 'border-red-600 animate-pulse'}`}>
                     <label className="block text-[9px] font-game text-red-500 uppercase font-bold mb-1 flex items-center gap-2">
                       <Clock size={12} /> Prazo Final {editingQuest ? '(IMUTÁVEL)' : '(OBRIGATÓRIO)'}
                     </label>
@@ -1536,13 +1516,13 @@ const App: React.FC = () => {
                       type="datetime-local"
                       value={newQuestDeadline}
                       onChange={e => setNewQuestDeadline(e.target.value)}
-                      className={`bg-black/40 border border-red-900/40 text-red-400 p-2 rounded text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${editingQuest ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                      className={`bg-black/40 border border-red-900/40 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${editingQuest ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                     />
                   </div>
                 )}
 
                 {newQuestIsSpecial && (
-                  <div className="p-4 border border-orange-900/30 bg-orange-950/20 rounded-lg flex items-center gap-3 md:col-span-2">
+                  <div className="p-4 border border-orange-900/30 bg-orange-950/20 flex items-center gap-3 md:col-span-2">
                     <AlertTriangle size={16} className="text-orange-500 shrink-0 animate-pulse" />
                     <p className="text-[9px] text-orange-200 uppercase leading-tight font-medium font-game tracking-wider">
                       Operações urgentes expiram e desaparecem às 23:59:59 do mesmo dia. Falhar gera uma punição (+10% Corrupção).
@@ -1551,7 +1531,7 @@ const App: React.FC = () => {
                 )}
 
                 {newQuestIsDaily && (
-                  <div className="p-4 border border-orange-900/20 bg-orange-950/5 rounded-lg flex items-center gap-3">
+                  <div className="p-4 border border-orange-900/20 bg-orange-950/5 flex items-center gap-3">
                     <AlertTriangle size={16} className="text-orange-600 shrink-0" />
                     <p className="text-[9px] text-slate-500 uppercase leading-tight font-medium">
                       Quests diárias resetam à meia-noite. Falha em completar resulta em punição de mana.
@@ -1603,7 +1583,7 @@ const App: React.FC = () => {
                 <button
                   onClick={handleSaveQuest}
                   disabled={isFormInvalid}
-                  className={`flex-1 py-4 border-2 font-game text-[12px] md:text-[13px] transition-all rounded font-bold uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 ${isFormInvalid
+                  className={`flex-1 py-4 border-2 font-game text-[12px] md:text-[13px] transition-all font-bold uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 ${isFormInvalid
                     ? 'bg-slate-900 border-slate-800 text-slate-700 cursor-not-allowed grayscale'
                     : 'bg-slate-900 border-cyan-800 text-cyan-400 hover:bg-cyan-800 hover:border-cyan-400'
                     }`}
