@@ -23,7 +23,7 @@ const SystemEffectOverlay: React.FC<SystemEffectOverlayProps> = ({ effect, onCom
   useEffect(() => {
     if (effect) {
       setActiveEffect(effect);
-      const duration = effect.type === 'useItem' ? 2500 : 800;
+      const duration = effect.type === 'useItem' ? 1500 : 800;
       const timer = setTimeout(() => {
         setActiveEffect(null);
         onComplete();
