@@ -45,19 +45,19 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
             case Rank.B:
                 return {
                     color: '#a855f7',
-                    neon: 'neon-text-purple',
+                    neon: 'neon-text-orange',
                     icon: <Zap size={80} />,
-                    bg: 'bg-purple-500/20',
-                    border: 'border-purple-500',
+                    bg: 'bg-orange-500/20',
+                    border: 'border-orange-500',
                     shadow: 'shadow-[0_0_50px_rgba(168,85,247,0.5)]'
                 };
             default:
                 return {
                     color: '#10b981',
-                    neon: 'neon-text-green-strong',
+                    neon: 'neon-text-cyan-strong',
                     icon: <Shield size={80} />,
-                    bg: 'bg-emerald-500/20',
-                    border: 'border-emerald-500',
+                    bg: 'bg-cyan-500/20',
+                    border: 'border-cyan-500',
                     shadow: 'shadow-[0_0_50px_rgba(16,185,129,0.5)]'
                 };
         }

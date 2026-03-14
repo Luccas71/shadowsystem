@@ -60,38 +60,38 @@ const AuthScreen: React.FC = () => {
         <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
             {/* Background decorations */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-10 left-10 w-40 h-40 border-t-2 border-l-2 border-emerald-500/10 opacity-40"></div>
-                <div className="absolute top-10 right-10 w-40 h-40 border-t-2 border-r-2 border-emerald-500/10 opacity-40"></div>
-                <div className="absolute bottom-10 left-10 w-40 h-40 border-b-2 border-l-2 border-emerald-500/10 opacity-40"></div>
-                <div className="absolute bottom-10 right-10 w-40 h-40 border-b-2 border-r-2 border-emerald-500/10 opacity-40"></div>
+                <div className="absolute top-10 left-10 w-40 h-40 border-t-2 border-l-2 border-cyan-500/10 opacity-40"></div>
+                <div className="absolute top-10 right-10 w-40 h-40 border-t-2 border-r-2 border-cyan-500/10 opacity-40"></div>
+                <div className="absolute bottom-10 left-10 w-40 h-40 border-b-2 border-l-2 border-cyan-500/10 opacity-40"></div>
+                <div className="absolute bottom-10 right-10 w-40 h-40 border-b-2 border-r-2 border-cyan-500/10 opacity-40"></div>
             </div>
 
             {/* Fixed header bar */}
-            <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-[0_0_15px_rgba(16,185,129,0.5)] z-50 opacity-30"></div>
+            <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent shadow-[0_0_15px_rgba(0,229,255,0.5)] z-50 opacity-30"></div>
 
             <div className="w-full max-w-md relative z-10">
                 {/* System Header */}
                 <div className="text-center mb-10 space-y-4">
                     <div className="flex items-center justify-center gap-2 opacity-30 mb-6">
-                        <Monitor size={14} className="text-emerald-500" />
-                        <span className="font-game text-[10px] tracking-[0.3em] text-emerald-700">SHADOW SYSTEM // AUTH PROTOCOL V1.0</span>
+                        <Monitor size={14} className="text-cyan-500" />
+                        <span className="font-game text-[10px] tracking-[0.3em] text-cyan-700">SHADOW SYSTEM // AUTH PROTOCOL V1.0</span>
                     </div>
 
                     <div className="relative inline-block">
-                        <Skull size={64} className="text-emerald-500 mx-auto drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]" />
+                        <Skull size={64} className="text-cyan-500 mx-auto drop-shadow-[0_0_20px_rgba(0,229,255,0.5)]" />
                     </div>
 
-                    <h1 className="font-game text-3xl md:text-4xl text-slate-100 neon-text-green-strong
+                    <h1 className="font-game text-3xl md:text-4xl text-slate-100 neon-text-cyan
  tracking-tight">
                         SHADOW SYSTEM
                     </h1>
-                    <p className="font-game text-[10px] text-emerald-700 tracking-[0.4em] uppercase">
+                    <p className="font-game text-[10px] text-cyan-700 tracking-[0.4em] uppercase">
                         {mode === 'login' ? 'PROTOCOLO DE AUTENTICAÇÃO' : 'REGISTRO DE NOVO CAÇADOR'}
                     </p>
                 </div>
 
                 {/* Auth Card */}
-                <div className="system-panel p-8 border-emerald-500/20 shadow-[0_0_50px_rgba(16, 185, 129, 0.1)
+                <div className="system-panel p-8 border-cyan-500/20 shadow-[0_0_50px_rgba(0,229,255,0.1)
 ] relative">
                     <div className="hud-tl hud-corner"></div>
                     <div className="hud-tr hud-corner"></div>
@@ -182,9 +182,9 @@ const AuthScreen: React.FC = () => {
 
                         {/* Success Message */}
                         {success && (
-                            <div className="flex items-start gap-3 p-4 bg-green-950/30 border border-green-500/30 rounded-lg animate-in slide-in-from-top-2">
-                                <Monitor size={16} className="text-green-500 shrink-0 mt-0.5" />
-                                <p className="font-game text-[11px] text-green-400 uppercase tracking-wider leading-relaxed">{success}</p>
+                            <div className="flex items-start gap-3 p-4 bg-cyan-950/30 border border-cyan-500/30 rounded-lg animate-in slide-in-from-top-2">
+                                <Monitor size={16} className="text-cyan-500 shrink-0 mt-0.5" />
+                                <p className="font-game text-[11px] text-cyan-400 uppercase tracking-wider leading-relaxed">{success}</p>
                             </div>
                         )}
 

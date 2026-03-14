@@ -4,12 +4,12 @@
 
 :root {
     font-size: 16px;
-    --void-deep: #050d2b;
-    --shadow-energy: #10b981;
-    --system-blue: #22c55e;
-    --penalty-red: #ef4444;
-    --system-purple: #a855f7;
-    --neon-green: #10b981;
+    --void-deep: #020b18;
+    --shadow-energy: #00e5ff;
+    --system-blue: #00bfff;
+    --penalty-red: #ff3333;
+    --system-orange: #ffaa00;
+    --neon-cyan: #00e5ff;
 }
 
 html,
@@ -20,15 +20,15 @@ body {
 }
 
 body {
-    color: #f0f9ff;
+    color: #e0f2fe;
     font-family: 'Inter', sans-serif;
     margin: 0;
     -webkit-font-smoothing: antialiased;
     background-image:
-        linear-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(16, 185, 129, 0.08) 1px, transparent 1px),
-        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
-    background-size: 40px 40px, 40px 40px, 100% 100%;
+        linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+    background-size: 30px 30px, 30px 30px, 100% 100%;
     background-attachment: fixed;
     user-select: none;
     position: relative;
@@ -42,8 +42,8 @@ body::after {
     width: 100%;
     height: 100%;
     background: repeating-linear-gradient(0deg,
-            rgba(0, 0, 0, 0.05) 0px,
-            rgba(0, 0, 0, 0.05) 1px,
+            rgba(0, 0, 0, 0.1) 0px,
+            rgba(0, 0, 0, 0.1) 1px,
             transparent 1px,
             transparent 2px);
     pointer-events: none;
@@ -52,23 +52,23 @@ body::after {
 
 .font-game {
     font-family: 'Rajdhani', sans-serif;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     font-weight: 600;
 }
 
 .system-panel {
-    background: rgba(5, 13, 43, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.45);
+    background: rgba(2, 11, 24, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.1) inset, 0 4px 25px rgba(0, 0, 0, 0.6);
     position: relative;
 }
 
 .holographic-border-top {
     height: 2px;
-    background: linear-gradient(90deg, transparent, #10b981, #22c55e, transparent);
-    box-shadow: 0 0 15px #10b981;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), #00bfff, transparent);
+    box-shadow: 0 0 15px var(--neon-cyan);
     position: relative;
 }
 
@@ -77,10 +77,10 @@ body::after {
     content: "";
     position: absolute;
     top: -2px;
-    width: 40px;
+    width: 30px;
     height: 6px;
-    background: #10b981;
-    box-shadow: 0 0 15px #10b981;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan);
 }
 
 .holographic-border-top::before {
@@ -92,28 +92,33 @@ body::after {
 }
 
 .neon-text-green-strong {
-    color: #10b981;
-    text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
 }
 
 .neon-text-red {
-    color: #ef4444;
-    text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    color: #ff3333;
+    text-shadow: 0 0 10px rgba(255, 51, 51, 0.8);
 }
 
 .neon-text-orange {
-    color: #f97316;
-    text-shadow: 0 0 10px rgba(249, 115, 22, 0.8);
+    color: #ff9900;
+    text-shadow: 0 0 10px rgba(255, 153, 0, 0.8);
 }
 
 .neon-text-blue {
-    color: #3b82f6;
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
 }
 
 .neon-text-green {
-    color: #22c55e;
-    text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+    color: #00e5ff;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+}
+
+.neon-text-cyan {
+    color: #00e5ff;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
 }
 
 .neon-text-purple {
@@ -122,16 +127,17 @@ body::after {
 }
 
 .neon-text-lime {
-    color: #84cc16;
-    text-shadow: 0 0 10px rgba(132, 204, 22, 0.8);
+    color: #ffaa00;
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
 }
 
 .hud-corner {
     position: absolute;
     width: 14px;
     height: 14px;
-    border-color: rgba(16, 185, 129, 0.3);
+    border-color: rgba(0, 229, 255, 0.8);
     pointer-events: none;
+    box-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
 }
 
 .hud-tl {
@@ -175,12 +181,12 @@ body::after {
 
     40% {
         transform: translate(-2px, -2px);
-        text-shadow: -2px 0 blue;
+        text-shadow: -2px 0 #00e5ff;
     }
 
     60% {
         transform: translate(2px, 2px);
-        text-shadow: 2px 0 green;
+        text-shadow: 2px 0 #ffaa00;
     }
 
     80% {
@@ -199,14 +205,17 @@ body::after {
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #020408;
+    background: #010610;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 10px;
+    background: #005577;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #00e5ff;
 }

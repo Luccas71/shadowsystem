@@ -56,12 +56,12 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
     <div className="space-y-8">
       {/* Header Perigo */}
       <div className={`relative p-6 border-2 rounded-xl overflow-hidden ${profile.corruption >= 100 ? 'border-red-600 bg-red-950/40' : 'border-sky-900/50 bg-sky-950/10'}`}>
-        <div className={`absolute top-0 left-0 w-full h-1 bg-green-600 shadow-[0_0_10px_#22c55e]`} style={{ width: `${profile.corruption}%` }}></div>
+        <div className={`absolute top-0 left-0 w-full h-1 bg-cyan-600 shadow-[0_0_10px_#00e5ff]`} style={{ width: `${profile.corruption}%` }}></div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className={`font-game text-2xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-green-400'}`}>
+          <h2 className={`font-game text-2xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-cyan-400'}`}>
             <Skull /> PROTOCOLO DE PURIFICAÇÃO
           </h2>
-          <span className="font-game text-[10px] text-green-600 tracking-[0.3em] font-bold">
+          <span className="font-game text-[10px] text-cyan-600 tracking-[0.3em] font-bold">
             {profile.corruption >= 100 ? "⚠️ ESTADO CRÍTICO" : "MONITORAMENTO DE ALMA"}
           </span>
         </div>
