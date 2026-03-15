@@ -133,9 +133,9 @@ export const DEFAULT_STORE_ITEMS: StoreItem[] = [
     purchasedCount: 0
   },
   {
-    id: 'treasure-1',
-    name: 'Baú de Ouro Antigo',
-    description: 'Concede 5.000 Gold instantaneamente.',
+    id: 'star-fragment-1',
+    name: 'Fragmento de Estrela',
+    description: 'Concede 2.000 XP e remove 10% de corrupção instantaneamente.',
     cost: 1500,
     purchasedCount: 0
   },

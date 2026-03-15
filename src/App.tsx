@@ -669,7 +669,7 @@ const App: React.FC = () => {
       case 'pendant-1': subtitle = "PINGENTE DO VIAJANTE EQUIPADO (-5% CORRUPÇÃO)"; break;
       case 'scroll-2': subtitle = "ESCUDO DE MANA ATIVADO"; break;
       case 'crystal-1': subtitle = "CRISTAL DE MANA CONSUMIDO (+5.000 XP)"; break;
-      case 'treasure-1': subtitle = "TESOURO REIVINDICADO (+5.000 GOLD)"; break;
+      case 'star-fragment-1': subtitle = "FRAGMENTO ABSORVIDO (+2.000 XP, -10% CORRUPÇÃO)"; break;
       case 'hourglass-1': subtitle = "TEMPO DE PURIFICAÇÃO ACELERADO (-4H)"; break;
       case 'feather-1': subtitle = "SINCRONIA RESTAURADA (+25% XP)"; break;
       case 'courage-1': subtitle = "PROVA DE CORAGEM SUPERADA (NÍVEL +1)"; break;
@@ -833,10 +833,33 @@ const App: React.FC = () => {
           addSystemMessage("SISTEMA: CRISTAL DE MANA CONSUMIDO (+5.000 XP).", "success");
           break;
         }
-        case 'treasure-1':
-          updates.gold = p.gold + 5000;
-          addSystemMessage("SISTEMA: TESOURO REIVINDICADO (+5.000 GOLD).", "success");
+        case 'star-fragment-1': {
+          updates.corruption = Math.max(0, p.corruption - 10);
+          let sfXp = p.xp + 2000;
+          let sfLevel = p.level;
+          let sfMaxXp = p.maxXp;
+          while (sfXp >= sfMaxXp) {
+            sfXp -= sfMaxXp;
+            sfLevel++;
+            sfMaxXp = calculateMaxXp(sfLevel);
+          }
+          updates.xp = sfXp;
+          updates.level = sfLevel;
+          updates.maxXp = sfMaxXp;
+          const sfRank = getRankByLevel(sfLevel);
+          updates.rank = sfRank;
+          updates.stats = calculateStats(sfLevel);
+
+          if (sfLevel > p.level) {
+            setLevelUpData({ oldLevel: p.level, newLevel: sfLevel });
+          }
+          if (sfRank !== p.rank) {
+            setRankUpData({ oldRank: p.rank, newRank: sfRank });
+          }
+
+          addSystemMessage("SISTEMA: FRAGMENTO DE ESTRELA ABSORVIDO (+2.000 XP, -10% CORRUPÇÃO).", "success");
           break;
+        }
         case 'hourglass-1':
           if (p.isPenaltyZoneActive && p.penaltyEndTime) {
             updates.penaltyEndTime = p.penaltyEndTime - (4 * 3600000);
