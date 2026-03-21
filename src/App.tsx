@@ -59,7 +59,7 @@ import {
   WifiOff,
   GripVertical
 } from 'lucide-react';
-import { Reorder } from 'framer-motion';
+import { Reorder, useDragControls } from 'framer-motion';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { persistenceService, AppData } from './services/persistenceService';
 
@@ -84,6 +84,52 @@ const INITIAL_PROFILE: HunterProfile = {
 
 const XP_DROP_THRESHOLD = 50000;
 const PENALTY_DURATION = 12 * 3600000; // 12 Horas em ms
+
+const DraggableQuestItem: React.FC<{ quest: Quest; children: React.ReactNode }> = ({ quest, children }) => {
+  const controls = useDragControls();
+  const pressTimer = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === 'touch') {
+      pressTimer.current = setTimeout(() => {
+        controls.start(e);
+        if (navigator.vibrate) navigator.vibrate(50);
+      }, 1000);
+    }
+  };
+
+  const clearTimer = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+  };
+
+  return (
+    <Reorder.Item
+      value={quest}
+      dragListener={false}
+      dragControls={controls}
+      onPointerDown={handlePointerDown}
+      onPointerUp={clearTimer}
+      onPointerCancel={clearTimer}
+      onContextMenu={(e: React.MouseEvent) => {
+        if ((e.nativeEvent as PointerEvent).pointerType === 'touch') e.preventDefault();
+      }}
+    >
+      <div className="flex items-center gap-2">
+         <div 
+           className="cursor-grab active:cursor-grabbing p-2 text-cyan-900/40 hover:text-cyan-600 transition-colors hidden md:block shrink-0"
+           onPointerDown={(e: React.PointerEvent) => {
+             if (e.pointerType === 'mouse') controls.start(e);
+           }}
+         >
+           <GripVertical size={20} />
+         </div>
+         <div className="flex-1 min-w-0">
+           {children}
+         </div>
+      </div>
+    </Reorder.Item>
+  );
+};
 
 const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -147,7 +193,7 @@ const App: React.FC = () => {
         type,
         timestamp: Date.now()
       };
-      return [newMessage, ...prev].slice(0, 40);
+      return [newMessage, ...prev].slice(0, 30);
     });
   }, []);
 
@@ -395,6 +441,9 @@ const App: React.FC = () => {
           });
           setStoreItems(mergedStore);
           setVices(cloudData.vices || []);
+          if (cloudData.messages) {
+            setMessages(cloudData.messages);
+          }
 
           persistenceService.saveLocal({
             profile: cloudProfile,
@@ -471,6 +520,7 @@ const App: React.FC = () => {
           quests,
           store_items: storeItems,
           vices,
+          messages,
           updated_at: now
         });
 
@@ -1409,24 +1459,17 @@ const App: React.FC = () => {
                 setQuests([...newOrder, ...completedOrFailed]);
               }} className="space-y-4">
                 {quests.filter(q => !q.completed && !q.failed).map(q => (
-                  <Reorder.Item key={q.id} value={q}>
-                    <div className="flex items-center gap-2">
-                       <div className="cursor-grab active:cursor-grabbing p-2 text-cyan-900/40 hover:text-cyan-600 transition-colors hidden md:block shrink-0">
-                         <GripVertical size={20} />
-                       </div>
-                       <div className="flex-1">
-                        <QuestCard
-                          quest={q}
-                          onToggleComplete={handleToggleComplete}
-                          onToggleSubQuest={handleToggleSubQuest}
-                          onDelete={handleDeleteQuest}
-                          onEdit={handleEditQuest}
-                          onAddSubQuest={handleAddSubQuest}
-                          onRemoveSubQuest={handleRemoveSubQuest}
-                        />
-                       </div>
-                    </div>
-                  </Reorder.Item>
+                  <DraggableQuestItem key={q.id} quest={q}>
+                    <QuestCard
+                      quest={q}
+                      onToggleComplete={handleToggleComplete}
+                      onToggleSubQuest={handleToggleSubQuest}
+                      onDelete={handleDeleteQuest}
+                      onEdit={handleEditQuest}
+                      onAddSubQuest={handleAddSubQuest}
+                      onRemoveSubQuest={handleRemoveSubQuest}
+                    />
+                  </DraggableQuestItem>
                 ))}
               </Reorder.Group>
                 {quests.filter(q => !q.completed && !q.failed).length === 0 && (
