@@ -1,4 +1,4 @@
-import { HunterProfile, Quest, StoreItem, Vice } from '../types';
+import { HunterProfile, Quest, StoreItem, Vice, SystemMessage } from '../types';
 
 const STORAGE_KEY = 'shadow_system_save_v1';
 
@@ -7,6 +7,7 @@ export interface AppData {
     quests: Quest[];
     storeItems: StoreItem[];
     vices: Vice[];
+    messages?: SystemMessage[];
     lastUpdate: string;
 }
 

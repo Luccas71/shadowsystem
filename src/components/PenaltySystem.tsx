@@ -70,7 +70,7 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between font-game text-[10px] text-cyan-400 uppercase">
             <span>Nível de Instabilidade</span>
-            <span className={profile.corruption >= 100 ? "text-red-600 font-bold" : ""}>{profile.corruption}%</span>
+            <span className={profile.corruption >= 100 ? "text-red-600 font-bold" : ""}>{profile.corruption.toFixed(2)}%</span>
           </div>
           <div className="h-8 bg-black border border-cyan-900 overflow-hidden p-1">
             <div

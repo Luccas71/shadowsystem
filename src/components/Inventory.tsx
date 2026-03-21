@@ -28,7 +28,7 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
           </div>
         ) : (
           ownedItems.map((item, index) => (
-            <div key={item.id} className="hud-board border-cyan-500/20 transition-all duration-300 group hover:hud-board-glow flex flex-col min-h-[160px] bg-slate-950/40 p-5 overflow-hidden relative">
+            <div key={`${item.id}-${item.origin || 'legacy'}-${index}`} className="hud-board border-cyan-500/20 transition-all duration-300 group hover:hud-board-glow flex flex-col min-h-[160px] bg-slate-950/40 p-5 overflow-hidden relative">
               {/* Background Grid Accent */}
               <div className="absolute inset-0 opacity-5 pointer-events-none [background-image:linear-gradient(rgba(0,229,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.1)_1px,transparent_1px)] [background-size:10px_10px]"></div>
               
@@ -40,6 +40,19 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
                       <h3 className="font-game text-lg text-white group-hover:text-cyan-400 transition-all duration-300 uppercase tracking-widest truncate font-black leading-tight">
                         {item.name}
                       </h3>
+                      <div className={`inline-block mt-1 px-2 py-0.5 text-[8px] font-game border uppercase tracking-widest ${
+                        item.origin === 'compra' ? 'border-orange-500/50 text-orange-500 bg-orange-950/20' :
+                        item.origin === 'diário' ? 'border-cyan-500/50 text-cyan-500 bg-cyan-950/20' :
+                        item.origin === 'rank' ? 'border-purple-500/50 text-purple-500 bg-purple-950/20' :
+                        item.origin === 'nível' ? 'border-green-500/50 text-green-500 bg-green-950/20' :
+                        'border-slate-500/40 text-slate-400 bg-slate-950/20'
+                      }`}>
+                        {item.origin === 'compra' ? 'ADQUIRIDO NA LOJA' : 
+                         item.origin === 'diário' ? 'RECOMPENSA DIÁRIA' :
+                         item.origin === 'rank' ? 'DROP DE RANK' :
+                         item.origin === 'nível' ? 'PROGRESSÃO DE NÍVEL' :
+                         'RELÍQUIA LEGADA'}
+                      </div>
                     </div>
                     <div className="flex flex-col items-end shrink-0">
                       <div className="text-[7px] font-game text-slate-600 uppercase tracking-tighter">QUANTIDADE</div>

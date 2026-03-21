@@ -10,7 +10,8 @@ import {
   SystemMessage,
   StoreItem,
   Vice,
-  ActiveBuff
+  ActiveBuff,
+  ItemOrigin
 } from './types';
 import {
   RANK_COLORS,
@@ -55,8 +56,10 @@ import {
   AlertTriangle,
   LogOut,
   Wifi,
-  WifiOff
+  WifiOff,
+  GripVertical
 } from 'lucide-react';
+import { Reorder } from 'framer-motion';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { persistenceService, AppData } from './services/persistenceService';
 
@@ -144,7 +147,7 @@ const App: React.FC = () => {
         type,
         timestamp: Date.now()
       };
-      return [newMessage, ...prev].slice(0, 4);
+      return [newMessage, ...prev].slice(0, 40);
     });
   }, []);
 
@@ -314,6 +317,12 @@ const App: React.FC = () => {
       setDataLoaded(false);
 
       // 1. skip local storage immediately to ensure cloud data is the only source
+      // EXCEPT for messages which are strictly local
+      const localData = persistenceService.loadLocal();
+      if (localData && localData.messages) {
+        setMessages(localData.messages);
+      }
+      
       /* 
       const localData = persistenceService.loadLocal();
       if (localData) {
@@ -392,10 +401,9 @@ const App: React.FC = () => {
             quests: cloudData.quests || [],
             storeItems: mergedStore,
             vices: cloudData.vices || [],
+            messages: messages,
             lastUpdate: cloudData.updated_at
           });
-
-          addSystemMessage("SISTEMA: DADOS SINCRONIZADOS COM A NUVEM.", "success");
         } else {
           // No cloud data exists: Initialize new clean save
           const initialData = {
@@ -416,6 +424,7 @@ const App: React.FC = () => {
             quests: [],
             storeItems: DEFAULT_STORE_ITEMS as StoreItem[],
             vices: [],
+            messages: messages,
             lastUpdate: initialData.updated_at
           });
           addSystemMessage("SISTEMA: NOVO REGISTRO DE CAÇADOR INICIALIZADO.", "success");
@@ -485,6 +494,7 @@ const App: React.FC = () => {
       quests,
       storeItems,
       vices,
+      messages,
       lastUpdate: new Date().toISOString()
     });
 
@@ -497,10 +507,9 @@ const App: React.FC = () => {
       }, 2000); // 2 second debounce for cloud sync
       return () => clearTimeout(handler);
     }
-  }, [profile, quests, storeItems, vices]);
+  }, [profile, quests, storeItems, vices, messages]);
 
-  const handleToggleComplete = (id: string) => {
-    if (processingQuestIds.current.has(id)) return;
+  const handleToggleComplete = (id: string) => {    if (processingQuestIds.current.has(id)) return;
 
     const quest = quests.find(qu => qu.id === id);
     if (quest && !quest.completed && !quest.failed) {
@@ -548,23 +557,35 @@ const App: React.FC = () => {
 
       const questDrops: StoreItem[] = [];
       if (dailyDrops < 2) {
-        // Chance of drop based on difficulty
-        const dropChances: Record<QuestDifficulty, number> = {
-          [QuestDifficulty.E]: 0.05,
-          [QuestDifficulty.D]: 0.10,
-          [QuestDifficulty.C]: 0.20,
-          [QuestDifficulty.B]: 0.35,
-          [QuestDifficulty.A]: 0.50,
-          [QuestDifficulty.S]: 0.80,
-        };
+        const commonItems = storeItems.filter(item => item.cost < 5000);
+        const pool = commonItems.length > 0 ? commonItems : storeItems;
 
-        const chance = dropChances[quest.difficulty];
-        if (Math.random() < chance) {
-          const randomIdx = Math.floor(Math.random() * storeItems.length);
-          const droppedItem = storeItems[randomIdx];
+        if (dailyDrops === 0) {
+          // Guaranteed drop on first mission
+          const randomIdx = Math.floor(Math.random() * pool.length);
+          const droppedItem = pool[randomIdx];
           questDrops.push(droppedItem);
           dailyDrops += 1;
-          addSystemMessage(`SISTEMA: ITEM ENCONTRADO! ${droppedItem.name.toUpperCase()}`, 'warning');
+          addSystemMessage(`SISTEMA: DROP DIÁRIO GARANTIDO! ${droppedItem.name.toUpperCase()}`, 'warning');
+        } else {
+          // Chance of drop on second mission based on difficulty
+          const dropChances: Record<QuestDifficulty, number> = {
+            [QuestDifficulty.E]: 0.10,
+            [QuestDifficulty.D]: 0.15,
+            [QuestDifficulty.C]: 0.25,
+            [QuestDifficulty.B]: 0.40,
+            [QuestDifficulty.A]: 0.60,
+            [QuestDifficulty.S]: 0.90,
+          };
+
+          const chance = dropChances[quest.difficulty];
+          if (Math.random() < chance) {
+            const randomIdx = Math.floor(Math.random() * pool.length);
+            const droppedItem = pool[randomIdx];
+            questDrops.push(droppedItem);
+            dailyDrops += 1;
+            addSystemMessage(`SISTEMA: ITEM ENCONTRADO! ${droppedItem.name.toUpperCase()}`, 'warning');
+          }
         }
       }
 
@@ -597,10 +618,25 @@ const App: React.FC = () => {
 
       const allDrops = [...levelDrops, ...rareDrops, ...questDrops];
       if (allDrops.length > 0) {
-        setStoreItems(prev => prev.map(si => {
-          const count = allDrops.filter(d => d.id === si.id).length;
-          return count > 0 ? { ...si, purchasedCount: si.purchasedCount + count } : si;
-        }));
+        setStoreItems(prev => {
+          let next = [...prev];
+          
+          // Helper to add specialized items to inventory
+          const addToInventory = (item: StoreItem, origin: ItemOrigin) => {
+            const existingIdx = next.findIndex(si => si.id === item.id && si.origin === origin);
+            if (existingIdx > -1) {
+              next[existingIdx] = { ...next[existingIdx], purchasedCount: next[existingIdx].purchasedCount + 1 };
+            } else {
+              next.push({ ...item, purchasedCount: 1, origin });
+            }
+          };
+
+          levelDrops.forEach(d => addToInventory(d, 'nível'));
+          rareDrops.forEach(d => addToInventory(d, 'raro'));
+          questDrops.forEach(d => addToInventory(d, 'diário'));
+
+          return next;
+        });
       }
 
       setCompletingQuest({
@@ -687,7 +723,7 @@ const App: React.FC = () => {
     });
 
     setStoreItems(prev => prev.map(si =>
-      si.id === item.id ? { ...si, purchasedCount: si.purchasedCount - 1 } : si
+      si.id === item.id && si.origin === item.origin ? { ...si, purchasedCount: si.purchasedCount - 1 } : si
     ));
 
     setProfile(p => {
@@ -1050,14 +1086,21 @@ const App: React.FC = () => {
     }
 
     if (editingQuest) {
-      setQuests(prev => prev.map(q => q.id === editingQuest.id ? {
-        ...q,
-        title: newQuestTitle.toUpperCase(),
-        difficulty: newQuestDifficulty,
-        deadline: resolvedDeadline,
-        xpReward: DIFFICULTY_XP[newQuestDifficulty],
-        goldReward: DIFFICULTY_GOLD[newQuestDifficulty],
-      } : q));
+      setQuests(prev => prev.map(q => {
+        if (q.id === editingQuest.id) {
+          const deadlineChanged = q.deadline !== resolvedDeadline;
+          return {
+            ...q,
+            title: newQuestTitle.toUpperCase(),
+            difficulty: newQuestDifficulty,
+            deadline: resolvedDeadline,
+            deadlineEdits: deadlineChanged ? (q.deadlineEdits || 0) + 1 : (q.deadlineEdits || 0),
+            xpReward: DIFFICULTY_XP[newQuestDifficulty],
+            goldReward: DIFFICULTY_GOLD[newQuestDifficulty],
+          };
+        }
+        return q;
+      }));
       addSystemMessage("SISTEMA: DIRETRIZ RECALIBRADA.", "success");
     } else {
       const newQuest: Quest = {
@@ -1072,6 +1115,7 @@ const App: React.FC = () => {
         isDaily: newQuestIsDaily,
         isSpecial: newQuestIsSpecial,
         deadline: resolvedDeadline,
+        deadlineEdits: 0,
         lastResetAt: newQuestIsDaily ? Date.now() : undefined,
         createdAt: Date.now(),
         subQuests: []
@@ -1323,13 +1367,21 @@ const App: React.FC = () => {
         <aside className="lg:col-span-3 space-y-6">
           <div className="hud-board p-6 min-h-[200px] lg:min-h-[300px] border-cyan-500/20">
             <h2 className="font-game text-[11px] md:text-[12px] text-cyan-500 mb-6 flex items-center gap-2 border-b border-cyan-900/40 pb-4 uppercase tracking-widest font-bold"><Bell size={14} /> ALERTAS</h2>
-            <div className="space-y-4">
-              {messages.map((m: SystemMessage) => (
-                <div key={m.id} className={`text-[12px] md:text-[13px] font-medium animate-in slide-in-from-left duration-200 ${m.type === 'success' ? 'text-cyan-500' : m.type === 'error' ? 'text-red-500' : 'text-cyan-600'}`}>
-                  <span className="opacity-30 text-[9px]">[{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]</span> <br />
-                  <span className="font-game uppercase tracking-tight break-words">&gt; {m.text}</span>
-                </div>
-              ))}
+            <div className="space-y-4 max-h-[150px] md:max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+              {messages.map((m: SystemMessage) => {
+                const messageDate = new Date(m.timestamp);
+                const isToday = messageDate.toDateString() === new Date().toDateString();
+                const dateStr = isToday 
+                  ? messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  : messageDate.toLocaleDateString([], { day: '2-digit', month: '2-digit' }) + ' ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                return (
+                  <div key={m.id} className={`text-[12px] md:text-[13px] font-medium animate-in slide-in-from-left duration-200 ${m.type === 'success' ? 'text-cyan-500' : m.type === 'error' ? 'text-red-500' : 'text-cyan-600'}`}>
+                    <span className="opacity-30 text-[9px]">[{dateStr}]</span> <br />
+                    <span className="font-game uppercase tracking-tight break-words">&gt; {m.text}</span>
+                  </div>
+                );
+              })}
               {messages.length === 0 && <p className="text-[11px] text-slate-700 italic font-game uppercase">SINCRONIZANDO...</p>}
             </div>
           </div>
@@ -1337,6 +1389,7 @@ const App: React.FC = () => {
 
         <div className="lg:col-span-9 min-w-0">
           {activeTab === 'quests' ? (
+            <>
             <div className="space-y-8 animate-in fade-in duration-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <h2 className="font-game text-2xl md:text-3xl flex items-center gap-4 text-slate-200 uppercase tracking-tight">
@@ -1350,25 +1403,37 @@ const App: React.FC = () => {
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <Reorder.Group axis="y" values={quests.filter(q => !q.completed && !q.failed)} onReorder={(newOrder) => {
+                const activeIds = new Set(newOrder.map(q => q.id));
+                const completedOrFailed = quests.filter(q => q.completed || q.failed);
+                setQuests([...newOrder, ...completedOrFailed]);
+              }} className="space-y-4">
                 {quests.filter(q => !q.completed && !q.failed).map(q => (
-                  <QuestCard
-                    key={q.id}
-                    quest={q}
-                    onToggleComplete={handleToggleComplete}
-                    onToggleSubQuest={handleToggleSubQuest}
-                    onDelete={handleDeleteQuest}
-                    onEdit={handleEditQuest}
-                    onAddSubQuest={handleAddSubQuest}
-                    onRemoveSubQuest={handleRemoveSubQuest}
-                  />
+                  <Reorder.Item key={q.id} value={q}>
+                    <div className="flex items-center gap-2">
+                       <div className="cursor-grab active:cursor-grabbing p-2 text-cyan-900/40 hover:text-cyan-600 transition-colors hidden md:block shrink-0">
+                         <GripVertical size={20} />
+                       </div>
+                       <div className="flex-1">
+                        <QuestCard
+                          quest={q}
+                          onToggleComplete={handleToggleComplete}
+                          onToggleSubQuest={handleToggleSubQuest}
+                          onDelete={handleDeleteQuest}
+                          onEdit={handleEditQuest}
+                          onAddSubQuest={handleAddSubQuest}
+                          onRemoveSubQuest={handleRemoveSubQuest}
+                        />
+                       </div>
+                    </div>
+                  </Reorder.Item>
                 ))}
+              </Reorder.Group>
                 {quests.filter(q => !q.completed && !q.failed).length === 0 && (
                   <div className="text-center py-20 hud-board border-dashed border border-cyan-900/30 opacity-40">
                     <p className="font-game text-[12px] text-cyan-700 tracking-widest uppercase">AGUARDANDO NOVAS MISSÕES...</p>
                   </div>
                 )}
-              </div>
 
               {/* Seção de Missões Concluídas Hoje */}
               {quests.filter(q => {
@@ -1408,6 +1473,7 @@ const App: React.FC = () => {
                   </div>
                 )}
             </div>
+            </>
           ) : activeTab === 'status' ? (
             <StatusWindow profile={profile} />
           ) : activeTab === 'penalties' ? (
@@ -1451,7 +1517,14 @@ const App: React.FC = () => {
 
                 if (profile.gold >= finalCost) {
                   setProfile(p => ({ ...p, gold: p.gold - finalCost }));
-                  setStoreItems(prev => prev.map(si => si.id === i.id ? { ...si, purchasedCount: si.purchasedCount + 1 } : si));
+                  setStoreItems(prev => {
+                    const existingIdx = prev.findIndex(si => si.id === i.id && si.origin === 'compra');
+                    if (existingIdx > -1) {
+                      return prev.map((si, idx) => idx === existingIdx ? { ...si, purchasedCount: si.purchasedCount + 1 } : si);
+                    } else {
+                      return [...prev, { ...i, purchasedCount: 1, origin: 'compra' }];
+                    }
+                  });
                   addSystemMessage(`SISTEMA: ARTEFATO "${i.name.toUpperCase()}" ADQUIRIDO.`, 'success');
                   setActiveEffect({ type: 'purchase' });
                 } else {
@@ -1532,14 +1605,14 @@ const App: React.FC = () => {
                 {!newQuestIsDaily && !newQuestIsSpecial && (
                   <div className={`p-4 border flex flex-col justify-center transition-all bg-red-950/10 ${newQuestDeadline ? 'border-red-900/60' : 'border-red-600 animate-pulse'}`}>
                     <label className="block text-[9px] font-game text-red-500 uppercase font-bold mb-1 flex items-center gap-2">
-                      <Clock size={12} /> Prazo Final {editingQuest ? '(IMUTÁVEL)' : '(OBRIGATÓRIO)'}
+                      <Clock size={12} /> Prazo Final {editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? '(LIMITE DE EDIÇÃO ATINGIDO)' : editingQuest ? '(APENAS UMA EDIÇÃO PERMITIDA)' : '(OBRIGATÓRIO)'}
                     </label>
                     <input
-                      disabled={!!editingQuest}
+                      disabled={!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1}
                       type="datetime-local"
                       value={newQuestDeadline}
                       onChange={e => setNewQuestDeadline(e.target.value)}
-                      className={`bg-black/40 border border-red-900/40 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${editingQuest ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                      className={`bg-black/40 border border-red-900/40 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                     />
                   </div>
                 )}
@@ -1634,7 +1707,7 @@ const App: React.FC = () => {
           onComplete={() => setActiveEffect(null)}
         />
       )}
-    </div>
+      </div>
     </>
   );
 };

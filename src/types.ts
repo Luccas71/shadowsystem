@@ -83,6 +83,7 @@ export interface Quest {
   failed: boolean;
   isNegative?: boolean;
   deadline?: number;
+  deadlineEdits?: number; // Contador de edições do deadline
   subQuests: SubQuest[];
   createdAt: number;
   isDaily?: boolean; // Nova propriedade
@@ -91,6 +92,8 @@ export interface Quest {
   completedAt?: number; // Data de conclusão da missão
 }
 
+export type ItemOrigin = 'diário' | 'compra' | 'rank' | 'nível' | 'raro';
+
 export interface StoreItem {
   id: string;
   name: string;
@@ -98,6 +101,7 @@ export interface StoreItem {
   cost: number;
   purchasedCount: number;
   icon?: string;
+  origin?: ItemOrigin;
 }
 
 export interface SystemMessage {
