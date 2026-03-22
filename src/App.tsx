@@ -772,9 +772,14 @@ const App: React.FC = () => {
       icon: <span className="text-4xl">{item.icon || '✨'}</span>
     });
 
-    setStoreItems(prev => prev.map(si =>
-      si.id === item.id && si.origin === item.origin ? { ...si, purchasedCount: si.purchasedCount - 1 } : si
-    ));
+    setStoreItems(prev => {
+      const next = [...prev];
+      const targetIdx = next.findIndex(si => si.id === item.id && si.purchasedCount > 0);
+      if (targetIdx > -1) {
+        next[targetIdx] = { ...next[targetIdx], purchasedCount: next[targetIdx].purchasedCount - 1 };
+      }
+      return next;
+    });
 
     setProfile(p => {
       const updates: Partial<HunterProfile> = {};

@@ -11,6 +11,16 @@ interface InventoryProps {
 const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
   const ownedItems = items.filter(i => i.purchasedCount > 0);
 
+  const consolidatedItems = ownedItems.reduce((acc, item) => {
+    const existing = acc.find(i => i.id === item.id);
+    if (existing) {
+      existing.purchasedCount += item.purchasedCount;
+    } else {
+      acc.push({ ...item });
+    }
+    return acc;
+  }, [] as StoreItem[]);
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center">
@@ -20,14 +30,14 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {ownedItems.length === 0 ? (
+        {consolidatedItems.length === 0 ? (
           <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-dashed border-cyan-900/30">
             <Package size={64} className="text-cyan-900 mb-4" />
             <p className="font-game text-cyan-800 text-sm uppercase tracking-widest">Seu inventário está vazio.</p>
             <p className="text-[10px] text-slate-600 mt-2">ADQUIRA RELÍQUIAS NA LOJA PARA FORTALECER SEU DESPERTAR.</p>
           </div>
         ) : (
-          ownedItems.map((item, index) => (
+          consolidatedItems.map((item, index) => (
             <div key={`${item.id}-${item.origin || 'legacy'}-${index}`} className="hud-board border-cyan-500/20 transition-all duration-300 group hover:hud-board-glow flex flex-col min-h-[160px] bg-slate-950/40 p-5 overflow-hidden relative">
               {/* Background Grid Accent */}
               <div className="absolute inset-0 opacity-5 pointer-events-none [background-image:linear-gradient(rgba(0,229,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.1)_1px,transparent_1px)] [background-size:10px_10px]"></div>
