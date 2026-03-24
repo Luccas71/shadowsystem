@@ -1371,11 +1371,11 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-4 justify-center md:justify-end">
-                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-red-500/20 bg-red-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Flame size={12} className="text-red-500 mb-1" />
-                  <p className="text-[8px] font-game text-red-700 mb-0.5 uppercase tracking-tighter">Ofensivas</p>
-                  <p className="font-game text-xl md:text-2xl text-red-500 leading-none">{profile.dailyStreak || 0}</p>
+                <div className="flex flex-col items-center justify-center min-w-[80px] md:min-w-[100px] p-3 hud-board border-amber-500/40 bg-amber-950/20 group hover:hud-board-glow transition-all relative overflow-hidden shadow-[0_0_15px_rgba(245,158,11,0.15)] scale-105">
+                  <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <Flame size={16} className="text-amber-500 mb-1 drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+                  <p className="text-[9px] font-game text-amber-600 mb-0.5 uppercase tracking-widest font-bold">Ofensiva</p>
+                  <p className="font-game text-2xl md:text-3xl text-amber-400 leading-none drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">{profile.dailyStreak || 0}</p>
                 </div>
                 <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-cyan-500/20 bg-cyan-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -1388,12 +1388,6 @@ const App: React.FC = () => {
                   <Coins size={12} className="text-orange-500 mb-1" />
                   <p className="text-[8px] font-game text-orange-700 mb-0.5 uppercase tracking-tighter">Ouro</p>
                   <p className="font-game text-xl md:text-2xl text-orange-500 leading-none">{profile.gold.toLocaleString()}</p>
-                </div>
-                <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 hud-board border-orange-500/20 bg-orange-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Database size={12} className="text-orange-500 mb-1" />
-                  <p className="text-[8px] font-game text-orange-700 mb-0.5 uppercase tracking-tighter">XP Total</p>
-                  <p className="font-game text-xl md:text-2xl text-orange-400 leading-none neon-text-purple">{profile.totalXpGained.toLocaleString()}</p>
                 </div>
               </div>
             </div>
