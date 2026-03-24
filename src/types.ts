@@ -46,6 +46,8 @@ export interface HunterProfile {
   activeBuffs: ActiveBuff[];
   dailyItemDropsCount?: number;
   lastItemDropDate?: string;
+  dailyStreak?: number; // Contador de ofensivas (dias consecutivos)
+  lastStreakDate?: string; // Data da ultima ofensiva incrementada
   lastUpdate?: string; // ISO timestamp
 }
 

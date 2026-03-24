@@ -57,7 +57,8 @@ import {
   LogOut,
   Wifi,
   WifiOff,
-  GripVertical
+  GripVertical,
+  Flame
 } from 'lucide-react';
 import { Reorder, useDragControls } from 'framer-motion';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
@@ -79,7 +80,9 @@ const INITIAL_PROFILE: HunterProfile = {
   stats: calculateStats(1),
   activeBuffs: [],
   dailyItemDropsCount: 0,
-  lastItemDropDate: ""
+  lastItemDropDate: "",
+  dailyStreak: 0,
+  lastStreakDate: ""
 };
 
 const XP_DROP_THRESHOLD = 50000;
@@ -256,9 +259,11 @@ const App: React.FC = () => {
           isPenaltyZoneActive: false,
           corruption: 0,
           penaltyEndTime: undefined,
-          penaltyType: undefined
+          penaltyType: undefined,
+          dailyStreak: 0,
+          lastStreakDate: ""
         }));
-        addSystemMessage("SISTEMA: PURIFICAÇÃO CONCLUÍDA. ESTABILIDADE DE MANA RESTAURADA.", "success");
+        addSystemMessage("SISTEMA: PURIFICAÇÃO CONCLUÍDA. ESTABILIDADE DE MANA RESTAURADA. OFENSIVA ZERADA.", "success");
         return;
       }
 
@@ -289,6 +294,7 @@ const App: React.FC = () => {
       let updateRequired = false;
       let corruptionIncrease = 0;
       let goldPenaltyAtOnce = 0;
+      let resetStreak = false;
 
       const updatedQuests = quests.reduce((acc, q) => {
         // Special Quests Expiration Logic
@@ -325,6 +331,7 @@ const App: React.FC = () => {
             updateRequired = true;
             if (!q.completed) {
               corruptionIncrease += 10;
+              resetStreak = true;
               addSystemMessage(`SISTEMA: TREINAMENTO DIÁRIO "${q.title}" NEGLIGENCIADO.`, "error");
             } else {
               addSystemMessage(`SISTEMA: CICLO DIÁRIO REINICIADO PARA "${q.title}".`, "info");
@@ -345,9 +352,13 @@ const App: React.FC = () => {
         return acc;
       }, [] as Quest[]);
 
-      if (updateRequired || corruptionIncrease > 0) {
+      if (updateRequired || corruptionIncrease > 0 || resetStreak) {
         setQuests(updatedQuests);
         updateCorruption(corruptionIncrease, goldPenaltyAtOnce);
+        if (resetStreak) {
+          setProfile(p => ({ ...p, dailyStreak: 0 }));
+          addSystemMessage("SISTEMA: OFENSIVA QUEBRADA. CONTADOR REINICIADO.", "warning");
+        }
       }
     }, 5000);
 
@@ -707,6 +718,15 @@ const App: React.FC = () => {
         setRankUpData({ oldRank: profile.rank, newRank: newRank });
       }
 
+      const nextQuests = quests.map(qu => qu.id === id ? { ...qu, completed: true, completedAt: Date.now() } : qu);
+      const hasDailies = nextQuests.some(q => q.isDaily);
+      const allDailiesCompletedNow = hasDailies && nextQuests.filter(q => q.isDaily).every(q => q.completed);
+      const willUpdateStreak = allDailiesCompletedNow && profile.lastStreakDate !== today;
+
+      if (willUpdateStreak) {
+        addSystemMessage("SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1)", "success");
+      }
+
       setProfile(p => ({
         ...p,
         xp: newXp,
@@ -717,10 +737,14 @@ const App: React.FC = () => {
         stats: calculateStats(newLevel),
         gold: p.gold + finalGoldReward,
         dailyItemDropsCount: dailyDrops,
-        lastItemDropDate: today
+        lastItemDropDate: today,
+        ...(willUpdateStreak ? {
+          dailyStreak: (p.dailyStreak || 0) + 1,
+          lastStreakDate: today
+        } : {})
       }));
 
-      setQuests(prev => prev.map(qu => qu.id === id ? { ...qu, completed: true, completedAt: Date.now() } : qu));
+      setQuests(nextQuests);
       addSystemMessage(`QUEST CONCLUÍDA. RECOMPENSA: +${finalGoldReward} OURO.`, 'success');
     }
   };
@@ -803,7 +827,8 @@ const App: React.FC = () => {
           updates.isPenaltyZoneActive = false;
           updates.penaltyEndTime = undefined;
           updates.penaltyType = undefined;
-          addSystemMessage("SISTEMA: PURIFICAÇÃO COMPLETA REALIZADA.", "success");
+          updates.dailyStreak = 0;
+          addSystemMessage("SISTEMA: PURIFICAÇÃO COMPLETA. OFENSIVA ZERADA.", "success");
           break;
         case 'key-1': {
           const timedBuff: ActiveBuff = {
@@ -1346,6 +1371,12 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-4 justify-center md:justify-end">
+                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-red-500/20 bg-red-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <Flame size={12} className="text-red-500 mb-1" />
+                  <p className="text-[8px] font-game text-red-700 mb-0.5 uppercase tracking-tighter">Ofensivas</p>
+                  <p className="font-game text-xl md:text-2xl text-red-500 leading-none">{profile.dailyStreak || 0}</p>
+                </div>
                 <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-cyan-500/20 bg-cyan-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <Zap size={12} className="text-cyan-500 mb-1" />
