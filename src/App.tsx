@@ -82,7 +82,8 @@ const INITIAL_PROFILE: HunterProfile = {
   dailyItemDropsCount: 0,
   lastItemDropDate: "",
   dailyStreak: 0,
-  lastStreakDate: ""
+  lastStreakDate: "",
+  lastDailyCheckDate: ""
 };
 
 const XP_DROP_THRESHOLD = 50000;
@@ -294,7 +295,24 @@ const App: React.FC = () => {
       let updateRequired = false;
       let corruptionIncrease = 0;
       let goldPenaltyAtOnce = 0;
-      let resetStreak = false;
+      let streakUpdatedToday = false;
+      let newStreakValue = profile.dailyStreak || 0;
+
+      const dayChangedSinceLastCheck = profile.lastDailyCheckDate && profile.lastDailyCheckDate !== today;
+      
+      if (dayChangedSinceLastCheck) {
+        const anyPending = quests.some(q => !q.completed && !q.failed);
+        if (!anyPending) {
+          newStreakValue += 1;
+          addSystemMessage("SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1)", "success");
+        } else {
+          newStreakValue = 0;
+          addSystemMessage("SISTEMA: OFENSIVA QUEBRADA. MISSÕES PENDENTES.", "warning");
+        }
+        streakUpdatedToday = true;
+      } else if (!profile.lastDailyCheckDate) {
+        streakUpdatedToday = true;
+      }
 
       const updatedQuests = quests.reduce((acc, q) => {
         // Special Quests Expiration Logic
@@ -331,7 +349,6 @@ const App: React.FC = () => {
             updateRequired = true;
             if (!q.completed) {
               corruptionIncrease += 10;
-              resetStreak = true;
               addSystemMessage(`SISTEMA: TREINAMENTO DIÁRIO "${q.title}" NEGLIGENCIADO.`, "error");
             } else {
               addSystemMessage(`SISTEMA: CICLO DIÁRIO REINICIADO PARA "${q.title}".`, "info");
@@ -352,12 +369,16 @@ const App: React.FC = () => {
         return acc;
       }, [] as Quest[]);
 
-      if (updateRequired || corruptionIncrease > 0 || resetStreak) {
+      if (updateRequired || corruptionIncrease > 0 || streakUpdatedToday) {
         setQuests(updatedQuests);
         updateCorruption(corruptionIncrease, goldPenaltyAtOnce);
-        if (resetStreak) {
-          setProfile(p => ({ ...p, dailyStreak: 0 }));
-          addSystemMessage("SISTEMA: OFENSIVA QUEBRADA. CONTADOR REINICIADO.", "warning");
+        if (streakUpdatedToday) {
+          setProfile(p => ({ 
+            ...p, 
+            dailyStreak: newStreakValue,
+            lastStreakDate: newStreakValue > (p.dailyStreak || 0) ? today : p.lastStreakDate,
+            lastDailyCheckDate: today
+          }));
         }
       }
     }, 5000);
@@ -719,13 +740,6 @@ const App: React.FC = () => {
       }
 
       const nextQuests = quests.map(qu => qu.id === id ? { ...qu, completed: true, completedAt: Date.now() } : qu);
-      const hasDailies = nextQuests.some(q => q.isDaily);
-      const allDailiesCompletedNow = hasDailies && nextQuests.filter(q => q.isDaily).every(q => q.completed);
-      const willUpdateStreak = allDailiesCompletedNow && profile.lastStreakDate !== today;
-
-      if (willUpdateStreak) {
-        addSystemMessage("SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1)", "success");
-      }
 
       setProfile(p => ({
         ...p,
@@ -737,11 +751,7 @@ const App: React.FC = () => {
         stats: calculateStats(newLevel),
         gold: p.gold + finalGoldReward,
         dailyItemDropsCount: dailyDrops,
-        lastItemDropDate: today,
-        ...(willUpdateStreak ? {
-          dailyStreak: (p.dailyStreak || 0) + 1,
-          lastStreakDate: today
-        } : {})
+        lastItemDropDate: today
       }));
 
       setQuests(nextQuests);
@@ -1676,16 +1686,16 @@ const App: React.FC = () => {
                 </div>
 
                 {!newQuestIsDaily && !newQuestIsSpecial && (
-                  <div className={`p-4 border flex flex-col justify-center transition-all bg-red-950/10 ${newQuestDeadline ? 'border-red-900/60' : 'border-red-600 animate-pulse'}`}>
-                    <label className="block text-[9px] font-game text-red-500 uppercase font-bold mb-1 flex items-center gap-2">
-                      <Clock size={12} /> Prazo Final {editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? '(LIMITE DE EDIÇÃO ATINGIDO)' : editingQuest ? '(APENAS UMA EDIÇÃO PERMITIDA)' : '(OBRIGATÓRIO)'}
+                  <div className={`p-4 border flex flex-col justify-center transition-all bg-red-900/20 ${newQuestDeadline ? 'border-red-500/50' : 'border-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}>
+                    <label className="block text-[10px] md:text-[11px] font-game text-red-400 uppercase font-bold mb-1 flex items-center gap-2">
+                      <CalendarDays size={16} className="text-red-500" /> Prazo Final {editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? '(LIMITE DE EDIÇÃO ATINGIDO)' : editingQuest ? '(APENAS UMA EDIÇÃO PERMITIDA)' : '(OBRIGATÓRIO)'}
                     </label>
                     <input
                       disabled={!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1}
                       type="datetime-local"
                       value={newQuestDeadline}
                       onChange={e => setNewQuestDeadline(e.target.value)}
-                      className={`bg-black/40 border border-red-900/40 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                      className={`bg-black/60 border border-red-900/60 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                     />
                   </div>
                 )}
@@ -1748,7 +1758,7 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-slate-900 mt-auto">
-                <button onClick={() => { setQuestForm({ isOpen: false }); resetForm(); }} className="hidden sm:block flex-1 py-4 font-game text-[11px] text-slate-600 hover:text-slate-300 transition-colors uppercase font-bold tracking-widest">Cancelar</button>
+                <button onClick={() => { setQuestForm({ isOpen: false }); resetForm(); }} className="hidden sm:block flex-1 py-4 font-game text-[11px] text-slate-600 hover:text-red-500 hover:bg-red-950/20 border border-transparent hover:border-red-900/40 transition-all uppercase font-bold tracking-widest">Cancelar</button>
                 <button
                   onClick={handleSaveQuest}
                   disabled={isFormInvalid}

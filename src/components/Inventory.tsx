@@ -15,11 +15,14 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
     const existing = acc.find(i => i.id === item.id);
     if (existing) {
       existing.purchasedCount += item.purchasedCount;
+      if (item.origin && !existing.origins?.includes(item.origin)) {
+        existing.origins = [...(existing.origins || []), item.origin];
+      }
     } else {
-      acc.push({ ...item });
+      acc.push({ ...item, origins: item.origin ? [item.origin] : [] });
     }
     return acc;
-  }, [] as StoreItem[]);
+  }, [] as (StoreItem & { origins?: string[] })[]);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -50,18 +53,22 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
                       <h3 className="font-game text-lg text-white group-hover:text-cyan-400 transition-all duration-300 uppercase tracking-widest truncate font-black leading-tight">
                         {item.name}
                       </h3>
-                      <div className={`inline-block mt-1 px-2 py-0.5 text-[8px] font-game border uppercase tracking-widest ${
-                        item.origin === 'compra' ? 'border-orange-500/50 text-orange-500 bg-orange-950/20' :
-                        item.origin === 'diário' ? 'border-cyan-500/50 text-cyan-500 bg-cyan-950/20' :
-                        item.origin === 'rank' ? 'border-purple-500/50 text-purple-500 bg-purple-950/20' :
-                        item.origin === 'nível' ? 'border-green-500/50 text-green-500 bg-green-950/20' :
-                        'border-slate-500/40 text-slate-400 bg-slate-950/20'
-                      }`}>
-                        {item.origin === 'compra' ? 'ADQUIRIDO NA LOJA' : 
-                         item.origin === 'diário' ? 'RECOMPENSA DIÁRIA' :
-                         item.origin === 'rank' ? 'DROP DE RANK' :
-                         item.origin === 'nível' ? 'PROGRESSÃO DE NÍVEL' :
-                         'RELÍQUIA LEGADA'}
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {item.origins?.map((origin, idx) => (
+                          <div key={idx} className={`inline-block px-2 py-0.5 text-[8px] font-game border uppercase tracking-widest ${
+                            origin === 'compra' ? 'border-orange-500/50 text-orange-500 bg-orange-950/20' :
+                            origin === 'diário' ? 'border-cyan-500/50 text-cyan-500 bg-cyan-950/20' :
+                            origin === 'rank' ? 'border-purple-500/50 text-purple-500 bg-purple-950/20' :
+                            origin === 'nível' ? 'border-green-500/50 text-green-500 bg-green-950/20' :
+                            'border-slate-500/40 text-slate-400 bg-slate-950/20'
+                          }`}>
+                            {origin === 'compra' ? 'ADQUIRIDO NA LOJA' : 
+                             origin === 'diário' ? 'RECOMPENSA DIÁRIA' :
+                             origin === 'rank' ? 'DROP DE RANK' :
+                             origin === 'nível' ? 'PROGRESSÃO DE NÍVEL' :
+                             'RELÍQUIA LEGADA'}
+                          </div>
+                        ))}
                       </div>
                     </div>
                     <div className="flex flex-col items-end shrink-0">

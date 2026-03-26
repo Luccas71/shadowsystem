@@ -48,6 +48,7 @@ export interface HunterProfile {
   lastItemDropDate?: string;
   dailyStreak?: number; // Contador de ofensivas (dias consecutivos)
   lastStreakDate?: string; // Data da ultima ofensiva incrementada
+  lastDailyCheckDate?: string; // Data da última verificação diária de streak
   lastUpdate?: string; // ISO timestamp
 }
 
