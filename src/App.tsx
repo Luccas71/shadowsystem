@@ -369,40 +369,31 @@ const App: React.FC = () => {
         }
 
         if (q.isScheduled && q.repeatDays) {
-          const currentDayOfWeek = new Date().getDay();
-          const isActiveToday = q.repeatDays.includes(currentDayOfWeek);
-          const lastReset = q.lastResetAt ? new Date(q.lastResetAt).toDateString() : '';
-
-          if (lastReset !== today) {
-            if (isActiveToday) {
-              updateRequired = true;
-              if (!q.completed) {
+          const lastResetDate = q.lastResetAt ? new Date(q.lastResetAt) : (q.createdAt ? new Date(q.createdAt) : null);
+          const lastResetDayStr = lastResetDate ? lastResetDate.toDateString() : '';
+          
+          if (lastResetDayStr !== today) {
+            updateRequired = true;
+            
+            // Verificamos se o dia que acabou de terminar era um dia ativo
+            if (lastResetDate) {
+              const dayFinished = lastResetDate.getDay();
+              const wasFinishedDayActive = q.repeatDays.includes(dayFinished);
+              
+              if (wasFinishedDayActive && !q.completed && !q.failed) {
                 corruptionIncrease += 10;
-                addSystemMessage(`SISTEMA: TREINAMENTO PROGRAMADO "${q.title}" NEGLIGENCIADO.`, "error");
-              } else {
-                addSystemMessage(`SISTEMA: CICLO PROGRAMADO REINICIADO PARA "${q.title}".`, "info");
+                addSystemMessage(`SISTEMA: MISSÃO PROGRAMADA "${q.title.toUpperCase()}" NÃO CUMPRIDA. +10% CORRUPÇÃO.`, "error");
               }
-
-              acc.push({
-                ...q,
-                completed: false,
-                failed: false,
-                lastResetAt: now,
-                subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
-              });
-              return acc;
-            } else if (q.completed || q.failed) {
-              // Reset quietly on non-active days if it was completed/failed yesterday
-              updateRequired = true;
-              acc.push({
-                ...q,
-                completed: false,
-                failed: false,
-                lastResetAt: now,
-                subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
-              });
-              return acc;
             }
+
+            acc.push({
+              ...q,
+              completed: false,
+              failed: false,
+              lastResetAt: now,
+              subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
+            });
+            return acc;
           }
         }
 
@@ -1548,12 +1539,24 @@ const App: React.FC = () => {
                 </button>
               </div>
 
-              <Reorder.Group axis="y" values={quests.filter(q => !q.completed && !q.failed)} onReorder={(newOrder) => {
+              <Reorder.Group axis="y" values={quests.filter(q => {
+                if (q.completed || q.failed) return false;
+                if (q.isScheduled && q.repeatDays) {
+                  return q.repeatDays.includes(new Date().getDay());
+                }
+                return true;
+              })} onReorder={(newOrder) => {
                 const activeIds = new Set(newOrder.map(q => q.id));
                 const completedOrFailed = quests.filter(q => q.completed || q.failed);
                 setQuests([...newOrder, ...completedOrFailed]);
               }} className="space-y-4">
-                {quests.filter(q => !q.completed && !q.failed).map(q => (
+                {quests.filter(q => {
+                  if (q.completed || q.failed) return false;
+                  if (q.isScheduled && q.repeatDays) {
+                    return q.repeatDays.includes(new Date().getDay());
+                  }
+                  return true;
+                }).map(q => (
                   <DraggableQuestItem key={q.id} quest={q}>
                     <QuestCard
                       quest={q}
@@ -1567,7 +1570,13 @@ const App: React.FC = () => {
                   </DraggableQuestItem>
                 ))}
               </Reorder.Group>
-                {quests.filter(q => !q.completed && !q.failed).length === 0 && (
+                {quests.filter(q => {
+                  if (q.completed || q.failed) return false;
+                  if (q.isScheduled && q.repeatDays) {
+                    return q.repeatDays.includes(new Date().getDay());
+                  }
+                  return true;
+                }).length === 0 && (
                   <div className="text-center py-20 hud-board border-dashed border border-cyan-900/30 opacity-40">
                     <p className="font-game text-[12px] text-cyan-700 tracking-widest uppercase">AGUARDANDO NOVAS MISSÕES...</p>
                   </div>
