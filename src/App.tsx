@@ -50,6 +50,7 @@ import {
   ShoppingBag,
   Database,
   Clock,
+  Timer,
   X,
   Check,
   Monitor,
@@ -169,6 +170,8 @@ const App: React.FC = () => {
   const [newQuestDifficulty, setNewQuestDifficulty] = useState<QuestDifficulty>(QuestDifficulty.E);
   const [newQuestIsDaily, setNewQuestIsDaily] = useState(false);
   const [newQuestIsSpecial, setNewQuestIsSpecial] = useState(false);
+  const [newQuestIsScheduled, setNewQuestIsScheduled] = useState(false);
+  const [newQuestRepeatDays, setNewQuestRepeatDays] = useState<number[]>([]);
   const [newQuestDeadline, setNewQuestDeadline] = useState<string>('');
   const [completingQuest, setCompletingQuest] = useState<{
     quest: Quest;
@@ -362,6 +365,44 @@ const App: React.FC = () => {
               subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
             });
             return acc;
+          }
+        }
+
+        if (q.isScheduled && q.repeatDays) {
+          const currentDayOfWeek = new Date().getDay();
+          const isActiveToday = q.repeatDays.includes(currentDayOfWeek);
+          const lastReset = q.lastResetAt ? new Date(q.lastResetAt).toDateString() : '';
+
+          if (lastReset !== today) {
+            if (isActiveToday) {
+              updateRequired = true;
+              if (!q.completed) {
+                corruptionIncrease += 10;
+                addSystemMessage(`SISTEMA: TREINAMENTO PROGRAMADO "${q.title}" NEGLIGENCIADO.`, "error");
+              } else {
+                addSystemMessage(`SISTEMA: CICLO PROGRAMADO REINICIADO PARA "${q.title}".`, "info");
+              }
+
+              acc.push({
+                ...q,
+                completed: false,
+                failed: false,
+                lastResetAt: now,
+                subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
+              });
+              return acc;
+            } else if (q.completed || q.failed) {
+              // Reset quietly on non-active days if it was completed/failed yesterday
+              updateRequired = true;
+              acc.push({
+                ...q,
+                completed: false,
+                failed: false,
+                lastResetAt: now,
+                subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
+              });
+              return acc;
+            }
           }
         }
 
@@ -1147,14 +1188,18 @@ const App: React.FC = () => {
     setNewQuestDifficulty(quest.difficulty);
     setNewQuestIsDaily(!!quest.isDaily);
     setNewQuestIsSpecial(!!quest.isSpecial);
+    setNewQuestIsScheduled(!!quest.isScheduled);
+    setNewQuestRepeatDays(quest.repeatDays || []);
     setNewQuestDeadline(quest.deadline ? new Date(quest.deadline).toISOString().slice(0, 16) : '');
     setQuestForm({ isOpen: true });
   };
 
   const handleSaveQuest = () => {
     if (!newQuestTitle.trim()) return;
+    const isFormInvalid = !newQuestTitle.trim() || (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestDeadline) || (newQuestIsScheduled && newQuestRepeatDays.length === 0);
+    if (isFormInvalid) return;
 
-    if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestDeadline) {
+    if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestDeadline) {
       addSystemMessage("SISTEMA: ERRO DE PROTOCOLO. QUESTS ÚNICAS EXIGEM UM PRAZO FINAL.", "error");
       return;
     }
@@ -1204,14 +1249,20 @@ const App: React.FC = () => {
         failed: false,
         isDaily: newQuestIsDaily,
         isSpecial: newQuestIsSpecial,
+        isScheduled: newQuestIsScheduled,
+        repeatDays: newQuestIsScheduled ? newQuestRepeatDays : undefined,
         deadline: resolvedDeadline,
         deadlineEdits: 0,
-        lastResetAt: newQuestIsDaily ? Date.now() : undefined,
+        lastResetAt: (newQuestIsDaily || newQuestIsScheduled) ? Date.now() : undefined,
         createdAt: Date.now(),
         subQuests: []
       };
       setQuests(prev => [newQuest, ...prev]);
-      addSystemMessage(newQuestIsSpecial ? "SISTEMA: OPERAÇÃO URGENTE REGISTRADA." : "SISTEMA: NOVA DIRETRIZ REGISTRADA.", "success");
+      let categoryName = "QUEST ÚNICA";
+      if (newQuestIsDaily) categoryName = "QUEST DIÁRIA";
+      if (newQuestIsSpecial) categoryName = "QUEST ESPECIAL";
+      if (newQuestIsScheduled) categoryName = "QUEST PROGRAMADA";
+      addSystemMessage(`SISTEMA: NOVA ${categoryName} REGISTRADA.`, "success");
     }
 
     setQuestForm({ isOpen: false });
@@ -1252,6 +1303,8 @@ const App: React.FC = () => {
     setNewQuestTitle('');
     setNewQuestIsDaily(false);
     setNewQuestIsSpecial(false);
+    setNewQuestIsScheduled(false);
+    setNewQuestRepeatDays([]);
     setNewQuestDeadline('');
     setNewQuestDifficulty(QuestDifficulty.E);
   };
@@ -1260,7 +1313,9 @@ const App: React.FC = () => {
   const nextRareDropProgress = (profile.totalXpGained % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
   const xpRemainingForDrop = XP_DROP_THRESHOLD - (profile.totalXpGained % XP_DROP_THRESHOLD);
 
-  const isFormInvalid = !newQuestTitle.trim() || (!newQuestIsDaily && !newQuestIsSpecial && !newQuestDeadline);
+  const isFormInvalid = !newQuestTitle.trim() || 
+    (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestDeadline) || 
+    (newQuestIsScheduled && newQuestRepeatDays.length === 0);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -1679,16 +1734,56 @@ const App: React.FC = () => {
                       {editingQuest ? <Lock size={20} /> : <Zap size={20} />}
                     </button>
                     <div className="min-w-0">
-                      <p className={`font-game text-[11px] uppercase font-bold truncate ${newQuestIsSpecial ? 'text-orange-400' : 'text-orange-600'}`}>Op. Urgente (Hoje)</p>
+                      <p className={`font-game text-[11px] uppercase font-bold truncate ${newQuestIsSpecial ? 'text-orange-400' : 'text-orange-600'}`}>Quest Especial</p>
                       <p className="text-[10px] text-slate-500 uppercase font-medium">{newQuestIsSpecial ? 'Expira Meia-Noite' : 'Opcional'}</p>
                     </div>
                   </div>
                 </div>
 
-                {!newQuestIsDaily && !newQuestIsSpecial && (
+                <div className={`flex flex-col gap-2`}>
+                  <div className={`flex items-center gap-4 bg-indigo-950/10 p-4 border border-indigo-900/20 rounded-lg transition-all ${editingQuest || newQuestIsDaily || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-900/20 cursor-pointer'}`}
+                    onClick={() => !editingQuest && !newQuestIsDaily && !newQuestIsSpecial && setNewQuestIsScheduled(!newQuestIsScheduled)}>
+                    <button
+                      disabled={!!editingQuest || newQuestIsDaily || newQuestIsSpecial}
+                      type="button"
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsScheduled ? 'bg-indigo-900/40 border-indigo-400 text-indigo-300 shadow-[0_0_10px_#818cf8]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsDaily || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                    >
+                      {editingQuest ? <Lock size={20} /> : <Timer size={20} />}
+                    </button>
+                    <div className="min-w-0">
+                      <p className="font-game text-[11px] text-indigo-400 uppercase font-bold truncate">Quest Programada</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-medium">{newQuestIsScheduled ? 'Repetição Semanal' : 'Não Selecionado'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {newQuestIsScheduled && (
+                  <div className="col-span-1 sm:col-span-2 space-y-3 bg-indigo-950/20 p-4 border border-indigo-900/30 rounded-lg">
+                    <label className="block text-[10px] font-game text-indigo-500 uppercase tracking-widest font-bold mb-2">Dias de Ativação</label>
+                    <div className="flex justify-between gap-1">
+                      {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day, index) => (
+                        <button
+                          key={day}
+                          onClick={() => {
+                            if (newQuestRepeatDays.includes(index)) {
+                              setNewQuestRepeatDays(newQuestRepeatDays.filter(d => d !== index));
+                            } else {
+                              setNewQuestRepeatDays([...newQuestRepeatDays, index].sort());
+                            }
+                          }}
+                          className={`flex-1 py-2 font-game text-[10px] border transition-all ${newQuestRepeatDays.includes(index) ? 'bg-indigo-500 border-indigo-400 text-black font-bold shadow-[0_0_10px_rgba(129,140,248,0.5)]' : 'bg-black border-indigo-900/30 text-indigo-900 hover:border-indigo-700'}`}
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && (
                   <div className={`p-4 border flex flex-col justify-center transition-all bg-red-900/20 ${newQuestDeadline ? 'border-red-500/50' : 'border-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}>
                     <label className="block text-[10px] md:text-[11px] font-game text-red-400 uppercase font-bold mb-1 flex items-center gap-2">
-                      <CalendarDays size={16} className="text-red-500" /> Prazo Final {editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? '(LIMITE DE EDIÇÃO ATINGIDO)' : editingQuest ? '(APENAS UMA EDIÇÃO PERMITIDA)' : '(OBRIGATÓRIO)'}
+                      <CalendarDays size={16} className="text-red-500" /> Quest Única {editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? '(LIMITE DE EDIÇÃO ATINGIDO)' : editingQuest ? '(APENAS UMA EDIÇÃO PERMITIDA)' : '(PRAZO OBRIGATÓRIO)'}
                     </label>
                     <input
                       disabled={!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1}
@@ -1730,6 +1825,10 @@ const App: React.FC = () => {
                     // PROTOCOLO 1.2: Apenas Rank S requer Rank S. Outros estão liberados até Rank A.
                     const isLocked = d === QuestDifficulty.S && profile.rank !== Rank.S;
                     const isActive = d === newQuestDifficulty;
+                    const rankStyle = RANK_COLORS[d as unknown as Rank] || '';
+                    const textClass = rankStyle.split(' ').find(c => c.startsWith('text-')) || 'text-slate-500';
+                    const borderClass = rankStyle.split(' ').find(c => c.startsWith('border-')) || 'border-slate-500';
+                    const neonClass = rankStyle.split(' ').find(c => c.startsWith('neon-text-')) || '';
 
                     return (
                       <button
@@ -1739,15 +1838,15 @@ const App: React.FC = () => {
                         className={`rank-cell h-14 md:h-16 border flex flex-col items-center justify-center gap-1 transition-all ${isLocked
                           ? 'border-red-950/10 bg-red-950/5 text-red-900/20 cursor-not-allowed'
                           : isActive
-                            ? 'rank-cell-active border-cyan-400 bg-cyan-900/20 text-cyan-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                            : 'border-slate-800 bg-black/40 text-slate-600 hover:border-cyan-700 hover:text-cyan-300'
+                            ? `rank-cell-active ${borderClass} bg-black/60 ${textClass} shadow-[0_0_15px_rgba(0,0,0,0.3)] ${neonClass}`
+                            : `border-slate-800 bg-black/40 ${textClass} opacity-40 hover:opacity-100 hover:${borderClass}`
                           }`}
                       >
                         {isLocked ? (
                           <Lock size={12} />
                         ) : (
                           <>
-                            <span className={`font-game text-lg md:text-xl font-black ${isActive ? 'text-cyan-400' : 'text-slate-500'}`}>{d}</span>
+                            <span className={`font-game text-lg md:text-xl font-black ${isActive ? textClass : 'text-slate-500'}`}>{d}</span>
                             <span className="font-game text-[8px] tracking-tighter font-bold uppercase hidden md:inline">RANK {d}</span>
                           </>
                         )}

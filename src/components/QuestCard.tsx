@@ -14,7 +14,8 @@ import {
   Clock,
   AlertCircle,
   Edit2,
-  Zap
+  Zap,
+  Timer
 } from 'lucide-react';
 
 interface QuestCardProps {
@@ -215,16 +216,22 @@ const QuestCard: React.FC<QuestCardProps> = ({
                 {quest.isDaily && (
                   <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : colors.badge
                     }`}>
-                    <RefreshCw size={10} /> DIÁRIA
+                    <RefreshCw size={10} /> QUEST DIÁRIA
+                  </span>
+                )}
+                {quest.isScheduled && (
+                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : 'text-indigo-400 border-indigo-500/30 bg-indigo-950/60 shadow-[0_0_10px_rgba(129,140,248,0.3)]'
+                    }`}>
+                    <Timer size={10} /> QUEST PROGRAMADA
                   </span>
                 )}
                 {quest.isSpecial && (
                   <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : 'text-purple-400 border-purple-500/30 bg-purple-950/60 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
                     }`}>
-                    <Zap size={10} /> OP. URGENTE
+                    <Zap size={10} /> QUEST ESPECIAL
                   </span>
                 )}
-                {!quest.isDaily && quest.deadline && !quest.completed && !quest.failed && (
+                {!quest.isDaily && !quest.isScheduled && quest.deadline && !quest.completed && !quest.failed && (
                   <span className={`flex items-center gap-1 font-game text-[9px] px-2 py-0.5 rounded-sm font-bold border whitespace-nowrap ${isUrgent ? 'text-red-500 border-red-500 bg-red-950/60' : colors.badge
                     }`}>
                     <Clock size={10} /> {timeLeft}

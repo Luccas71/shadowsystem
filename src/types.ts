@@ -92,6 +92,8 @@ export interface Quest {
   isDaily?: boolean; // Nova propriedade
   lastResetAt?: number; // Nova propriedade
   isSpecial?: boolean; // Expira a meia noite, gera punicao se nao completada e desaparece
+  isScheduled?: boolean; // Novo: Se repete em dias específicos
+  repeatDays?: number[]; // Novo: Array de dias da semana (0-6)
   completedAt?: number; // Data de conclusão da missão
 }
 
