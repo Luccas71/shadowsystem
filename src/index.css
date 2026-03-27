@@ -14,6 +14,8 @@
     --penalty-red: #ff3333;
     --system-orange: #ffaa00;
     --neon-cyan: #00e5ff;
+    --neon-green: #10b981;
+    --neon-purple: #a855f7;
 }
 
 html,
@@ -142,6 +144,11 @@ body::after {
 .neon-text-blue {
     color: #00bfff;
     text-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
+}
+
+.neon-text-emerald {
+    color: #10b981;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
 }
 
 .neon-text-green {

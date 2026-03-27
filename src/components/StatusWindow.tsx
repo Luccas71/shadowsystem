@@ -133,14 +133,14 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
           progress={Math.min(100, rankProgress)} 
           label="PRÓXIMO RANK" 
           subLabel={nextRank ? `EVOLUÇÃO PARA RANK ${nextRank.rank}` : "RANK MÁXIMO ATINGIDO"}
-          color={profile.rank === Rank.S ? "stroke-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]" : "stroke-orange-500"}
+          color={profile.rank === Rank.S ? "stroke-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]" : "stroke-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]"}
           icon={<Trophy size={16} />} 
         />
         <CircularProgress 
           progress={rareDropProgress} 
           label="ITEM RARO" 
           subLabel={`${Math.floor(xpRemainingForDrop / 1000)}K XP PARA O DROP`}
-          color="stroke-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.5)]"
+          color="stroke-lime-500 shadow-[0_0_20px_rgba(132,204,22,0.3)]"
           icon={<Sparkles size={16} />} 
         />
       </div>
@@ -149,23 +149,23 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
       <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-slate-950/20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
           <div className="flex items-center gap-6">
-            <div className="relative p-4 bg-black/40 border border-white/10 text-cyan-400">
+            <div className="relative p-4 bg-black/40 border border-white/10 text-emerald-400">
               <Database size={28} />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-1 h-3 bg-cyan-600"></div>
-                <h3 className="font-game text-[10px] text-cyan-700 uppercase tracking-[0.4em] font-black opacity-80">RESERVA_ESTÁVEL_DE_MANA</h3>
+                <div className="w-1 h-3 bg-emerald-600"></div>
+                <h3 className="font-game text-[10px] text-emerald-700 uppercase tracking-[0.4em] font-black opacity-80">RESERVA_ESTÁVEL_DE_MANA</h3>
               </div>
               <p className="font-game text-4xl text-white tracking-widest font-black">
-                {profile.totalXpGained.toLocaleString()} <span className="text-sm text-cyan-900 font-bold ml-1 opacity-50">XP_TOTAL</span>
+                {profile.totalXpGained.toLocaleString()} <span className="text-sm text-emerald-900 font-bold ml-1 opacity-50">XP_TOTAL</span>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="px-5 py-2 border border-white/5 text-cyan-600 font-game text-[11px] uppercase tracking-[0.3em] font-black flex items-center gap-3">
-              <span className="w-1.5 h-1.5 bg-cyan-900 rounded-full"></span>
+            <div className="px-5 py-2 border border-white/5 text-emerald-600 font-game text-[11px] uppercase tracking-[0.3em] font-black flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-emerald-900 rounded-full"></span>
               CONEXÃO_ATIVA
             </div>
           </div>
@@ -173,7 +173,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
       </div>
 
       {/* Ofensiva do Sistema (Streak) */}
-      <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-amber-950/10 group hover:bg-amber-950/20 transition-all duration-500">
+      <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-emerald-950/10 group hover:bg-emerald-950/20 transition-all duration-500">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
           <div className="flex items-center gap-6">
             <div className={`relative p-4 bg-black/40 border border-white/10 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
@@ -181,8 +181,8 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-1 h-3 bg-amber-600"></div>
-                <h3 className="font-game text-[10px] text-amber-700 uppercase tracking-[0.4em] font-black opacity-80">TIER_DE_CONSISTÊNCIA</h3>
+                <div className="w-1 h-3 bg-emerald-600"></div>
+                <h3 className="font-game text-[10px] text-emerald-700 uppercase tracking-[0.4em] font-black opacity-80">TIER_DE_CONSISTÊNCIA</h3>
               </div>
               <p className="font-game text-4xl text-white tracking-widest font-black">
                 {getCurrentStreakTier(profile.dailyStreak || 0).name} <span className={`text-sm font-bold ml-1 opacity-50 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>{profile.dailyStreak || 0}_DIAS</span>
@@ -191,7 +191,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
           </div>
 
           <div className="flex flex-col items-end gap-2">
-            <div className="px-5 py-2 border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 font-game text-[14px] uppercase tracking-[0.2em] font-black flex items-center gap-3 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+            <div className="px-5 py-2 border border-emerald-500/20 bg-emerald-950/20 text-emerald-400 font-game text-[14px] uppercase tracking-[0.2em] font-black flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
                BÔNUS: +{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% GERAL
             </div>
           </div>
@@ -332,7 +332,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                 <div key={buff.id} className="hud-board border-white/10 p-6 md:p-7 relative overflow-hidden group bg-slate-950/40 hover:bg-slate-900/40 transition-all duration-300">
                   <div className="flex justify-between items-start mb-2 relative z-10">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-black/60 border border-white/10 text-cyan-400 font-game shadow-[0_0_15px_rgba(34,211,238,0.1)] group-hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] transition-all">
+                      <div className="p-3 bg-black/60 border border-white/10 text-emerald-400 font-game shadow-[0_0_15px_rgba(16,185,129,0.1)] group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
                         {buff.icon || '✨'}
                       </div>
                       <div>
@@ -350,7 +350,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                       </div>
                     </div>
                     {buff.value && (
-                      <div className="font-game text-[12px] text-cyan-400 border border-cyan-500/30 px-2.5 py-1 bg-cyan-950/40 font-black shadow-inner">
+                      <div className="font-game text-[12px] text-emerald-400 border border-emerald-500/30 px-2.5 py-1 bg-emerald-950/40 font-black shadow-inner">
                         {buff.value}
                       </div>
                     )}
@@ -360,15 +360,15 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                     <div className="mt-4 space-y-1.5 relative z-10">
                       <div className="flex items-center justify-between text-[8px] font-game text-slate-500 uppercase tracking-[0.2em] font-black">
                         <div className="flex items-center gap-1.5">
-                          <Clock size={10} className="text-cyan-600" /> TEMPO_RESTANTE
+                          <Clock size={10} className="text-emerald-600" /> TEMPO_RESTANTE
                         </div>
-                        <span className="text-cyan-400">
+                        <span className="text-emerald-400">
                           {Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS
                         </span>
                       </div>
                       <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-cyan-500 shadow-[0_0_10px_#06b6d4] transition-all duration-1000"
+                          className="h-full bg-emerald-500 shadow-[0_0_10px_#10b981] transition-all duration-1000"
                           style={{ width: `${Math.max(0, Math.min(100, ((buff.endTime - Date.now()) / 3600000) * 100))}%` }}
                         ></div>
                       </div>
@@ -376,7 +376,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                   )}
 
                   {/* Decorative background element for buff cards */}
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 blur-3xl rounded-full -mr-12 -mt-12 pointer-events-none group-hover:bg-cyan-500/10 transition-all"></div>
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-3xl rounded-full -mr-12 -mt-12 pointer-events-none group-hover:bg-emerald-500/10 transition-all"></div>
                 </div>
               ))
             )}
