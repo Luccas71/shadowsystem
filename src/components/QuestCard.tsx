@@ -176,7 +176,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
           : `hud-board-glow ${rankBorderClass} border-opacity-50`
         }`}>
 
-        <div className="p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 relative z-10 min-w-0">
+        <div className="p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-8 relative z-10 min-w-0">
 
           <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-20 md:h-20 self-center sm:self-auto group/check">
             {!quest.completed && !quest.failed && (
@@ -210,8 +210,9 @@ const QuestCard: React.FC<QuestCardProps> = ({
           <div className="flex-1 space-y-2 min-w-0 w-full">
             <div className="flex flex-col gap-2 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-game text-[10px] px-2 py-0.5 border leading-none font-bold tracking-widest ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/80 whitespace-nowrap`}>
-                  {quest.failed ? 'FALHA' : `RANK ${quest.difficulty}`}
+                <span className={`font-game text-[10px] px-2 py-0.5 border leading-none font-black tracking-[0.2em] shadow-sm relative overflow-hidden transition-all duration-500 ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/80 whitespace-nowrap group-hover:px-4`}>
+                  <div className="absolute inset-x-0 bottom-0 h-[1px] bg-current opacity-30"></div>
+                  {quest.failed ? 'FALHA' : `RANK_${quest.difficulty}`}
                 </span>
                 {quest.isDaily && (
                   <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : colors.badge
@@ -249,12 +250,27 @@ const QuestCard: React.FC<QuestCardProps> = ({
               {quest.failed ? 'Diretriz falha por descumprimento de prazo.' : quest.description}
             </p>
 
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] md:text-[12px] font-game text-slate-500 pt-1 font-bold uppercase tracking-wider">
-              <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <Flame size={12} className={!quest.completed && !quest.failed ? colors.flameIcon : ''} /> {quest.xpReward.toLocaleString()} EXP
+            <div className="flex flex-wrap gap-x-6 gap-y-3 pt-3 border-t border-white/5">
+              <div className="flex flex-col gap-1">
+                <span className="text-[8px] font-game text-slate-600 uppercase tracking-widest font-black">RECOMPENSA_XP</span>
+                <div className="flex items-center gap-2 text-[12px] md:text-[14px] font-game text-white font-black tracking-wider">
+                  <div className={`p-1 bg-black/40 border border-white/5 ${!quest.completed && !quest.failed ? colors.flameIcon : 'text-slate-700'}`}>
+                    <Flame size={14} fill="currentColor" fillOpacity={0.1} />
+                  </div>
+                  <span>{quest.xpReward.toLocaleString()}</span>
+                  <span className="text-[10px] text-slate-600 font-bold">EXP</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <Coins size={12} className={!quest.completed && !quest.failed ? 'text-amber-600' : ''} /> {quest.goldReward.toLocaleString()} OURO
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[8px] font-game text-slate-600 uppercase tracking-widest font-black">RECOMPENSA_OURO</span>
+                <div className="flex items-center gap-2 text-[12px] md:text-[14px] font-game text-amber-500 font-black tracking-wider">
+                  <div className={`p-1 bg-black/40 border border-white/5 ${!quest.completed && !quest.failed ? 'text-amber-500' : 'text-slate-700'}`}>
+                    <Coins size={14} fill="currentColor" fillOpacity={0.1} />
+                  </div>
+                  <span>{quest.goldReward.toLocaleString()}</span>
+                  <span className="text-[10px] text-amber-900/50 font-bold">OURO</span>
+                </div>
               </div>
             </div>
           </div>

@@ -132,14 +132,14 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
           progress={Math.min(100, rankProgress)} 
           label="PRÓXIMO RANK" 
           subLabel={nextRank ? `EVOLUÇÃO PARA RANK ${nextRank.rank}` : "RANK MÁXIMO ATINGIDO"}
-          color="stroke-orange-500"
+          color={profile.rank === Rank.S ? "stroke-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]" : "stroke-orange-500"}
           icon={<Trophy size={16} />} 
         />
         <CircularProgress 
           progress={rareDropProgress} 
           label="ITEM RARO" 
           subLabel={`${Math.floor(xpRemainingForDrop / 1000)}K XP PARA O DROP`}
-          color="stroke-purple-500"
+          color="stroke-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.5)]"
           icon={<Sparkles size={16} />} 
         />
       </div>
@@ -171,7 +171,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Lógica de Rank do Sistema */}
         <div className="space-y-4">
           <h3 className="font-game text-[12px] text-slate-500 uppercase flex items-center gap-2 border-b border-white/5 pb-2 font-bold tracking-widest">
@@ -187,49 +187,67 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
               return (
                 <div
                   key={item.rank}
-                  className={`hud-board p-5 transition-all duration-500 relative overflow-hidden ${isCurrent
-                    ? `border-white/20 bg-white/5`
+                  className={`hud-board p-6 md:p-7 transition-all duration-500 relative overflow-hidden group/rank ${isCurrent
+                    ? `border-white/20 bg-white/5 shadow-[0_0_25px_rgba(255,255,255,0.05)]`
                     : isAchieved
                       ? 'border-white/5 opacity-60 bg-slate-900/20'
                       : 'border-white/5 opacity-20'
                     }`}
                 >
+                  {/* Background Rank Letter */}
+                  <span className={`absolute -right-4 -bottom-8 font-game text-[120px] font-black pointer-events-none transition-all duration-1000 select-none ${
+                    isCurrent ? 'opacity-10 scale-110' : 'opacity-5'
+                  }`}>
+                    {item.rank}
+                  </span>
+
                   <div className="flex items-center justify-between relative z-10">
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6 w-full">
                       <div className="relative">
-                        <div className={`font-game text-3xl w-16 h-16 flex flex-col items-center justify-center border font-black relative overflow-hidden ${isCurrent 
-                          ? `text-white border-white/40 bg-white/5` 
+                        <div className={`font-game text-3xl w-16 h-16 flex flex-col items-center justify-center border font-black relative overflow-hidden transition-all duration-500 ${isCurrent 
+                          ? `text-white border-white/40 bg-white/5 shadow-[0_0_15px_rgba(255,255,255,0.1)]` 
                           : isAchieved 
                             ? 'text-slate-500 border-white/10 bg-slate-800/20' 
                             : 'text-slate-900 border-white/5 bg-black/10'
                           }`}>
                           <span className="relative z-10">{item.rank}</span>
+                          {isCurrent && (
+                             <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 animate-pulse"></div>
+                          )}
                         </div>
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
                           <h4 className={`font-game text-[14px] uppercase tracking-[0.1em] font-black ${isCurrent ? 'text-white' : 'text-slate-600'}`}>
                             {item.label}
                           </h4>
                           {isCurrent && (
-                            <span className="text-[8px] font-game bg-white/20 text-white px-1.5 py-0.5 font-black uppercase tracking-widest">
+                            <span className="text-[8px] font-game bg-white/20 text-white px-1.5 py-0.5 font-black uppercase tracking-widest animate-pulse">
                               ATUAL
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className={`w-1 h-2 ${isLocked ? 'bg-slate-900' : 'bg-slate-700'}`}></div>
-                          <p className={`text-[10px] font-game uppercase font-black tracking-widest ${isLocked ? 'text-slate-800' : 'text-slate-700'}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-1 h-2 ${isLocked ? 'bg-slate-900' : isCurrent ? 'bg-white/40' : 'bg-slate-700'}`}></div>
+                          <p className={`text-[10px] font-game uppercase font-black tracking-widest ${isLocked ? 'text-slate-800' : isCurrent ? 'text-white/60' : 'text-slate-700'}`}>
                             {isLocked ? `REQUISITO: NÍVEL ${item.minLevel}` : `STATUS: CLASSIFICAÇÃO_CONFIRMADA`}
                           </p>
                         </div>
+                        
+                        {isCurrent && nextRank && (
+                          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-2 relative">
+                            <div 
+                              className="absolute inset-y-0 left-0 bg-white/20 transition-all duration-1000 shadow-[0_0_10px_white]"
+                              style={{ width: `${rankProgress}%` }}
+                            ></div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end gap-2 ml-4">
                       {isCurrent ? (
-                        <div className="flex flex-col items-end">
-                        </div>
+                        <Zap size={20} className="text-white animate-pulse" />
                       ) : isAchieved ? (
                         <CheckCircle2 size={24} className="text-slate-700 opacity-50" />
                       ) : (
@@ -258,32 +276,54 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
               </div>
             ) : (
               profile.activeBuffs.map(buff => (
-                <div key={buff.id} className="hud-board border-white/10 p-5 relative overflow-hidden group">
-                  <div className="flex justify-between items-start mb-2">
+                <div key={buff.id} className="hud-board border-white/10 p-6 md:p-7 relative overflow-hidden group bg-slate-950/40 hover:bg-slate-900/40 transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2 relative z-10">
                     <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-black/40 border border-white/10 text-slate-400 font-game">
+                      <div className="p-3 bg-black/60 border border-white/10 text-cyan-400 font-game shadow-[0_0_15px_rgba(34,211,238,0.1)] group-hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] transition-all">
                         {buff.icon || '✨'}
                       </div>
                       <div>
-                        <h4 className="font-game text-[14px] text-white uppercase tracking-tight font-bold">{buff.name}</h4>
-                        <p className="text-[11px] text-slate-500 italic leading-tight font-medium">{buff.description}</p>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <h4 className="font-game text-[14px] text-white uppercase tracking-tight font-black">{buff.name}</h4>
+                          <span className={`text-[8px] font-game px-1.5 py-0.5 font-black uppercase tracking-tighter shadow-sm ${
+                            buff.type === 'timed' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
+                            buff.type === 'passive' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                            'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                          }`}>
+                            {buff.type}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 italic leading-tight font-medium max-w-[200px]">{buff.description}</p>
                       </div>
                     </div>
                     {buff.value && (
-                      <div className="font-game text-[12px] text-sky-400 border border-sky-500/30 px-2.5 py-0.5 bg-sky-950/20 font-bold">
+                      <div className="font-game text-[12px] text-cyan-400 border border-cyan-500/30 px-2.5 py-1 bg-cyan-950/40 font-black shadow-inner">
                         {buff.value}
                       </div>
                     )}
                   </div>
 
                   {buff.endTime && (
-                    <div className="flex items-center gap-2 mt-4 text-[10px] font-game text-sky-600 uppercase tracking-widest font-bold">
-                      <Clock size={12} /> TEMPO RESTANTE:
-                      <span className="text-sky-400">
-                        {Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS
-                      </span>
+                    <div className="mt-4 space-y-1.5 relative z-10">
+                      <div className="flex items-center justify-between text-[8px] font-game text-slate-500 uppercase tracking-[0.2em] font-black">
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={10} className="text-cyan-600" /> TEMPO_RESTANTE
+                        </div>
+                        <span className="text-cyan-400">
+                          {Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS
+                        </span>
+                      </div>
+                      <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-cyan-500 shadow-[0_0_10px_#06b6d4] transition-all duration-1000"
+                          style={{ width: `${Math.max(0, Math.min(100, ((buff.endTime - Date.now()) / 3600000) * 100))}%` }}
+                        ></div>
+                      </div>
                     </div>
                   )}
+
+                  {/* Decorative background element for buff cards */}
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 blur-3xl rounded-full -mr-12 -mt-12 pointer-events-none group-hover:bg-cyan-500/10 transition-all"></div>
                 </div>
               ))
             )}
