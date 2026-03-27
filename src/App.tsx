@@ -309,7 +309,7 @@ const App: React.FC = () => {
         const yesterdayDay = yesterday.getDay();
 
         // Só quebra a ofensiva se havia missões ATIVAS ontem que não foram concluídas
-        const anyPending = quests.some(q => {
+        const pendingQuests = quests.filter(q => {
           if (q.completed || q.failed) return false;
           
           // Quests diárias e especiais são sempre ativas no dia
@@ -324,16 +324,16 @@ const App: React.FC = () => {
           return false;
         });
 
+        const anyPending = pendingQuests.length > 0;
+
         if (!anyPending) {
           // Incremento normal da ofensiva
           newStreakValue += 1;
           addSystemMessage("SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1)", "success");
         } else {
-          // Mesmo que quebre, se o usuário pediu para incrementar 2, talvez devêssemos manter?
-          // Vou manter a quebra mas adicionar os 2 prometidos se o usuário assim desejar, 
-          // mas a lógica agora deve evitar quebras injustas.
           newStreakValue = 0;
-          addSystemMessage("SISTEMA: OFENSIVA QUEBRADA. MISSÕES PENDENTES.", "warning");
+          const questTitles = pendingQuests.map(q => q.title.toUpperCase()).join(', ');
+          addSystemMessage(`SISTEMA: OFENSIVA QUEBRADA. MISSÕES PENDENTES: ${questTitles}`, "warning");
         }
         streakUpdatedToday = true;
       } else if (!profile.lastDailyCheckDate) {
@@ -496,6 +496,18 @@ const App: React.FC = () => {
       }
 
       isInitializing.current = false;
+
+      // Protocolo de Reestabelecimento de Ofensiva (Correção Direta no Load)
+      const correctionApplied = localStorage.getItem('streak_correction_2026_03_27_v10');
+      if (!correctionApplied) {
+        setProfile(p => {
+          const newStreak = (p.dailyStreak || 0) + 2;
+          return { ...p, dailyStreak: newStreak };
+        });
+        localStorage.setItem('streak_correction_2026_03_27_v10', 'true');
+        addSystemMessage("SISTEMA: PROTOCOLO DE REESTABELECIMENTO DE MANA CONCLUÍDO (+2 OFENSIVA).", "success");
+      }
+
       setDataLoaded(true);
     };
 
@@ -1921,33 +1933,9 @@ const App: React.FC = () => {
           onComplete={() => setActiveEffect(null)}
         />
       )}
-
-      {/* Protocolo de Reestabelecimento de Ofensiva (One-time correction) */}
-      <StreakCorrection addSystemMessage={addSystemMessage} setProfile={setProfile} dataLoaded={dataLoaded} />
       </div>
     </>
   );
-};
-
-const StreakCorrection: React.FC<{ 
-  addSystemMessage: (t: string, type?: any) => void; 
-  setProfile: React.Dispatch<React.SetStateAction<HunterProfile>>;
-  dataLoaded: boolean;
-}> = ({ addSystemMessage, setProfile, dataLoaded }) => {
-  useEffect(() => {
-    if (dataLoaded) {
-      const correctionApplied = localStorage.getItem('streak_correction_2026_03_27');
-      if (!correctionApplied) {
-        setProfile(p => ({
-          ...p,
-          dailyStreak: (p.dailyStreak || 0) + 2
-        }));
-        localStorage.setItem('streak_correction_2026_03_27', 'true');
-        addSystemMessage("SISTEMA: PROTOCOLO DE REESTABELECIMENTO DE MANA CONCLUÍDO (+2 OFENSIVA).", "success");
-      }
-    }
-  }, [dataLoaded, setProfile, addSystemMessage]);
-  return null;
 };
 
 export default App;
