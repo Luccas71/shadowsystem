@@ -1473,98 +1473,137 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <header className={`mb-12 p-6 md:p-10 hud-board hud-board-glow flex flex-col lg:flex-row items-center gap-8 md:gap-10 transition-all duration-700 ${profile.isPenaltyZoneActive ? 'border-red-500 shadow-[0_0_50px_rgba(220,38,38,0.2)]' : 'border-cyan-500/30'}`}>
-        {/* Usando cantos internos apenas se necessário, mas o painel principal já tem bordas HUD */}
-
-        <div className="relative shrink-0 flex flex-col items-center">
-          <div className="relative group">
-            <div className="w-40 h-40 md:w-52 md:h-52 bg-slate-900 border border-slate-800 p-1.5 overflow-hidden shadow-2xl relative">
-              <img src={profile.avatar} alt="Caçador" className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700" />
-            </div>
-            <div className={`absolute -bottom-4 -right-4 font-game text-4xl md:text-6xl px-4 py-1.5 bg-black border border-slate-800 shadow-2xl rank-label ${RANK_COLORS[profile.rank]}`}>
-              {profile.rank}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 space-y-6 w-full min-w-0">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-1 min-w-0">
-              <h1 className="font-game text-2xl md:text-4xl text-slate-100 tracking-tight leading-none uppercase truncate neon-text-cyan-strong">{profile.name}</h1>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] md:text-[11px] font-game text-cyan-400 bg-cyan-950/40 px-2 py-0.5 border border-cyan-500/20 whitespace-nowrap">{profile.title}</span>
-                <span className="text-[9px] md:text-[10px] font-game text-slate-600 uppercase">Sistema Ativo: V1.2</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setIsEditingProfile(true)}
-                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-cyan-400 transition-all group/btn shadow-lg"
-                  title="CONFIGURAÇÕES"
-                >
-                  <Settings size={18} className="group-hover/btn:rotate-45 transition-transform" />
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="p-2.5 bg-black/40 hover:bg-black/40 border border-slate-800 text-slate-500 hover:text-red-400 transition-all shadow-lg"
-                  title="DESCONECTAR DO SISTEMA"
-                >
-                  <LogOut size={18} />
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 sm:gap-4 justify-center md:justify-end">
-                <div className="flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] p-3 hud-board border-amber-500/40 bg-amber-950/20 group hover:hud-board-glow transition-all relative overflow-hidden shadow-[0_0_15px_rgba(245,158,11,0.15)] scale-105">
-                  <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Flame size={16} className={`${getCurrentStreakTier(profile.dailyStreak || 0).color} mb-1 drop-shadow-[0_0_5px_currentColor]`} />
-                  <p className="text-[9px] font-game text-amber-600 mb-0.5 uppercase tracking-widest font-bold">Ofensiva</p>
-                  <div className="flex flex-col items-center">
-                    <p className="font-game text-2xl md:text-3xl text-amber-400 leading-none drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">{profile.dailyStreak || 0}</p>
-                    <span className={`text-[8px] font-game mt-1 px-1.5 py-0.5 border border-current/20 bg-black/40 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>{getCurrentStreakTier(profile.dailyStreak || 0).name}</span>
-                    {(profile.dailyStreak || 0) >= 7 && (
-                      <p className="text-[7px] font-game text-cyan-400 mt-0.5">+{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% BÔNUS</p>
-                    )}
+      <header className={`relative mb-12 overflow-hidden transition-all duration-700 bg-black/20 border-y border-white/5 ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.1)]' : 'border-cyan-500/10'}`}>
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/5 to-transparent pointer-events-none"></div>
+        <div className="absolute -left-20 -top-20 w-64 h-64 bg-cyan-600/5 blur-[100px] rounded-full pointer-events-none"></div>
+        
+        <div className="hud-board p-1 md:p-1.5 bg-black/40 backdrop-blur-md relative z-10 border-none shadow-none">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center p-6 md:p-8 gap-10">
+            
+            {/* Profile Avatar & Rank Section */}
+            <div className="relative shrink-0 self-center lg:self-auto">
+              <div className="relative group">
+                {/* Hexagonal style border */}
+                <div className="relative w-44 h-44 md:w-56 md:h-56">
+                  {/* Outer hex border */}
+                  <div className="absolute inset-0 bg-cyan-500/20 clip-hex rotate-3 group-hover:rotate-0 transition-transform duration-700"></div>
+                  {/* Inner container */}
+                  <div className="absolute inset-2 bg-slate-900 overflow-hidden clip-hex border border-white/5">
+                    <img 
+                      src={profile.avatar} 
+                      alt="Hunter" 
+                      className="w-full h-full object-cover filter brightness-[0.8] contrast-[1.2] grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
+                    />
+                    {/* Scanline effect */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none"></div>
                   </div>
                 </div>
-                <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-cyan-500/20 bg-cyan-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Zap size={12} className="text-cyan-500 mb-1" />
-                  <p className="text-[8px] font-game text-cyan-700 mb-0.5 uppercase tracking-tighter">Nível</p>
-                  <p className="font-game text-xl md:text-2xl text-white leading-none neon-text-cyan-strong">{profile.level}</p>
-                </div>
-                <div className="flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] p-2 hud-board border-orange-500/20 bg-orange-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Coins size={12} className="text-orange-500 mb-1" />
-                  <p className="text-[8px] font-game text-orange-700 mb-0.5 uppercase tracking-tighter">Ouro</p>
-                  <p className="font-game text-xl md:text-2xl text-orange-500 leading-none">{profile.gold.toLocaleString()}</p>
+                
+                {/* Rank Badge - Floating style */}
+                <div className={`absolute -bottom-2 -right-2 font-game text-5xl md:text-7xl px-6 py-2 bg-black border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] z-20 transition-all duration-500 ${RANK_COLORS[profile.rank]} drop-shadow-[0_0_15px_currentColor]`}>
+                  {profile.rank}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between items-end mb-1">
-              <span className="text-[11px] font-game text-cyan-500 tracking-[0.2em] font-black drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]">ESTADO DE SINCRONIA</span>
-              <span className="text-[13px] font-game text-cyan-400 font-bold drop-shadow-[0_0_5px_rgba(0,229,255,0.3)]">{xpPercentage}%</span>
-            </div>
-            <div className="h-3 bg-black/80 border border-cyan-900/50 relative overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.05)]">
-              <div
-                className={`h-full transition-all duration-[1s] ease-out shadow-[0_0_20px_rgba(0,229,255,0.2)] ${profile.isPenaltyZoneActive ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-gradient-to-r from-cyan-900 via-cyan-500 to-cyan-300'}`}
-                style={{ width: `${xpPercentage}%` }}
-              >
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.1)_50%,transparent_100%)] animate-[shimmer_2s_infinite]"></div>
+            {/* Profile Info & Core Stats */}
+            <div className="flex-1 flex flex-col justify-between gap-10 min-w-0">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="space-y-3 min-w-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1 h-6 bg-cyan-500 shadow-[0_0_10px_#06b6d4]"></div>
+                    <h1 className="font-game text-3xl md:text-5xl text-white tracking-widest leading-none uppercase truncate drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                      {profile.name}
+                    </h1>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 ml-4">
+                    <span className="text-[11px] font-game text-cyan-400 bg-cyan-950/60 px-3 py-1 border-y border-cyan-500/40 tracking-[0.2em]">{profile.title}</span>
+                    <div className="flex items-center gap-1.5 opacity-40">
+                      <div className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse"></div>
+                      <span className="text-[9px] font-game text-slate-500 uppercase tracking-widest">SISTEMA_V1.2_SINCRONIZADO</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Control Icons */}
+                <div className="flex gap-2 self-end md:self-auto">
+                  <button onClick={() => setIsEditingProfile(true)} className="p-3 bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 text-slate-500 hover:text-cyan-400 transition-all group shadow-sm">
+                    <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
+                  </button>
+                  <button onClick={handleLogout} className="p-3 bg-white/5 border border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all shadow-sm">
+                    <LogOut size={18} />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex justify-between items-center text-[8px] font-game text-cyan-900/60 uppercase tracking-tighter italic">
-              <span>SISTEMA_ESTÁVEL</span>
-              <span>VÍNCULO_NEURAL_ATIVO</span>
+
+              {/* Status Modules Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                {/* Level Module */}
+                <div className="hud-board p-4 border-white/5 bg-slate-900/40 relative group overflow-hidden">
+                  <div className="absolute bottom-0 right-0 p-2 opacity-5 scale-150 rotate-12 transition-transform group-hover:scale-110">
+                    <Zap size={40} className="text-cyan-500" />
+                  </div>
+                  <span className="block text-[8px] font-game text-slate-500 uppercase tracking-widest mb-1">NÍVEL_ATUAL</span>
+                  <p className="font-game text-2xl md:text-3xl text-white neon-text-cyan-strong">{profile.level}</p>
+                </div>
+
+                {/* Gold Module */}
+                <div className="hud-board p-4 border-white/5 bg-slate-900/40 relative group overflow-hidden">
+                  <div className="absolute bottom-0 right-0 p-2 opacity-5 scale-150 rotate-12 transition-transform group-hover:scale-110">
+                    <Coins size={40} className="text-orange-500" />
+                  </div>
+                  <span className="block text-[8px] font-game text-slate-500 uppercase tracking-widest mb-1">RESERVA_DE_OURO</span>
+                  <p className="font-game text-2xl md:text-3xl text-orange-400">{profile.gold.toLocaleString()}</p>
+                </div>
+
+                {/* Streak Module */}
+                <div className="hud-board p-4 border-amber-500/20 bg-amber-950/10 relative group overflow-hidden col-span-2 md:col-span-1 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)]">
+                   <div className="flex items-center justify-between">
+                     <div>
+                       <span className="block text-[8px] font-game text-amber-600 uppercase tracking-widest mb-1">OFENSIVA_ATIVA</span>
+                       <div className="flex items-baseline gap-2">
+                         <p className="font-game text-3xl text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{profile.dailyStreak || 0}</p>
+                         <span className="text-[10px] font-game text-slate-500 uppercase tracking-tighter">DIAS</span>
+                       </div>
+                     </div>
+                     <div className={`p-2 bg-black/40 border border-white/5 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
+                       <Flame size={20} className="animate-pulse" />
+                     </div>
+                   </div>
+                   <div className="mt-2 text-[8px] font-game flex justify-between uppercase tracking-tighter italic">
+                     <span className={getCurrentStreakTier(profile.dailyStreak || 0).color}>{getCurrentStreakTier(profile.dailyStreak || 0).name}</span>
+                     {(profile.dailyStreak || 0) >= 7 && (
+                       <span className="text-cyan-400">+{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% BÔNUS</span>
+                     )}
+                   </div>
+                </div>
+              </div>
+
+              {/* XP Sync Progress */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-end">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-cyan-500 animate-ping"></div>
+                    <span className="text-[10px] font-game text-cyan-500 tracking-[0.2em] font-black uppercase">TAXA_DE_SINCRONIZAÇÃO_DO_SISTEMA</span>
+                  </div>
+                  <span className="text-[12px] font-game text-cyan-400 font-bold tracking-widest">{xpPercentage}%</span>
+                </div>
+                <div className="h-2 bg-black/60 border border-white/5 relative overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]' : 'bg-gradient-to-r from-cyan-950 via-cyan-500 to-white'}`}
+                    style={{ width: `${xpPercentage}%` }}
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] animate-[shimmer_3s_infinite]"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-3 p-2 md:p-0 bg-slate-950/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-cyan-500/20 md:border-none mb-0 md:mb-12">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-4 p-2 md:p-1 bg-slate-950/95 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none border-t border-cyan-500/30 md:border-none mb-0 md:mb-12">
         {[
           { id: 'quests', label: 'MISSÕES', icon: Target, color: 'cyan' },
           { id: 'status', label: 'STATUS', icon: Activity, color: 'cyan' },
@@ -1572,22 +1611,33 @@ const App: React.FC = () => {
           { id: 'store', label: 'LOJA', icon: ShoppingBag, color: 'orange' },
           { id: 'penalties', label: 'PURIFICAÇÃO', icon: HeartPulse, color: 'red' },
         ].map(tab => {
+          const isActive = activeTab === tab.id;
           const colorClasses: Record<string, string> = {
-            cyan: 'bg-cyan-600/10 text-cyan-400 border-cyan-500/50',
-            orange: 'bg-orange-600/10 text-orange-400 border-orange-500/50',
-            red: 'bg-red-600/10 text-red-400 border-red-500/50',
+            cyan: isActive ? 'text-cyan-400 border-cyan-500 bg-cyan-500/10' : 'text-slate-500 border-cyan-900/40 hover:text-cyan-400 hover:border-cyan-500/50',
+            orange: isActive ? 'text-orange-400 border-orange-500 bg-orange-500/10' : 'text-slate-500 border-orange-900/40 hover:text-orange-400 hover:border-orange-500/50',
+            red: isActive ? 'text-red-400 border-red-500 bg-red-500/10' : 'text-slate-500 border-red-900/40 hover:text-red-400 hover:border-red-500/50',
           };
 
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'quests' | 'status' | 'inventory' | 'store' | 'penalties')}
-              className={`p-2 md:p-4 system-panel font-game text-[9px] md:text-[13px] flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 transition-all border ${activeTab === tab.id
-                ? `${colorClasses[tab.color]} shadow-[0_0_15px_var(--neon-cyan)] z-10 scale-[1.02]`
-                : 'text-slate-500 border-cyan-900/30 hover:text-cyan-300 bg-black/40'
-                }`}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`group/nav p-3 md:p-5 font-game text-[9px] md:text-[13px] flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 transition-all duration-500 border relative overflow-hidden ${colorClasses[tab.color]} ${isActive ? 'shadow-[inset_0_0_20px_rgba(0,0,0,0.4),0_0_15px_rgba(0,229,255,0.1)] scale-[1.02] z-10' : 'bg-black/40 hover:bg-black/60'}`}
             >
-              <tab.icon size={18} className="shrink-0" /> <span className="truncate max-w-full tracking-widest">{tab.label}</span>
+              {/* Active indicator line */}
+              {isActive && (
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-current animate-pulse shadow-[0_0_10px_currentColor]"></div>
+              )}
+              
+              <tab.icon size={isActive ? 20 : 18} className={`shrink-0 transition-transform duration-500 ${isActive ? 'scale-110' : 'group-hover/nav:scale-110 opacity-60 group-hover/nav:opacity-100'}`} />
+              <span className={`truncate max-w-full tracking-[0.2em] font-black ${isActive ? 'opacity-100' : 'opacity-40 group-hover/nav:opacity-80'}`}>
+                {tab.label}
+              </span>
+
+              {/* Decorative scanline for active tab */}
+              {isActive && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite] pointer-events-none"></div>
+              )}
             </button>
           );
         })}
