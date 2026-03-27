@@ -847,7 +847,7 @@ const App: React.FC = () => {
       case 'potion-2': subtitle = "MANA ESTABILIZADA (-10% CORRUPÇÃO)"; break;
       case 'potion-3': subtitle = "PURIFICAÇÃO PARCIAL (-50% CORRUPÇÃO)"; break;
       case 'scroll-1': subtitle = "PURIFICAÇÃO COMPLETA REALIZADA"; break;
-      case 'key-1': subtitle = "MODO DE ESPERA ATIVADO (30 MIN)"; break;
+      case 'elixir-vida-1': subtitle = "VITALIDADE TOTAL RESTAURADA (+50% XP, 0% CORRUPÇÃO)"; break;
       case 'armor-1': subtitle = "PROTEÇÃO DO MONARCA EQUIPADA"; break;
       case 'orb-1': subtitle = "AVAREZA DO CAÇADOR ATIVADA (+10% OURO)"; break;
       case 'ring-1': subtitle = "ANEL DE MIDAS EQUIPADO (+5% OURO)"; break;
@@ -907,17 +907,33 @@ const App: React.FC = () => {
           updates.dailyStreak = 0;
           addSystemMessage("SISTEMA: PURIFICAÇÃO COMPLETA. OFENSIVA ZERADA.", "success");
           break;
-        case 'key-1': {
-          const timedBuff: ActiveBuff = {
-            id: `timed-key-${Date.now()}`,
-            name: "MODO DE ESPERA",
-            description: "Punições suspensas temporariamente.",
-            type: 'timed',
-            icon: '⌛',
-            endTime: Date.now() + (30 * 60 * 1000)
-          };
-          buffs.push(timedBuff);
-          addSystemMessage("SISTEMA: MODO DE ESPERA ATIVADO (30 MIN).", "info");
+        case 'elixir-vida-1': {
+          updates.corruption = 0;
+          let newXp = p.xp + Math.floor(p.maxXp * 0.5);
+          let newLevel = p.level;
+          let newMaxXp = p.maxXp;
+
+          while (newXp >= newMaxXp) {
+            newXp -= newMaxXp;
+            newLevel++;
+            newMaxXp = calculateMaxXp(newLevel);
+          }
+          
+          updates.xp = newXp;
+          updates.level = newLevel;
+          updates.maxXp = newMaxXp;
+          const newRank = getRankByLevel(newLevel);
+          updates.rank = newRank;
+          updates.stats = calculateStats(newLevel);
+
+          if (newLevel > p.level) {
+            setLevelUpData({ oldLevel: p.level, newLevel: newLevel });
+          }
+          if (newRank !== p.rank) {
+            setRankUpData({ oldRank: p.rank, newRank: newRank });
+          }
+
+          addSystemMessage("SISTEMA: ELIXIR DA VIDA CONSUMIDO. POTENCIAL E ESTABILIDADE RESTAURADOS.", "success");
           break;
         }
         case 'armor-1': {

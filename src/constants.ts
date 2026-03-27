@@ -77,10 +77,10 @@ export const DEFAULT_STORE_ITEMS: StoreItem[] = [
     purchasedCount: 0
   },
   {
-    id: 'key-1',
-    name: 'Chave de Dungeon Instantânea',
-    description: 'Concede o direito a 30 minutos de lazer total sem culpa. O Sistema entra em modo de espera.',
-    cost: 1000,
+    id: 'elixir-vida-1',
+    name: 'Elixir da Vida',
+    description: 'Restaura instantaneamente 50% da Sincronia (XP) e remove toda a corrupção.',
+    cost: 10000,
     purchasedCount: 0
   },
   {
