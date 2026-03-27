@@ -1606,14 +1606,16 @@ const App: React.FC = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-4 p-2 md:p-1 bg-slate-950/95 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none border-t border-cyan-500/30 md:border-none mb-0 md:mb-12">
         {[
           { id: 'quests', label: 'MISSÕES', icon: Target, color: 'cyan' },
-          { id: 'status', label: 'STATUS', icon: Activity, color: 'cyan' },
-          { id: 'inventory', label: 'INVENTÁRIO', icon: Package, color: 'cyan' },
+          { id: 'status', label: 'STATUS', icon: Activity, color: 'green' },
+          { id: 'inventory', label: 'INVENTÁRIO', icon: Package, color: 'purple' },
           { id: 'store', label: 'LOJA', icon: ShoppingBag, color: 'orange' },
           { id: 'penalties', label: 'PURIFICAÇÃO', icon: HeartPulse, color: 'red' },
         ].map(tab => {
           const isActive = activeTab === tab.id;
           const colorClasses: Record<string, string> = {
             cyan: isActive ? 'text-cyan-400 border-cyan-500 bg-cyan-500/10' : 'text-slate-500 border-cyan-900/40 hover:text-cyan-400 hover:border-cyan-500/50',
+            green: isActive ? 'text-emerald-400 border-emerald-500 bg-emerald-500/10' : 'text-slate-500 border-emerald-900/40 hover:text-emerald-400 hover:border-emerald-500/50',
+            purple: isActive ? 'text-purple-400 border-purple-500 bg-purple-500/10' : 'text-slate-500 border-purple-900/40 hover:text-purple-400 hover:border-purple-500/50',
             orange: isActive ? 'text-orange-400 border-orange-500 bg-orange-500/10' : 'text-slate-500 border-orange-900/40 hover:text-orange-400 hover:border-orange-500/50',
             red: isActive ? 'text-red-400 border-red-500 bg-red-500/10' : 'text-slate-500 border-red-900/40 hover:text-red-400 hover:border-red-500/50',
           };
