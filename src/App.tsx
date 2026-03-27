@@ -489,7 +489,9 @@ const App: React.FC = () => {
         if (localData) {
           setProfile(localData.profile);
           setQuests(localData.quests);
-          setStoreItems(localData.storeItems);
+          // Cleanup legacy items from local store
+          const cleanedStore = (localData.storeItems as StoreItem[]).filter((item: StoreItem) => item.id !== 'key-1');
+          setStoreItems(cleanedStore);
           setVices(localData.vices);
         }
         addSystemMessage("SISTEMA: MODO OFFLINE ATIVADO. AS ALTERAÇÕES SERÃO SINCRONIZADAS POSTERIORMENTE.", "warning");
@@ -533,10 +535,10 @@ const App: React.FC = () => {
           setProfile(cloudProfile);
           setQuests(cloudData.quests || []);
 
-          const cloudStore: StoreItem[] = cloudData.store_items || DEFAULT_STORE_ITEMS;
+          const cloudStore: StoreItem[] = (cloudData.store_items || DEFAULT_STORE_ITEMS).filter((item: StoreItem) => item.id !== 'key-1');
           const mergedStore = [...cloudStore];
           DEFAULT_STORE_ITEMS.forEach(defaultItem => {
-            if (!mergedStore.some(item => item.id === defaultItem.id)) mergedStore.push(defaultItem);
+            if (!mergedStore.some((item: StoreItem) => item.id === defaultItem.id)) mergedStore.push(defaultItem);
           });
           setStoreItems(mergedStore);
           setVices(cloudData.vices || []);
