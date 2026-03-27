@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { HunterProfile, Rank } from '../types';
-import { RANK_COLORS } from '../constants';
+import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier } from '../constants';
 import {
   Sparkles,
   Clock,
@@ -10,7 +10,8 @@ import {
   Trophy,
   Dna,
   Database,
-  Zap
+  Zap,
+  Flame
 } from 'lucide-react';
 
 interface StatusWindowProps {
@@ -258,6 +259,69 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Ofensiva do Sistema (Streak) */}
+        <div className="space-y-4">
+          <h3 className="font-game text-[12px] text-slate-500 uppercase flex items-center gap-2 border-b border-white/5 pb-2 font-bold tracking-widest">
+            <Flame size={14} className="text-amber-500" /> OFENSIVA DO SISTEMA
+          </h3>
+
+          <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-amber-950/5 group hover:bg-amber-950/10 transition-all duration-500">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+              <div className="flex items-center gap-6">
+                <div className={`relative p-5 bg-black/40 border border-white/10 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
+                  <Flame size={32} className="drop-shadow-[0_0_10px_currentColor]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-1 h-3 bg-amber-600"></div>
+                    <h3 className="font-game text-[10px] text-amber-700 uppercase tracking-[0.4em] font-black opacity-80">TIER_DE_CONSISTÊNCIA</h3>
+                  </div>
+                  <div className="flex items-baseline gap-3">
+                    <p className={`font-game text-4xl tracking-widest font-black ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
+                      {getCurrentStreakTier(profile.dailyStreak || 0).name}
+                    </p>
+                    <span className="text-lg text-white/40 font-game font-bold">{profile.dailyStreak || 0} DIAS</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-2">
+                <div className="px-5 py-2 border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 font-game text-[14px] uppercase tracking-[0.2em] font-black flex items-center gap-3 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+                   BÔNUS: +{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% GERAL
+                </div>
+                <p className="text-[9px] font-game text-slate-600 uppercase tracking-tighter italic">Multiplicador aplicado a XP e Ouro</p>
+              </div>
+            </div>
+            
+            {/* Visual Progress to next tier */}
+            {(() => {
+              const currentTier = getCurrentStreakTier(profile.dailyStreak || 0);
+              const currentTierIdx = STREAK_TIERS.findIndex(t => t.name === currentTier.name);
+              const nextTier = STREAK_TIERS[currentTierIdx + 1];
+              if (nextTier) {
+                const currentMin = STREAK_TIERS[currentTierIdx].minDays;
+                const nextMin = nextTier.minDays;
+                const progress = ((profile.dailyStreak || 0) - currentMin) / (nextMin - currentMin) * 100;
+                return (
+                  <div className="mt-6 space-y-2">
+                    <div className="flex justify-between text-[8px] font-game text-slate-500 uppercase tracking-widest">
+                      <span>PROGRESSO PARA TIER {nextTier.name}</span>
+                      <span>{nextMin - (profile.dailyStreak || 0)} DIAS RESTANTES</span>
+                    </div>
+                    <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-1000 ${nextTier.color.replace('text-', 'bg-')}`}
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
         </div>
 

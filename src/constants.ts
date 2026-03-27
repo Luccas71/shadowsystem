@@ -10,6 +10,29 @@ export const RANK_COLORS: Record<Rank, string> = {
   [Rank.S]: 'text-red-500 border-red-500 font-bold neon-text-red animate-pulse',
 };
 
+export interface StreakTier {
+  name: string;
+  minDays: number;
+  multiplier: number;
+  color: string;
+}
+
+export const STREAK_TIERS: StreakTier[] = [
+  { name: 'BRONZE', minDays: 0, multiplier: 1.0, color: 'text-orange-700' },
+  { name: 'PRATA', minDays: 7, multiplier: 1.05, color: 'text-slate-400' },
+  { name: 'OURO', minDays: 15, multiplier: 1.10, color: 'text-amber-400' },
+  { name: 'PLATINA', minDays: 30, multiplier: 1.20, color: 'text-cyan-400' },
+  { name: 'MONARCA', minDays: 60, multiplier: 1.30, color: 'text-purple-500' },
+];
+
+export const getCurrentStreakTier = (streak: number) => {
+  return [...STREAK_TIERS].reverse().find(tier => (streak || 0) >= tier.minDays) || STREAK_TIERS[0];
+};
+
+export const getStreakMultiplier = (streak: number) => {
+  return getCurrentStreakTier(streak).multiplier;
+};
+
 // Valores base sem o buff de 15%
 export const DIFFICULTY_XP: Record<QuestDifficulty, number> = {
   [QuestDifficulty.E]: 400,

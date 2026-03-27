@@ -20,7 +20,10 @@ import {
   calculateMaxXp,
   calculateStats,
   getRankByLevel,
-  DEFAULT_STORE_ITEMS
+  DEFAULT_STORE_ITEMS,
+  STREAK_TIERS,
+  getCurrentStreakTier,
+  getStreakMultiplier
 } from './constants';
 import QuestCard from './components/QuestCard';
 import ProfileEditor from './components/ProfileEditor';
@@ -329,11 +332,42 @@ const App: React.FC = () => {
         if (!anyPending) {
           // Incremento normal da ofensiva
           newStreakValue += 1;
-          addSystemMessage("SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1)", "success");
+          const tier = getCurrentStreakTier(newStreakValue);
+          addSystemMessage(`SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1). TIER ATUAL: ${tier.name}`, "success");
+          
+          // Milestone Reward a cada 7 dias
+          if (newStreakValue > 0 && newStreakValue % 7 === 0) {
+            const randomItem = storeItems[Math.floor(Math.random() * storeItems.length)];
+            setStoreItems(prev => {
+              const next = [...prev];
+              const existingIdx = next.findIndex(si => si.id === randomItem.id && si.origin === 'diário');
+              if (existingIdx > -1) {
+                next[existingIdx] = { ...next[existingIdx], purchasedCount: next[existingIdx].purchasedCount + 1 };
+              } else {
+                next.push({ ...randomItem, purchasedCount: 1, origin: 'diário' });
+              }
+              return next;
+            });
+            addSystemMessage(`SISTEMA: RECOMPENSA DE MARCO DE 7 DIAS! RECEBIDO: ${randomItem.name.toUpperCase()}`, "warning");
+            setActiveEffect({
+              type: 'useItem',
+              title: "RECOMPENSA DE CAVALEIRO",
+              subtitle: `MARCO DE ${newStreakValue} DIAS ALCANÇADO`,
+              icon: <Flame size={48} className="text-amber-500" />
+            });
+          }
         } else {
-          newStreakValue = 0;
-          const questTitles = pendingQuests.map(q => q.title.toUpperCase()).join(', ');
-          addSystemMessage(`SISTEMA: OFENSIVA QUEBRADA. MISSÕES PENDENTES: ${questTitles}`, "warning");
+          // Salvaguarda de Rank: B ou superior não reseta, apenas mantém
+          const isRankProtected = [Rank.B, Rank.A, Rank.S].includes(profile.rank);
+          
+          if (isRankProtected) {
+            addSystemMessage(`SISTEMA: SALVAGUARDA DE RANK ATIVADA (${profile.rank}). OFENSIVA PRESERVADA.`, "info");
+            // Mantém o valor atual (newStreakValue já foi inicializado com profile.dailyStreak)
+          } else {
+            newStreakValue = 0;
+            const questTitles = pendingQuests.map(q => q.title.toUpperCase()).join(', ');
+            addSystemMessage(`SISTEMA: OFENSIVA QUEBRADA. MISSÕES PENDENTES: ${questTitles}`, "warning");
+          }
         }
         streakUpdatedToday = true;
       } else if (!profile.lastDailyCheckDate) {
@@ -677,7 +711,8 @@ const App: React.FC = () => {
       // Calculate XP Multiplier from buffs
       const xpBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-xp-boost').length;
       const shadowEssenceBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-shadow-essence').length;
-      const xpMultiplier = 1 + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02);
+      const streakMultiplier = getStreakMultiplier(profile.dailyStreak || 0);
+      const xpMultiplier = (1 + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02)) * streakMultiplier;
 
       const finalXpReward = Math.floor(quest.xpReward * xpMultiplier);
       const newTotalXp = currentTotalXp + finalXpReward;
@@ -697,7 +732,7 @@ const App: React.FC = () => {
       // Calculate Gold Multiplier from buffs
       const orbBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-orb').length;
       const ringBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-ring').length;
-      const goldMultiplier = 1 + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02);
+      const goldMultiplier = (1 + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02)) * streakMultiplier;
 
       const finalGoldReward = Math.floor(quest.goldReward * goldMultiplier);
 
@@ -1480,11 +1515,17 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-4 justify-center md:justify-end">
-                <div className="flex flex-col items-center justify-center min-w-[80px] md:min-w-[100px] p-3 hud-board border-amber-500/40 bg-amber-950/20 group hover:hud-board-glow transition-all relative overflow-hidden shadow-[0_0_15px_rgba(245,158,11,0.15)] scale-105">
+                <div className="flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] p-3 hud-board border-amber-500/40 bg-amber-950/20 group hover:hud-board-glow transition-all relative overflow-hidden shadow-[0_0_15px_rgba(245,158,11,0.15)] scale-105">
                   <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Flame size={16} className="text-amber-500 mb-1 drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+                  <Flame size={16} className={`${getCurrentStreakTier(profile.dailyStreak || 0).color} mb-1 drop-shadow-[0_0_5px_currentColor]`} />
                   <p className="text-[9px] font-game text-amber-600 mb-0.5 uppercase tracking-widest font-bold">Ofensiva</p>
-                  <p className="font-game text-2xl md:text-3xl text-amber-400 leading-none drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">{profile.dailyStreak || 0}</p>
+                  <div className="flex flex-col items-center">
+                    <p className="font-game text-2xl md:text-3xl text-amber-400 leading-none drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">{profile.dailyStreak || 0}</p>
+                    <span className={`text-[8px] font-game mt-1 px-1.5 py-0.5 border border-current/20 bg-black/40 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>{getCurrentStreakTier(profile.dailyStreak || 0).name}</span>
+                    {(profile.dailyStreak || 0) >= 7 && (
+                      <p className="text-[7px] font-game text-cyan-400 mt-0.5">+{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% BÔNUS</p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex flex-col items-center justify-center min-w-[70px] md:min-w-[80px] p-2 hud-board border-cyan-500/20 bg-cyan-950/10 group hover:hud-board-glow transition-all relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
