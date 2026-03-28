@@ -18,86 +18,60 @@ interface StatusWindowProps {
   profile: HunterProfile;
 }
 
-const CircularProgress: React.FC<{
-  progress: number;
-  label: string;
-  subLabel?: string;
-  color: string;
+const StatusCard: React.FC<{
   icon: React.ReactNode;
-}> = ({ progress, label, color }) => {
-  const radius = 80;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
-  const uniqueId = label.replace(/\s+/g, '-').toLowerCase();
-
+  label: string;
+  mainValue: string;
+  subValue?: string;
+  bonusText?: string;
+  progress: number;
+  progressLabel: string;
+  remainingLabel: string;
+  color: string;
+  bgColor?: string;
+}> = ({ icon, label, mainValue, subValue, bonusText, progress, progressLabel, remainingLabel, color, bgColor = "bg-slate-950/40" }) => {
   return (
-    <div className="hud-board p-6 flex flex-col items-center justify-center relative overflow-hidden bg-slate-950/40 transition-all duration-700 border-white/5 min-h-[380px] w-full">
-      <div className="relative w-60 h-60 mb-8 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90 relative z-10 p-2" viewBox="0 0 200 200">
-          <defs>
-            <mask id={`mask-${uniqueId}`}>
-              <circle
-                cx="100"
-                cy="100"
-                r={radius}
-                fill="none"
-                stroke="white"
-                strokeWidth="14"
-                strokeDasharray="5 2.5"
-              />
-            </mask>
-          </defs>
-
-          {/* Background Ring (Static Gray Ticks) */}
-          <circle
-            cx="100"
-            cy="100"
-            r={radius}
-            className="fill-none stroke-white/[0.05]"
-            strokeWidth="14"
-            strokeDasharray="5.5 2.5"
-          />
-          
-          {/* Functional Progress Ring (Masked Solid Color) */}
-          <circle
-            cx="100"
-            cy="100"
-            r={radius}
-            className={`fill-none transition-all duration-[1500ms] ease-out ${color.split(' ')[0]}`}
-            strokeWidth="14"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="butt"
-            mask={`url(#mask-${uniqueId})`}
-          />
-
-          {/* Solid Inner Border */}
-          <circle
-            cx="100"
-            cy="100"
-            r={radius - 14}
-            className="fill-none stroke-white/10"
-            strokeWidth="1"
-          />
-        </svg>
-
-        {/* Center Content - Ultra Tight Alignment */}
-        <div className="absolute inset-0 flex items-center justify-center z-20">
-          <div className="flex items-baseline justify-center">
-            <span className="font-game text-6xl text-white font-black tracking-[-0.1em] text-shadow-glow">
-              {Math.floor(progress)}
-            </span>
-            <span className="font-game text-2xl text-white/40 font-bold -ml-1.5">
-              %
-            </span>
+    <div className={`hud-board p-8 border-white/5 relative overflow-hidden ${bgColor} group transition-all duration-500`}>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+        <div className="flex items-center gap-6">
+          <div className={`relative p-4 bg-black/40 border border-white/10 ${color}`}>
+            {React.cloneElement(icon as any, { size: 28, className: "drop-shadow-[0_0_10px_currentColor]" })}
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className={`w-1 h-3 ${color.replace('text-', 'bg-')}`}></div>
+              <h3 className={`font-game text-[10px] uppercase tracking-[0.4em] font-black opacity-80 ${color}`}>
+                {label}
+              </h3>
+            </div>
+            <p className="font-game text-4xl text-white tracking-widest font-black uppercase">
+              {mainValue} {subValue && <span className={`text-sm font-bold ml-1 opacity-50 ${color}`}>{subValue}</span>}
+            </p>
           </div>
         </div>
+
+        {bonusText && (
+          <div className="flex flex-col items-end gap-2">
+            <div className={`px-5 py-2 border ${color.replace('text-', 'border-')}/20 ${color.replace('text-', 'bg-')}/10 ${color} font-game text-[14px] uppercase tracking-[0.2em] font-black flex items-center gap-3 shadow-[0_0_15px_rgba(0,0,0,0.2)]`}>
+              {bonusText}
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="text-center relative z-10 w-full px-4">
-        <h4 className="font-game text-[16px] text-white uppercase tracking-[0.5em] font-black drop-shadow-2xl opacity-90 transition-opacity">
-          {label}
-        </h4>
+      <div className="mt-6 space-y-2 border-t border-white/5 pt-4">
+        <div className={`flex justify-between font-game text-[10px] ${color} uppercase`}>
+          <span>{progressLabel}</span>
+          <span className="font-bold">{remainingLabel}</span>
+        </div>
+        <div className={`h-8 bg-black border border-current overflow-hidden p-1 ${color} shadow-sm`}>
+          <div
+            className={`h-full transition-all duration-1000 ${color} relative overflow-hidden`}
+            style={{ width: `${Math.min(100, Math.max(0, progress))}%`, backgroundColor: 'currentColor' }}
+          >
+            <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -114,34 +88,39 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
   ];
 
   const XP_DROP_THRESHOLD = 50000;
-  const levelProgress = (profile.xp / profile.maxXp) * 100;
-
+  
   const currentRankIdx = rankProgression.findIndex(r => r.rank === profile.rank);
   const nextRank = rankProgression[currentRankIdx + 1];
   const rankProgress = nextRank 
     ? ((profile.level - (rankProgression[currentRankIdx].minLevel)) / (nextRank.minLevel - rankProgression[currentRankIdx].minLevel)) * 100 
     : 100;
 
-  const rareDropProgress = (profile.totalXpGained % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
-  const xpRemainingForDrop = XP_DROP_THRESHOLD - (profile.totalXpGained % XP_DROP_THRESHOLD);
+  const rareDropProgress = ((profile.totalXpGained || 0) % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
+  const xpRemainingForDrop = XP_DROP_THRESHOLD - ((profile.totalXpGained || 0) % XP_DROP_THRESHOLD);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
-      {/* HUD Circular Section */}
+      {/* HUD Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <CircularProgress 
-          progress={Math.min(100, rankProgress)} 
-          label="PRÓXIMO RANK" 
-          subLabel={nextRank ? `EVOLUÇÃO PARA RANK ${nextRank.rank}` : "RANK MÁXIMO ATINGIDO"}
-          color={profile.rank === Rank.S ? "stroke-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]" : "stroke-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]"}
-          icon={<Trophy size={16} />} 
+        <StatusCard
+          icon={<Trophy />}
+          label="EVOLUÇÃO_DE_RANK"
+          mainValue={profile.rank}
+          subValue={nextRank ? `PARA RANK ${nextRank.rank}` : "RANK MÁXIMO"}
+          progress={rankProgress}
+          progressLabel={nextRank ? `PROGRESSO PARA ${nextRank.label}` : "MONARCA SUPREMO"}
+          remainingLabel={nextRank ? `${nextRank.minLevel - profile.level} NÍVEIS RESTANTES` : "EVOLUÇÃO CONCLUÍDA"}
+          color={profile.rank === Rank.S ? "text-red-500" : "text-emerald-500"}
         />
-        <CircularProgress 
-          progress={rareDropProgress} 
-          label="ITEM RARO" 
-          subLabel={`${Math.floor(xpRemainingForDrop / 1000)}K XP PARA O DROP`}
-          color="stroke-lime-500 shadow-[0_0_20px_rgba(132,204,22,0.3)]"
-          icon={<Sparkles size={16} />} 
+        <StatusCard
+          icon={<Sparkles />}
+          label="PROXIMIDADE_DE_DROP"
+          mainValue="ITEM RARO"
+          subValue={`${Math.floor(rareDropProgress)}%`}
+          progress={rareDropProgress}
+          progressLabel="PROGRESSO DE RECOMPENSA"
+          remainingLabel={`${(xpRemainingForDrop / 1000).toFixed(1)}K XP PARA O DROP`}
+          color="text-lime-500"
         />
       </div>
 
@@ -158,7 +137,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                 <h3 className="font-game text-[10px] text-emerald-700 uppercase tracking-[0.4em] font-black opacity-80">RESERVA_ESTÁVEL_DE_MANA</h3>
               </div>
               <p className="font-game text-4xl text-white tracking-widest font-black">
-                {profile.totalXpGained.toLocaleString()} <span className="text-sm text-emerald-900 font-bold ml-1 opacity-50">XP_TOTAL</span>
+                {(profile.totalXpGained || 0).toLocaleString()} <span className="text-sm text-emerald-900 font-bold ml-1 opacity-50">XP_TOTAL</span>
               </p>
             </div>
           </div>
@@ -173,56 +152,30 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
       </div>
 
       {/* Ofensiva do Sistema (Streak) */}
-      <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-emerald-950/10 group hover:bg-emerald-950/20 transition-all duration-500">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
-          <div className="flex items-center gap-6">
-            <div className={`relative p-4 bg-black/40 border border-white/10 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
-              <Flame size={28} className="drop-shadow-[0_0_10px_currentColor]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-1 h-3 bg-emerald-600"></div>
-                <h3 className="font-game text-[10px] text-emerald-700 uppercase tracking-[0.4em] font-black opacity-80">TIER_DE_CONSISTÊNCIA</h3>
-              </div>
-              <p className="font-game text-4xl text-white tracking-widest font-black">
-                {getCurrentStreakTier(profile.dailyStreak || 0).name} <span className={`text-sm font-bold ml-1 opacity-50 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>{profile.dailyStreak || 0}_DIAS</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end gap-2">
-            <div className="px-5 py-2 border border-emerald-500/20 bg-emerald-950/20 text-emerald-400 font-game text-[14px] uppercase tracking-[0.2em] font-black flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-               BÔNUS: +{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% GERAL
-            </div>
-          </div>
-        </div>
+      {(() => {
+        const currentTier = getCurrentStreakTier(profile.dailyStreak || 0);
+        const currentTierIdx = STREAK_TIERS.findIndex(t => t.name === currentTier.name);
+        const nextTier = STREAK_TIERS[currentTierIdx + 1];
         
-        {(() => {
-          const currentTier = getCurrentStreakTier(profile.dailyStreak || 0);
-          const currentTierIdx = STREAK_TIERS.findIndex(t => t.name === currentTier.name);
-          const nextTier = STREAK_TIERS[currentTierIdx + 1];
-          if (nextTier) {
-            const currentMin = STREAK_TIERS[currentTierIdx].minDays;
-            const nextMin = nextTier.minDays;
-            const progress = ((profile.dailyStreak || 0) - currentMin) / (nextMin - currentMin) * 100;
-            return (
-              <div className="mt-6 space-y-1.5 border-t border-white/5 pt-4">
-                <div className="flex justify-between text-[8px] font-game text-slate-500 uppercase tracking-widest">
-                  <span>PROGRESSO PARA {nextTier.name}</span>
-                  <span>{nextMin - (profile.dailyStreak || 0)} DIAS RESTANTES</span>
-                </div>
-                <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full transition-all duration-1000 ${nextTier.color.replace('text-', 'bg-')}`}
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
-      </div>
+        const currentMin = STREAK_TIERS[currentTierIdx].minDays;
+        const nextMin = nextTier ? nextTier.minDays : currentMin;
+        const progress = nextTier ? (((profile.dailyStreak || 0) - currentMin) / (nextMin - currentMin) * 100) : 100;
+
+        return (
+          <StatusCard
+            icon={<Flame />}
+            label="TIER_DE_CONSISTÊNCIA"
+            mainValue={currentTier.name}
+            subValue={`${profile.dailyStreak || 0}_DIAS`}
+            bonusText={`BÔNUS: +${Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% GERAL`}
+            progress={progress}
+            progressLabel={nextTier ? `PROGRESSO PARA ${nextTier.name}` : "TIER MÁXIMO ALCANÇADO"}
+            remainingLabel={nextTier ? `${nextMin - (profile.dailyStreak || 0)} DIAS RESTANTES` : "MONARCA DA CONSTÂNCIA"}
+            color={currentTier.color}
+            bgColor="bg-emerald-950/10"
+          />
+        );
+      })()}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Lógica de Rank do Sistema */}
@@ -288,11 +241,19 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                         </div>
                         
                         {isCurrent && nextRank && (
-                          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-2 relative">
-                            <div 
-                              className="absolute inset-y-0 left-0 bg-white/20 transition-all duration-1000 shadow-[0_0_10px_white]"
-                              style={{ width: `${rankProgress}%` }}
-                            ></div>
+                          <div className="mt-3 space-y-2">
+                            <div className="flex justify-between font-game text-[10px] text-white/50 uppercase">
+                              <span>PROGRESSO PARA {nextRank.label}</span>
+                              <span className="font-bold">{nextRank.minLevel - profile.level} NÍVEIS RESTANTES</span>
+                            </div>
+                            <div className={`h-8 bg-black border border-current overflow-hidden p-1 text-white/40`}>
+                              <div 
+                                className={`h-full transition-all duration-1000 text-white shadow-[0_0_10px_currentColor] relative overflow-hidden`}
+                                style={{ width: `${rankProgress}%`, backgroundColor: 'currentColor' }}
+                              >
+                                <div className="absolute inset-0 shimmer-gradient shimmer-animated opacity-30"></div>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -357,20 +318,18 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile }) => {
                   </div>
 
                   {buff.endTime && (
-                    <div className="mt-4 space-y-1.5 relative z-10">
-                      <div className="flex items-center justify-between text-[8px] font-game text-slate-500 uppercase tracking-[0.2em] font-black">
-                        <div className="flex items-center gap-1.5">
-                          <Clock size={10} className="text-emerald-600" /> TEMPO_RESTANTE
-                        </div>
-                        <span className="text-emerald-400">
-                          {Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS
-                        </span>
+                    <div className="mt-4 space-y-2 relative z-10">
+                      <div className="flex justify-between font-game text-[10px] text-emerald-400 uppercase">
+                        <span>TEMPO RESTANTE</span>
+                        <span className="font-bold">{Math.max(0, Math.floor((buff.endTime - Date.now()) / 60000))} MINUTOS</span>
                       </div>
-                      <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                      <div className="h-8 bg-black border border-emerald-900/50 overflow-hidden p-1">
                         <div 
-                          className="h-full bg-emerald-500 shadow-[0_0_10px_#10b981] transition-all duration-1000"
+                          className="h-full transition-all duration-1000 bg-emerald-500 shadow-[0_0_10px_#10b981] relative overflow-hidden"
                           style={{ width: `${Math.max(0, Math.min(100, ((buff.endTime - Date.now()) / 3600000) * 100))}%` }}
-                        ></div>
+                        >
+                          <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
+                        </div>
                       </div>
                     </div>
                   )}

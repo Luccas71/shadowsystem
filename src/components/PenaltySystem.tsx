@@ -67,16 +67,18 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
         </div>
 
         {/* Corruption Meter */}
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
           <div className="flex justify-between font-game text-[10px] text-cyan-400 uppercase">
             <span>Nível de Instabilidade</span>
             <span className={profile.corruption >= 100 ? "text-red-600 font-bold" : ""}>{profile.corruption.toFixed(2)}%</span>
           </div>
           <div className="h-8 bg-black border border-cyan-900 overflow-hidden p-1">
             <div
-              className={`h-full ${profile.corruption >= 100 ? 'bg-red-600' : profile.corruption > 50 ? 'bg-cyan-800' : 'bg-cyan-950'}`}
+              className={`h-full transition-all duration-1000 ${profile.corruption >= 100 ? 'bg-red-600' : profile.corruption > 50 ? 'bg-cyan-800' : 'bg-cyan-950'} relative overflow-hidden`}
               style={{ width: `${profile.corruption}%` }}
-            ></div>
+            >
+              <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
+            </div>
           </div>
         </div>
       </div>

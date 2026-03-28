@@ -537,11 +537,11 @@ const App: React.FC = () => {
       const correctionApplied = localStorage.getItem('streak_correction_2026_03_27_v10');
       if (!correctionApplied) {
         setProfile(p => {
-          const newStreak = (p.dailyStreak || 0) + 2;
+          const newStreak = (p.dailyStreak || 0) + 1;
           return { ...p, dailyStreak: newStreak };
         });
         localStorage.setItem('streak_correction_2026_03_27_v10', 'true');
-        addSystemMessage("SISTEMA: PROTOCOLO DE REESTABELECIMENTO DE MANA CONCLUÍDO (+2 OFENSIVA).", "success");
+        addSystemMessage("SISTEMA: PROTOCOLO DE REESTABELECIMENTO DE MANA CONCLUÍDO (+1 OFENSIVA).", "success");
       }
 
       setDataLoaded(true);
@@ -959,6 +959,7 @@ const App: React.FC = () => {
           updates.xp = newXp;
           updates.level = newLevel;
           updates.maxXp = newMaxXp;
+          updates.totalXpGained = (p.totalXpGained || 0) + Math.floor(p.maxXp * 0.5);
           const newRank = getRankByLevel(newLevel);
           updates.rank = newRank;
           updates.stats = calculateStats(newLevel);
@@ -1064,6 +1065,7 @@ const App: React.FC = () => {
           updates.xp = newXp;
           updates.level = newLevel;
           updates.maxXp = newMaxXp;
+          updates.totalXpGained = (p.totalXpGained || 0) + xpGain;
           const newRank = getRankByLevel(newLevel);
           updates.rank = newRank;
           updates.stats = calculateStats(newLevel);
@@ -1092,6 +1094,7 @@ const App: React.FC = () => {
           updates.xp = sfXp;
           updates.level = sfLevel;
           updates.maxXp = sfMaxXp;
+          updates.totalXpGained = (p.totalXpGained || 0) + 2000;
           const sfRank = getRankByLevel(sfLevel);
           updates.rank = sfRank;
           updates.stats = calculateStats(sfLevel);
@@ -1114,15 +1117,19 @@ const App: React.FC = () => {
             addSystemMessage("SISTEMA: O TEMPO FLUI NORMALMENTE AGORA.", "warning");
           }
           break;
-        case 'feather-1':
-          updates.xp = Math.min(p.maxXp, p.xp + Math.floor(p.maxXp * 0.25));
+          const xpGain = Math.floor(p.maxXp * 0.25);
+          updates.xp = Math.min(p.maxXp, p.xp + xpGain);
+          updates.totalXpGained = (p.totalXpGained || 0) + xpGain;
           addSystemMessage("SISTEMA: PENA DE FÊNIX CONSUMIDA. SINCRONIA RESTAURADA.", "success");
           break;
         case 'courage-1': {
           const newLevel = p.level + 1;
           const newRank = getRankByLevel(newLevel);
+          const xpToNextLevel = p.maxXp - p.xp;
           updates.level = newLevel;
           updates.maxXp = calculateMaxXp(newLevel);
+          updates.xp = 0; // Se sobe de nível instantaneamente, geralmente reseta a barra ou mantém se for um sistema específico, aqui manteremos 0 por simplicidade do item.
+          updates.totalXpGained = (p.totalXpGained || 0) + xpToNextLevel;
           updates.rank = newRank;
           updates.stats = calculateStats(newLevel);
 
@@ -1148,6 +1155,7 @@ const App: React.FC = () => {
           updates.xp = sXp;
           updates.level = sLevel;
           updates.maxXp = sMaxXp;
+          updates.totalXpGained = (p.totalXpGained || 0) + randXp;
           const newRank = getRankByLevel(sLevel);
           updates.rank = newRank;
           updates.stats = calculateStats(sLevel);
@@ -1484,19 +1492,19 @@ const App: React.FC = () => {
             {/* Profile Avatar & Rank Section */}
             <div className="relative shrink-0 self-center lg:self-auto">
               <div className="relative group">
-                {/* Hexagonal style border */}
+                {/* Rectangular style border */}
                 <div className="relative w-44 h-44 md:w-56 md:h-56">
-                  {/* Outer hex border */}
-                  <div className="absolute inset-0 bg-cyan-500/20 clip-hex rotate-3 group-hover:rotate-0 transition-transform duration-700"></div>
+                  {/* Outer border with tilt */}
+                  <div className="absolute inset-0 bg-cyan-500/10 border border-cyan-500/30 -rotate-2 group-hover:rotate-0 transition-transform duration-700"></div>
                   {/* Inner container */}
-                  <div className="absolute inset-2 bg-slate-900 overflow-hidden clip-hex border border-white/5">
+                  <div className="absolute inset-0 bg-slate-900 overflow-hidden border border-white/10 group-hover:border-cyan-500/30 transition-colors duration-500">
                     <img 
                       src={profile.avatar} 
                       alt="Hunter" 
                       className="w-full h-full object-cover filter brightness-[0.8] contrast-[1.2] grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
                     />
                     {/* Scanline effect */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-50"></div>
                   </div>
                 </div>
                 
@@ -1581,20 +1589,17 @@ const App: React.FC = () => {
               </div>
 
               {/* XP Sync Progress */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-cyan-500 animate-ping"></div>
-                    <span className="text-[10px] font-game text-cyan-500 tracking-[0.2em] font-black uppercase">TAXA_DE_SINCRONIZAÇÃO_DO_SISTEMA</span>
-                  </div>
-                  <span className="text-[12px] font-game text-cyan-400 font-bold tracking-widest">{xpPercentage}%</span>
+              <div className="space-y-2 mt-4">
+                <div className="flex justify-between font-game text-[10px] text-cyan-400 uppercase">
+                  <span>PROGRESSO PARA NÍVEL {profile.level + 1}</span>
+                  <span className="font-bold">{xpPercentage}%</span>
                 </div>
-                <div className="h-2 bg-black/60 border border-white/5 relative overflow-hidden">
+                <div className="h-8 bg-black border border-cyan-900 overflow-hidden p-1">
                   <div
-                    className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]' : 'bg-gradient-to-r from-cyan-950 via-cyan-500 to-white'}`}
+                    className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]' : 'bg-gradient-to-r from-cyan-950 via-cyan-500 to-white'} relative overflow-hidden`}
                     style={{ width: `${xpPercentage}%` }}
                   >
-                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] animate-[shimmer_3s_infinite]"></div>
+                    <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
                   </div>
                 </div>
               </div>
