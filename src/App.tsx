@@ -533,17 +533,7 @@ const App: React.FC = () => {
 
       isInitializing.current = false;
 
-      // Protocolo de Reestabelecimento de Ofensiva (Correção Direta no Load)
-      const correctionApplied = localStorage.getItem('streak_correction_2026_03_27_v10');
-      if (!correctionApplied) {
-        setProfile(p => {
-          const newStreak = (p.dailyStreak || 0) + 1;
-          return { ...p, dailyStreak: newStreak };
-        });
-        localStorage.setItem('streak_correction_2026_03_27_v10', 'true');
-        addSystemMessage("SISTEMA: PROTOCOLO DE REESTABELECIMENTO DE MANA CONCLUÍDO (+1 OFENSIVA).", "success");
-      }
-
+      // Removed correction script to prevent +2 multidevice bugs
       setDataLoaded(true);
     };
 
@@ -672,7 +662,7 @@ const App: React.FC = () => {
 
   // Local Save + Mark for Cloud Sync
   useEffect(() => {
-    if (!dataLoaded || isInitializing.current || isSyncing) return;
+    if (!dataLoaded || isInitializing.current) return;
 
     persistenceService.saveLocal({
       profile,
@@ -692,7 +682,7 @@ const App: React.FC = () => {
       }, 2000); // 2 second debounce for cloud sync
       return () => clearTimeout(handler);
     }
-  }, [profile, quests, storeItems, vices, messages]);
+  }, [profile, quests, storeItems, vices, messages, dataLoaded, isOnline, session]);
 
   const handleToggleComplete = (id: string) => {    if (processingQuestIds.current.has(id)) return;
 
