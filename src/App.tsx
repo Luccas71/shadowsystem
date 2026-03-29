@@ -191,6 +191,13 @@ const App: React.FC = () => {
   const hasUnsavedChanges = React.useRef(false);
   const isInitializing = React.useRef(true);
 
+  const questsRef = React.useRef(quests);
+  const profileRef = React.useRef(profile);
+  useEffect(() => {
+    questsRef.current = quests;
+    profileRef.current = profile;
+  }, [quests, profile]);
+
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
     setMessages(prev => {
       // Prevent duplicate messages within 1 second
@@ -259,8 +266,10 @@ const App: React.FC = () => {
     const checkInterval = setInterval(() => {
       const now = Date.now();
       const today = new Date().toDateString();
+      const currentProfile = profileRef.current;
+      const currentQuests = questsRef.current;
 
-      if (profile.isPenaltyZoneActive && profile.penaltyEndTime && now > profile.penaltyEndTime) {
+      if (currentProfile.isPenaltyZoneActive && currentProfile.penaltyEndTime && now > currentProfile.penaltyEndTime) {
         setProfile(p => ({
           ...p,
           isPenaltyZoneActive: false,
@@ -274,7 +283,7 @@ const App: React.FC = () => {
         return;
       }
 
-      if (profile.isPenaltyZoneActive) {
+      if (currentProfile.isPenaltyZoneActive) {
         setProfile(p => {
           const armorBuffs = p.activeBuffs.filter(b => b.slug === 'buff-armor').length;
           const drainReduction = Math.pow(0.5, armorBuffs); // Cada manto reduz em 50% o dreno restante
@@ -302,17 +311,17 @@ const App: React.FC = () => {
       let corruptionIncrease = 0;
       let goldPenaltyAtOnce = 0;
       let streakUpdatedToday = false;
-      let newStreakValue = profile.dailyStreak || 0;
+      let newStreakValue = currentProfile.dailyStreak || 0;
 
-      const dayChangedSinceLastCheck = profile.lastDailyCheckDate && profile.lastDailyCheckDate !== today;
+      const dayChangedSinceLastCheck = currentProfile.lastDailyCheckDate && currentProfile.lastDailyCheckDate !== today;
       
       if (dayChangedSinceLastCheck) {
         // Obter o dia da semana de "ontem" (o dia que estamos verificando)
-        const yesterday = new Date(profile.lastDailyCheckDate || '');
+        const yesterday = new Date(currentProfile.lastDailyCheckDate || '');
         const yesterdayDay = yesterday.getDay();
 
         // Só quebra a ofensiva se havia missões ATIVAS ontem que não foram concluídas
-        const pendingQuests = quests.filter(q => {
+        const pendingQuests = currentQuests.filter(q => {
           if (q.completed || q.failed) return false;
           
           // Quests diárias e especiais são sempre ativas no dia
@@ -358,11 +367,11 @@ const App: React.FC = () => {
           }
         } else {
           // Salvaguarda de Rank: B ou superior não reseta, apenas mantém
-          const isRankProtected = [Rank.B, Rank.A, Rank.S].includes(profile.rank);
+          const isRankProtected = [Rank.B, Rank.A, Rank.S].includes(currentProfile.rank);
           
           if (isRankProtected) {
-            addSystemMessage(`SISTEMA: SALVAGUARDA DE RANK ATIVADA (${profile.rank}). OFENSIVA PRESERVADA.`, "info");
-            // Mantém o valor atual (newStreakValue já foi inicializado com profile.dailyStreak)
+            addSystemMessage(`SISTEMA: SALVAGUARDA DE RANK ATIVADA (${currentProfile.rank}). OFENSIVA PRESERVADA.`, "info");
+            // Mantém o valor atual (newStreakValue já foi inicializado com currentProfile.dailyStreak)
           } else {
             newStreakValue = 0;
             const questTitles = pendingQuests.map(q => q.title.toUpperCase()).join(', ');
@@ -370,11 +379,11 @@ const App: React.FC = () => {
           }
         }
         streakUpdatedToday = true;
-      } else if (!profile.lastDailyCheckDate) {
+      } else if (!currentProfile.lastDailyCheckDate) {
         streakUpdatedToday = true;
       }
 
-      const updatedQuests = quests.reduce((acc, q) => {
+      const updatedQuests = currentQuests.reduce((acc, q) => {
         // Special Quests Expiration Logic
         if (q.isSpecial && !q.completed && !q.failed) {
           const lastReset = q.createdAt ? new Date(q.createdAt).toDateString() : '';
@@ -397,7 +406,7 @@ const App: React.FC = () => {
         if (!q.isDaily && !q.completed && !q.failed && !q.isSpecial && q.deadline && now > q.deadline) {
           updateRequired = true;
           corruptionIncrease += 12;
-          goldPenaltyAtOnce += Math.floor(profile.gold * 0.05);
+          goldPenaltyAtOnce += Math.floor(currentProfile.gold * 0.05);
           addSystemMessage(`DIRETRIZ FALHA: ${q.title}. PUNIÇÃO DE MANA APLICADA.`, "error");
           acc.push({ ...q, failed: true });
           return acc;
@@ -473,7 +482,7 @@ const App: React.FC = () => {
     }, 5000);
 
     return () => clearInterval(checkInterval);
-  }, [quests, profile, updateCorruption, addSystemMessage]);
+  }, [updateCorruption, addSystemMessage, storeItems]);
 
   // Load Initial Data (Offline First)
   useEffect(() => {
@@ -684,7 +693,8 @@ const App: React.FC = () => {
     }
   }, [profile, quests, storeItems, vices, messages, dataLoaded, isOnline, session]);
 
-  const handleToggleComplete = (id: string) => {    if (processingQuestIds.current.has(id)) return;
+  const handleToggleComplete = (id: string) => {
+    if (processingQuestIds.current.has(id)) return;
 
     const quest = quests.find(qu => qu.id === id);
     if (quest && !quest.completed && !quest.failed) {
@@ -695,6 +705,9 @@ const App: React.FC = () => {
       }
 
       processingQuestIds.current.add(id);
+      setTimeout(() => {
+        processingQuestIds.current.delete(id);
+      }, 2000);
 
       const currentTotalXp = profile.totalXpGained;
 
@@ -1687,9 +1700,15 @@ const App: React.FC = () => {
                 }
                 return true;
               })} onReorder={(newOrder) => {
-                const activeIds = new Set(newOrder.map(q => q.id));
                 const completedOrFailed = quests.filter(q => q.completed || q.failed);
-                setQuests([...newOrder, ...completedOrFailed]);
+                const inactive = quests.filter(q => {
+                  if (q.completed || q.failed) return false;
+                  if (q.isScheduled && q.repeatDays) {
+                    return !q.repeatDays.includes(new Date().getDay());
+                  }
+                  return false;
+                });
+                setQuests([...newOrder, ...inactive, ...completedOrFailed]);
               }} className="space-y-4">
                 {quests.filter(q => {
                   if (q.completed || q.failed) return false;
