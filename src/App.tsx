@@ -87,7 +87,8 @@ const INITIAL_PROFILE: HunterProfile = {
   lastItemDropDate: "",
   dailyStreak: 0,
   lastStreakDate: "",
-  lastDailyCheckDate: ""
+  lastDailyCheckDate: "",
+  fragilityHistory: []
 };
 
 const XP_DROP_THRESHOLD = 50000;
@@ -1874,7 +1875,20 @@ const App: React.FC = () => {
               vices={vices}
               onAddVice={(title, corruption) => setVices(prev => [...prev, { id: Math.random().toString(36).substr(2, 9), title, corruptionIncrease: corruption, penaltyXp: 0 }])}
               onRemoveVice={id => setVices(prev => prev.filter(v => v.id !== id))}
-              onSuccumb={v => updateCorruption(v.corruptionIncrease)}
+              onSuccumb={v => {
+                updateCorruption(v.corruptionIncrease);
+                const today = new Date().toISOString().split('T')[0];
+                setProfile(p => {
+                  const history = [...(p.fragilityHistory || [])];
+                  const idx = history.findIndex(h => h.date === today);
+                  if (idx > -1) {
+                    history[idx] = { ...history[idx], count: history[idx].count + 1 };
+                  } else {
+                    history.push({ date: today, count: 1 });
+                  }
+                  return { ...p, fragilityHistory: history };
+                });
+              }}
               onStartSurvival={() => {
                 if (profile.corruption >= 100) {
                   const now = Date.now();

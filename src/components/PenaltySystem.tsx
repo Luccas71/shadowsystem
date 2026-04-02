@@ -11,7 +11,8 @@ import {
   Plus,
   X,
   ArrowDown,
-  Lock
+  Lock,
+  ScrollText
 } from 'lucide-react';
 
 interface PenaltySystemProps {
@@ -204,6 +205,57 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
           </div>
         </div>
       )}
+
+      {/* Relatório de Fragilidades */}
+      <div className="mt-12 space-y-6">
+        <h3 className="font-game text-[14px] text-red-900/60 uppercase flex items-center gap-3 border-b border-red-900/20 pb-3 font-black tracking-widest">
+          <ScrollText size={16} className="text-red-600" /> REGISTRO DE QUEDAS (LOG DE FRAGILIDADE)
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {(!profile.fragilityHistory || profile.fragilityHistory.length === 0) ? (
+            <div className="col-span-full py-12 text-center border border-dashed border-red-900/20 bg-red-950/5 rounded-lg">
+               <Skull size={32} className="mx-auto text-red-900/20 mb-3" />
+               <p className="font-game text-[10px] text-red-900/40 uppercase tracking-widest font-black">NENHUMA QUEBRA DE PROTOCOLO REGISTRADA</p>
+               <p className="text-[8px] text-red-900/30 uppercase mt-1">Sua vontade permanece inabalável perante o sistema.</p>
+            </div>
+          ) : (
+            [...profile.fragilityHistory].sort((a,b) => b.date.localeCompare(a.date)).map((entry, idx) => (
+              <div key={idx} className="hud-board border-red-900/30 p-5 bg-red-950/10 flex flex-col gap-2 relative group overflow-hidden hover:border-red-600/50 transition-all duration-300">
+                <div className="flex justify-between items-start relative z-10">
+                   <div className="space-y-0.5">
+                     <span className="font-game text-[10px] text-red-500/70 block uppercase tracking-tighter">DATA DO EVENTO</span>
+                     <span className="font-game text-sm text-white font-black tracking-widest">
+                       {new Date(entry.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                     </span>
+                   </div>
+                   <div className="text-right">
+                     <span className="font-game text-2xl text-red-600 font-extrabold drop-shadow-[0_0_8px_rgba(220,38,38,0.5)]">{entry.count}</span>
+                     <span className="font-game text-[10px] text-red-900 font-black ml-1 uppercase">x</span>
+                   </div>
+                </div>
+                
+                <div className="mt-2 relative z-10">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[8px] font-game text-red-900 uppercase font-black tracking-widest">GRAVIDADE DA FALHA</span>
+                    <span className="text-[8px] font-game text-red-600 font-black uppercase">{entry.count > 5 ? 'CRÍTICO' : entry.count > 2 ? 'ALTO' : 'MONITORADO'}</span>
+                  </div>
+                  <div className="h-1.5 bg-black border border-red-900/30 overflow-hidden p-[1px]">
+                    <div 
+                      className={`h-full relative overflow-hidden transition-all duration-1000 ${entry.count > 5 ? 'bg-red-500' : 'bg-red-800'}`} 
+                      style={{ width: `${Math.min(100, entry.count * 15)}%` }}
+                    >
+                      <div className="absolute inset-0 shimmer-gradient shimmer-animated opacity-40"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="absolute top-0 right-0 w-24 h-24 bg-red-600/5 blur-3xl rounded-full -mr-12 -mt-12 pointer-events-none group-hover:bg-red-600/10 transition-all"></div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Modal Adicionar Vício */}
       {isAdding && (

@@ -50,6 +50,12 @@ export interface HunterProfile {
   lastStreakDate?: string; // Data da ultima ofensiva incrementada
   lastDailyCheckDate?: string; // Data da última verificação diária de streak
   lastUpdate?: string; // ISO timestamp
+  fragilityHistory?: FragilityHistoryEntry[];
+}
+
+export interface FragilityHistoryEntry {
+  date: string; // YYYY-MM-DD
+  count: number;
 }
 
 export interface SubQuest {
