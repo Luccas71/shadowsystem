@@ -166,6 +166,7 @@ const App: React.FC = () => {
 
   const [messages, setMessages] = useState<SystemMessage[]>([]);
   const [activeTab, setActiveTab] = useState<'quests' | 'status' | 'penalties' | 'inventory' | 'store'>('quests');
+  const [showInactiveQuests, setShowInactiveQuests] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [questForm, setQuestForm] = useState<{ isOpen: boolean }>({ isOpen: false });
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
@@ -320,50 +321,62 @@ const App: React.FC = () => {
         const yesterday = new Date(currentProfile.lastDailyCheckDate || '');
         const yesterdayDay = yesterday.getDay();
 
-        // Só quebra a ofensiva se havia missões ATIVAS ontem que não foram concluídas
-        const pendingQuests = currentQuests.filter(q => {
-          if (q.completed || q.failed) return false;
-          
-          // Quests diárias e especiais são sempre ativas no dia
+        // Só quebra a ofensiva se havia missões OBRIGATÓRIAS ontem que não foram concluídas
+        const mandatoryYesterday = currentQuests.filter(q => {
+          // Quests diárias e especiais são sempre obrigatórias no dia
           if (q.isDaily || q.isSpecial) return true;
           
           // Quests programadas só contam se ontem era um dia de ativação
           if (q.isScheduled && q.repeatDays?.includes(yesterdayDay)) return true;
           
-          // Quests normais com prazo que expirou ontem ou antes
-          if (!q.isDaily && !q.isSpecial && !q.isScheduled && q.deadline && q.deadline < now) return true;
+          // Quests com prazo que expirou exatamente ontem (dia de vencimento)
+          if (q.deadline) {
+            const deadlineDateString = new Date(q.deadline).toDateString();
+            return deadlineDateString === yesterday.toDateString();
+          }
           
           return false;
         });
 
+        const pendingQuests = mandatoryYesterday.filter(q => !q.completed && !q.failed);
         const anyPending = pendingQuests.length > 0;
+        
+        // Verificamos se houve alguma atividade (conclusão) ontem, mesmo que não obrigatória
+        const activityYesterday = currentQuests.some(q => 
+          q.completed && q.completedAt && new Date(q.completedAt).toDateString() === yesterday.toDateString()
+        );
 
         if (!anyPending) {
-          // Incremento normal da ofensiva
-          newStreakValue += 1;
-          const tier = getCurrentStreakTier(newStreakValue);
-          addSystemMessage(`SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1). TIER ATUAL: ${tier.name}`, "success");
-          
-          // Milestone Reward a cada 7 dias
-          if (newStreakValue > 0 && newStreakValue % 7 === 0) {
-            const randomItem = storeItems[Math.floor(Math.random() * storeItems.length)];
-            setStoreItems(prev => {
-              const next = [...prev];
-              const existingIdx = next.findIndex(si => si.id === randomItem.id && si.origin === 'diário');
-              if (existingIdx > -1) {
-                next[existingIdx] = { ...next[existingIdx], purchasedCount: next[existingIdx].purchasedCount + 1 };
-              } else {
-                next.push({ ...randomItem, purchasedCount: 1, origin: 'diário' });
-              }
-              return next;
-            });
-            addSystemMessage(`SISTEMA: RECOMPENSA DE MARCO DE 7 DIAS! RECEBIDO: ${randomItem.name.toUpperCase()}`, "warning");
-            setActiveEffect({
-              type: 'useItem',
-              title: "RECOMPENSA DE CAVALEIRO",
-              subtitle: `MARCO DE ${newStreakValue} DIAS ALCANÇADO`,
-              icon: <Flame size={48} className="text-amber-500" />
-            });
+          // Só incrementa se havia metas obrigatórias ou se houve alguma tarefa concluída voluntariamente
+          if (mandatoryYesterday.length > 0 || activityYesterday) {
+            newStreakValue += 1;
+            const tier = getCurrentStreakTier(newStreakValue);
+            addSystemMessage(`SISTEMA: OFENSIVA DIÁRIA MANTIDA! (+1). TIER ATUAL: ${tier.name}`, "success");
+            
+            // Milestone Reward a cada 7 dias
+            if (newStreakValue > 0 && newStreakValue % 7 === 0) {
+              const randomItem = storeItems[Math.floor(Math.random() * storeItems.length)];
+              setStoreItems(prev => {
+                const next = [...prev];
+                const existingIdx = next.findIndex(si => si.id === randomItem.id && si.origin === 'diário');
+                if (existingIdx > -1) {
+                  next[existingIdx] = { ...next[existingIdx], purchasedCount: next[existingIdx].purchasedCount + 1 };
+                } else {
+                  next.push({ ...randomItem, purchasedCount: 1, origin: 'diário' });
+                }
+                return next;
+              });
+              addSystemMessage(`SISTEMA: RECOMPENSA DE MARCO DE 7 DIAS! RECEBIDO: ${randomItem.name.toUpperCase()}`, "warning");
+              setActiveEffect({
+                type: 'useItem',
+                title: "RECOMPENSA DE CAVALEIRO",
+                subtitle: `MARCO DE ${newStreakValue} DIAS ALCANÇADO`,
+                icon: <Flame size={48} className="text-amber-500" />
+              });
+            }
+          } else {
+            // Congelamento: Não aumenta nem reseta
+            addSystemMessage("SISTEMA: OFENSIVA CONGELADA. NENHUMA TAREFA OBRIGATÓRIA DETECTADA ONTEM.", "info");
           }
         } else {
           // Salvaguarda de Rank: B ou superior não reseta, apenas mantém
@@ -416,6 +429,15 @@ const App: React.FC = () => {
           const lastReset = q.lastResetAt ? new Date(q.lastResetAt).toDateString() : '';
           if (lastReset !== today) {
             updateRequired = true;
+            
+            const newHistory = [...(q.history || [])];
+            if (lastReset && !newHistory.some(h => h.date === lastReset)) {
+              newHistory.push({
+                date: lastReset,
+                status: q.completed ? 'completed' : 'ignored'
+              });
+            }
+
             if (!q.completed) {
               corruptionIncrease += 10;
               addSystemMessage(`SISTEMA: TREINAMENTO DIÁRIO "${q.title}" NEGLIGENCIADO.`, "error");
@@ -428,6 +450,7 @@ const App: React.FC = () => {
               completed: false,
               failed: false,
               lastResetAt: now,
+              history: newHistory,
               subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
             });
             return acc;
@@ -441,14 +464,25 @@ const App: React.FC = () => {
           if (lastResetDayStr !== today) {
             updateRequired = true;
             
+            const newHistory = [...(q.history || [])];
+
             // Verificamos se o dia que acabou de terminar era um dia ativo
             if (lastResetDate) {
               const dayFinished = lastResetDate.getDay();
               const wasFinishedDayActive = q.repeatDays.includes(dayFinished);
               
-              if (wasFinishedDayActive && !q.completed && !q.failed) {
-                corruptionIncrease += 10;
-                addSystemMessage(`SISTEMA: MISSÃO PROGRAMADA "${q.title.toUpperCase()}" NÃO CUMPRIDA. +10% CORRUPÇÃO.`, "error");
+              if (wasFinishedDayActive) {
+                if (lastResetDayStr && !newHistory.some(h => h.date === lastResetDayStr)) {
+                  newHistory.push({
+                    date: lastResetDayStr,
+                    status: q.completed ? 'completed' : 'ignored'
+                  });
+                }
+
+                if (!q.completed && !q.failed) {
+                  corruptionIncrease += 10;
+                  addSystemMessage(`SISTEMA: MISSÃO PROGRAMADA "${q.title.toUpperCase()}" NÃO CUMPRIDA. +10% CORRUPÇÃO.`, "error");
+                }
               }
             }
 
@@ -457,6 +491,7 @@ const App: React.FC = () => {
               completed: false,
               failed: false,
               lastResetAt: now,
+              history: newHistory,
               subQuests: q.subQuests?.map(sq => ({ ...sq, completed: false })) || []
             });
             return acc;
@@ -1322,6 +1357,10 @@ const App: React.FC = () => {
             deadlineEdits: deadlineChanged ? (q.deadlineEdits || 0) + 1 : (q.deadlineEdits || 0),
             xpReward: DIFFICULTY_XP[newQuestDifficulty],
             goldReward: DIFFICULTY_GOLD[newQuestDifficulty],
+            isDaily: newQuestIsDaily,
+            isSpecial: newQuestIsSpecial,
+            isScheduled: newQuestIsScheduled,
+            repeatDays: newQuestIsScheduled ? newQuestRepeatDays : undefined,
           };
         }
         return q;
@@ -1742,6 +1781,52 @@ const App: React.FC = () => {
                   </div>
                 )}
 
+              {/* Seção de Missões Programadas Inativas (Fora de Agenda) */}
+              {quests.filter(q => {
+                if (q.completed || q.failed) return false;
+                if (q.isScheduled && q.repeatDays) {
+                  return !q.repeatDays.includes(new Date().getDay());
+                }
+                return false;
+              }).length > 0 && (
+                <div className="mt-12 space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 opacity-70">
+                    <h2 className="font-game text-xl md:text-2xl flex items-center gap-4 text-slate-400 uppercase tracking-tight">
+                      <CalendarDays size={20} className="text-cyan-800" /> Missões Fora de Agenda
+                    </h2>
+                    <button
+                      onClick={() => setShowInactiveQuests(!showInactiveQuests)}
+                      className="w-full sm:w-auto px-4 py-2 hud-board border border-cyan-900/30 text-cyan-600 hover:text-cyan-400 font-game text-[10px] tracking-widest transition-all flex items-center justify-center gap-2 uppercase font-bold"
+                    >
+                      {showInactiveQuests ? '[ Ocultar Missões ]' : '[ Visualizar Missões ]'}
+                    </button>
+                  </div>
+
+                  {showInactiveQuests && (
+                    <div className="space-y-4 opacity-60 hover:opacity-100 transition-opacity duration-500">
+                      {quests.filter(q => {
+                        if (q.completed || q.failed) return false;
+                        if (q.isScheduled && q.repeatDays) {
+                          return !q.repeatDays.includes(new Date().getDay());
+                        }
+                        return false;
+                      }).map(q => (
+                        <QuestCard
+                          key={q.id}
+                          quest={q}
+                          onToggleComplete={handleToggleComplete}
+                          onToggleSubQuest={handleToggleSubQuest}
+                          onDelete={handleDeleteQuest}
+                          onEdit={handleEditQuest}
+                          onAddSubQuest={handleAddSubQuest}
+                          onRemoveSubQuest={handleRemoveSubQuest}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Seção de Missões Concluídas Hoje */}
               {quests.filter(q => {
                 if (!q.completed || !q.completedAt) return false;
@@ -1782,7 +1867,7 @@ const App: React.FC = () => {
             </div>
             </>
           ) : activeTab === 'status' ? (
-            <StatusWindow profile={profile} />
+            <StatusWindow profile={profile} quests={quests} />
           ) : activeTab === 'penalties' ? (
             <PenaltySystem
               profile={profile}

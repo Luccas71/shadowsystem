@@ -58,6 +58,13 @@ export interface SubQuest {
   completed: boolean;
 }
 
+export type QuestHistoryStatus = 'completed' | 'failed' | 'ignored';
+
+export interface QuestHistoryEntry {
+  date: string;
+  status: QuestHistoryStatus;
+}
+
 export enum QuestDifficulty {
   E = 'E',
   D = 'D',
@@ -95,6 +102,7 @@ export interface Quest {
   isScheduled?: boolean; // Novo: Se repete em dias específicos
   repeatDays?: number[]; // Novo: Array de dias da semana (0-6)
   completedAt?: number; // Data de conclusão da missão
+  history?: QuestHistoryEntry[]; // Histórico de completude da quest em dias anteriores
 }
 
 export type ItemOrigin = 'diário' | 'compra' | 'rank' | 'nível' | 'raro';
