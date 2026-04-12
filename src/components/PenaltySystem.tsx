@@ -58,27 +58,27 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
       {/* Header Perigo */}
       <div className={`relative p-6 border-2 overflow-hidden ${profile.corruption >= 100 ? 'border-red-600 bg-red-950/40' : 'border-cyan-900/50 bg-cyan-950/10'}`}>
         <div className={`absolute top-0 left-0 w-full h-1 bg-cyan-600 shadow-[0_0_10px_#06b6d4]`} style={{ width: `${profile.corruption}%` }}></div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className={`font-game text-2xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-cyan-400'}`}>
-            <Skull /> PROTOCOLO DE PURIFICAÇÃO
+        <div className="flex items-center justify-between mb-4 relative z-10">
+          <h2 className={`font-game text-xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-cyan-400'}`}>
+            <Skull size={20} /> Purificação
           </h2>
-          <span className="font-game text-[10px] text-cyan-600 tracking-[0.3em] font-bold">
-            {profile.corruption >= 100 ? "⚠️ ESTADO CRÍTICO" : "MONITORAMENTO DE ALMA"}
+          <span className="font-game text-[9px] text-cyan-600/60 tracking-[0.2em] font-bold">
+            {profile.corruption >= 100 ? "⚠️ ALERTA CRÍTICO" : "SINC_ALMA // ATIVO"}
           </span>
         </div>
 
         {/* Corruption Meter */}
         <div className="space-y-2 mb-6">
-          <div className="flex justify-between font-game text-[10px] text-cyan-400 uppercase">
+          <div className="flex justify-between font-game text-[9px] text-cyan-400/70 uppercase">
             <span>Nível de Instabilidade</span>
             <span className={profile.corruption >= 100 ? "text-red-600 font-bold" : ""}>{profile.corruption.toFixed(2)}%</span>
           </div>
-          <div className="h-8 bg-black border border-cyan-900 overflow-hidden p-1">
+          <div className="h-2 bg-black/40 border-x border-cyan-900/30 overflow-hidden">
             <div
-              className={`h-full transition-all duration-1000 ${profile.corruption >= 100 ? 'bg-red-600' : profile.corruption > 50 ? 'bg-cyan-800' : 'bg-cyan-950'} relative overflow-hidden`}
+              className={`h-full transition-all duration-1000 ${profile.corruption >= 100 ? 'bg-red-600' : profile.corruption > 50 ? 'bg-cyan-800' : 'bg-cyan-600'} relative overflow-hidden`}
               style={{ width: `${profile.corruption}%` }}
             >
-              <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
+              <div className="absolute inset-0 shimmer-gradient opacity-20"></div>
             </div>
           </div>
         </div>

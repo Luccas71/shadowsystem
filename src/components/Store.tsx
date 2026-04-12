@@ -110,11 +110,11 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
         </div>
       )}
 
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4`}>
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-3`}>
         {items.length === 0 && (
-          <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-sky-900/30 bg-sky-950/10 transition-all duration-300 shadow-none bg-amber-950/10 shadow-none">
-            <Package size={64} className="text-amber-900 mb-4" />
-            <p className="font-game text-amber-800 text-xs uppercase tracking-[0.2em]">Cofre do Sistema Vazio</p>
+          <div className="col-span-full py-20 flex flex-col items-center opacity-30 border border-white/5">
+            <Package size={48} className="text-amber-900 mb-4" />
+            <p className="font-game text-amber-800 text-[10px] uppercase tracking-[0.2em]">Cofre Vazio</p>
           </div>
         )}
         {items.map(item => {
@@ -123,64 +123,64 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
             <div
               key={item.id}
               onClick={() => !isLocked && toggleExpand(item.id)}
-              className={`hud-board border p-5 flex flex-col justify-between group cursor-pointer transition-all duration-500 relative overflow-hidden ${isLocked
-                ? 'border-slate-800'
+              className={`relative flex flex-col bg-slate-950/60 border transition-all duration-500 cursor-pointer p-4 ${isLocked
+                ? 'border-slate-900 opacity-50'
                 : isExpanded
-                  ? 'hud-board-glow border-amber-400 scale-[1.02] z-10'
-                  : 'border-amber-900/40 hover:border-amber-500/60'
+                  ? 'border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.05)]'
+                  : 'border-white/5 hover:border-amber-500/20'
                 }`}
             >
-              {/* Overlay de expansão visual */}
-              <div className={`absolute top-0 right-0 p-2 transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-30 group-hover:opacity-100'}`}>
-                {isExpanded ? <ChevronUp size={16} className="text-amber-400" /> : <ChevronDown size={16} className="text-amber-600" />}
-              </div>
+              {/* Minimal Accent */}
+              <div className={`absolute top-0 left-0 w-full h-[1px] transition-all duration-700 ${isExpanded ? 'bg-amber-500/30' : 'bg-transparent group-hover:bg-amber-500/10'}`}></div>
 
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className={`font-game text-lg tracking-tight transition-colors ${isExpanded ? 'text-amber-400' : 'text-amber-100 group-hover:text-amber-400'}`}>
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className={`font-game text-md uppercase tracking-widest transition-colors font-bold ${isExpanded ? 'text-amber-400' : 'text-slate-100'}`}>
                     {item.name}
                   </h3>
+                  <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                    <ChevronDown size={14} className="text-amber-600/50" />
+                  </div>
                 </div>
 
-                <div className={`relative transition-all duration-500 ${isExpanded ? 'max-h-[500px] mb-4' : 'max-h-12 mb-3'}`}>
-                  <p className={`text-xs text-slate-400 italic leading-relaxed transition-all ${!isExpanded ? 'line-clamp-2' : ''}`}>
-                    {item.description || 'Uma relíquia de poder incalculável, aguardando um mestre digno.'}
+                <div className={`overflow-hidden transition-all duration-500 ${isExpanded ? 'max-h-[500px] opacity-100 mb-4' : 'max-h-12 opacity-50 mb-3'}`}>
+                  <p className={`text-[10px] text-slate-400 italic leading-snug ${!isExpanded ? 'line-clamp-2' : ''}`}>
+                    {item.description || 'Relíquia de poder sincronizada.'}
                   </p>
                   {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-amber-900/30 transition-all duration-500 bg-amber-950/10 shadow-none animate-in fade-in slide-in-from-top-2">
-                      <div className="flex items-center gap-2 text-[8px] font-game text-amber-700 uppercase tracking-widest mb-1">
-                        <Info size={10} /> Registro de Dados do Sistema
+                    <div className="mt-4 pt-4 border-t border-white/5 animate-in fade-in slide-in-from-top-1">
+                      <div className="text-[7px] font-game text-slate-600 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
+                        <Info size={10} /> Atributos Identificados
                       </div>
-                      <div className="text-[10px] text-slate-500 font-game uppercase leading-tight">
-                        STATUS: IDENTIFICADO <br />
+                      <div className="text-[9px] text-amber-500/70 font-game uppercase leading-relaxed">
                         RARIDADE: {item.cost > 5000 ? 'LENDÁRIO' : item.cost > 1000 ? 'RARO' : 'COMUM'}
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between mt-auto">
-                  <div className="flex items-center gap-2 text-amber-500 font-game text-sm shadow-sm">
-                    <Coins size={14} className={isExpanded ? 'animate-pulse' : ''} /> {item.cost} Ouro
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/5">
+                  <div className="flex items-center gap-1.5 text-amber-500 font-game text-xs font-bold leading-none">
+                    <Coins size={12} className={isExpanded ? 'animate-pulse' : ''} /> {item.cost}
                   </div>
 
-                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center gap-3" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => onRemoveItem(item.id)}
-                      className="p-2 text-slate-700 hover:text-red-500 transition-colors"
-                      title="Deletar Relíquia"
+                      className="p-1.5 text-slate-700 hover:text-red-500 transition-colors"
+                      title="Deletar"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
                     </button>
                     <button
                       onClick={() => gold >= item.cost && onPurchaseItem(item)}
                       disabled={gold < item.cost}
-                      className={`px-5 py-2 font-game text-[10px] uppercase tracking-widest transition-all active:scale-95 ${gold >= item.cost
-                        ? 'bg-amber-600 text-white hover:bg-amber-500 shadow-[0_0_15px_rgba(217,119,6,0.3)]'
-                        : 'bg-red-900/40 text-red-400 border border-red-500/30 cursor-not-allowed opacity-50'
+                      className={`px-4 py-1.5 font-game text-[9px] uppercase tracking-widest transition-all font-bold ${gold >= item.cost
+                        ? 'bg-amber-600/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500 hover:text-white'
+                        : 'bg-red-900/5 text-red-900 border border-red-900/20 cursor-not-allowed'
                         }`}
                     >
-                      {gold >= item.cost ? 'ADQUIRIR' : 'SEM OURO'}
+                      Adquirir
                     </button>
                   </div>
                 </div>

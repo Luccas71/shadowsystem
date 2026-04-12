@@ -176,101 +176,86 @@ const QuestCard: React.FC<QuestCardProps> = ({
           : `hud-board-glow ${rankBorderClass} border-opacity-50`
         }`}>
 
-        <div className="p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-8 relative z-10 min-w-0">
+        <div className="p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 md:gap-7 relative z-10 min-w-0">
 
-          <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-20 md:h-20 self-center sm:self-auto group/check">
+          <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-16 md:h-16 self-center sm:self-auto group/check">
             {!quest.completed && !quest.failed && (
               <>
-                <div className={`checkbox-ring absolute w-10 h-10 md:w-14 md:h-14 rotate-45 border border-current opacity-20 ${rankTextClass} transition-all duration-500`}></div>
+                <div className={`checkbox-ring absolute w-10 min-h-10 md:w-12 md:h-12 rotate-45 border border-current opacity-10 ${rankTextClass} transition-all duration-500`}></div>
               </>
             )}
 
             <button
               disabled={quest.failed}
               onClick={() => onToggleComplete(quest.id)}
-              className={`w-10 h-10 md:w-11 md:h-11 rotate-45 border-2 transition-all duration-500 flex items-center justify-center relative overflow-hidden hover:scale-110 hover:border-opacity-100 hover:shadow-[0_0_25px_currentColor] ${quest.completed
+              className={`w-9 h-9 md:w-10 md:h-10 rotate-45 border transition-all duration-500 flex items-center justify-center relative overflow-hidden hover:scale-110 hover:border-opacity-100 hover:shadow-[0_0_15px_currentColor] ${quest.completed
                 ? 'bg-slate-900 border-slate-800 text-slate-700'
                 : quest.failed
                   ? 'bg-red-950 border-red-900 text-red-900 cursor-not-allowed hover:scale-100 hover:shadow-none'
-                  : `bg-black ${rankBorderClass} border-opacity-60 ${rankTextClass} shadow-[0_0_15px_rgba(0,0,0,0.6)]`
+                  : `bg-black ${rankBorderClass} border-opacity-40 ${rankTextClass}`
                 }`}
             >
               <div className="flex items-center justify-center relative z-20">
                 {quest.completed ? (
-                  <div className={`w-3.5 h-3.5 ${colors.checkboxFill}`}></div>
+                  <div className={`w-3 h-3 ${colors.checkboxFill}`}></div>
                 ) : quest.failed ? (
-                  <AlertCircle size={20} className="text-red-900 -rotate-45" />
+                  <AlertCircle size={18} className="text-red-900 -rotate-45" />
                 ) : (
-                  <div className={`w-2.5 h-2.5 bg-current transition-all duration-500 shadow-[0_0_12px_currentColor] group-hover/check:w-3.5 group-hover/check:h-3.5 group-hover/check:shadow-[0_0_20px_currentColor]`}></div>
+                  <div className={`w-2 h-2 bg-current transition-all duration-500 opacity-80 group-hover/check:opacity-100 group-hover/check:shadow-[0_0_15px_currentColor]`}></div>
                 )}
               </div>
             </button>
           </div>
 
-          <div className="flex-1 space-y-2 min-w-0 w-full">
-            <div className="flex flex-col gap-2 min-w-0">
+          <div className="flex-1 space-y-1.5 min-w-0 w-full">
+            <div className="flex flex-col gap-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-game text-[10px] px-2 py-0.5 border leading-none font-black tracking-[0.2em] shadow-sm relative overflow-hidden transition-all duration-500 ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/80 whitespace-nowrap group-hover:px-4`}>
-                  <div className="absolute inset-x-0 bottom-0 h-[1px] bg-current opacity-30"></div>
+                <span className={`font-game text-[9px] px-2 py-0.5 border leading-none font-bold tracking-[0.1em] transition-all duration-500 ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/60 whitespace-nowrap`}>
                   {quest.failed ? 'FALHA' : `RANK_${quest.difficulty}`}
                 </span>
                 {quest.isDaily && (
-                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : colors.badge
-                    }`}>
-                    <RefreshCw size={10} /> QUEST DIÁRIA
+                  <span className={`font-game text-[8px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap ${quest.failed ? 'text-red-500' : 'text-cyan-500'}`}>
+                    Diário
                   </span>
                 )}
                 {quest.isScheduled && (
-                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : 'text-indigo-400 border-indigo-500/30 bg-indigo-950/60 shadow-[0_0_10px_rgba(129,140,248,0.3)]'
-                    }`}>
-                    <Timer size={10} /> QUEST PROGRAMADA
+                  <span className="font-game text-[8px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap text-indigo-400">
+                    Programado
                   </span>
                 )}
                 {quest.isSpecial && (
-                  <span className={`flex items-center gap-1 font-game text-[9px] border px-2 py-0.5 rounded-sm font-bold whitespace-nowrap ${quest.failed ? colors.badgeFailed : 'text-purple-400 border-purple-500/30 bg-purple-950/60 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
-                    }`}>
-                    <Zap size={10} /> QUEST ESPECIAL
+                  <span className="font-game text-[8px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap text-purple-400 font-bold">
+                    Urgente
                   </span>
                 )}
                 {!quest.isDaily && !quest.isScheduled && quest.deadline && !quest.completed && !quest.failed && (
-                  <span className={`flex items-center gap-1 font-game text-[9px] px-2 py-0.5 rounded-sm font-bold border whitespace-nowrap ${isUrgent ? 'text-red-500 border-red-500 bg-red-950/60' : colors.badge
-                    }`}>
-                    <Clock size={10} /> {timeLeft}
+                  <span className={`font-game text-[8px] uppercase tracking-widest font-bold whitespace-nowrap ${isUrgent ? 'text-red-500' : 'text-slate-500'}`}>
+                    {timeLeft}
                   </span>
                 )}
               </div>
-              <h3 className={`font-game text-xl md:text-2xl tracking-tight transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-slate-100'
+              <h3 className={`font-game text-lg md:text-xl tracking-wide transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-slate-100'
                 }`}>
                 {quest.title}
               </h3>
             </div>
 
-            <p className={`text-[13px] md:text-[14px] font-medium leading-relaxed transition-colors duration-500 break-words ${quest.completed || quest.failed ? 'text-slate-700' : 'text-slate-400'
+            <p className={`text-[12px] md:text-[13px] font-medium leading-relaxed transition-colors duration-500 break-words ${quest.completed || quest.failed ? 'text-slate-700' : 'text-slate-500'
               }`}>
               {quest.failed ? 'Diretriz falha por descumprimento de prazo.' : quest.description}
             </p>
 
-            <div className="flex flex-wrap gap-x-6 gap-y-3 pt-3 border-t border-white/5">
-              <div className="flex flex-col gap-1">
-                <span className="text-[8px] font-game text-slate-600 uppercase tracking-widest font-black">RECOMPENSA_XP</span>
-                <div className="flex items-center gap-2 text-[12px] md:text-[14px] font-game text-white font-black tracking-wider">
-                  <div className={`p-1 bg-black/40 border border-white/5 ${!quest.completed && !quest.failed ? colors.flameIcon : 'text-slate-700'}`}>
-                    <Flame size={14} fill="currentColor" fillOpacity={0.1} />
-                  </div>
-                  <span>{quest.xpReward.toLocaleString()}</span>
-                  <span className="text-[10px] text-slate-600 font-bold">EXP</span>
-                </div>
+            <div className="flex items-center gap-6 pt-2">
+              <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-slate-400">
+                 <Flame size={12} className={!quest.completed && !quest.failed ? colors.flameIcon : 'text-slate-700'} />
+                 <span>{quest.xpReward.toLocaleString()}</span>
+                 <span className="opacity-40 text-[9px]">XP</span>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <span className="text-[8px] font-game text-slate-600 uppercase tracking-widest font-black">RECOMPENSA_OURO</span>
-                <div className="flex items-center gap-2 text-[12px] md:text-[14px] font-game text-amber-500 font-black tracking-wider">
-                  <div className={`p-1 bg-black/40 border border-white/5 ${!quest.completed && !quest.failed ? 'text-amber-500' : 'text-slate-700'}`}>
-                    <Coins size={14} fill="currentColor" fillOpacity={0.1} />
-                  </div>
-                  <span>{quest.goldReward.toLocaleString()}</span>
-                  <span className="text-[10px] text-amber-900/50 font-bold">OURO</span>
-                </div>
+              <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-amber-500/80">
+                 <Coins size={12} className={!quest.completed && !quest.failed ? 'text-amber-500' : 'text-slate-700'} />
+                 <span>{quest.goldReward.toLocaleString()}</span>
+                 <span className="opacity-40 text-[9px] text-amber-900">OURO</span>
               </div>
             </div>
           </div>

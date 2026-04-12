@@ -30,47 +30,46 @@ const StatusCard: React.FC<{
   remainingLabel: string;
   color: string;
   bgColor?: string;
-}> = ({ icon, label, mainValue, subValue, bonusText, progress, progressLabel, remainingLabel, color, bgColor = "bg-slate-950/40" }) => {
+}> = ({ icon, label, mainValue, subValue, bonusText, progress, progressLabel, remainingLabel, color, bgColor = "bg-slate-950/20" }) => {
   return (
-    <div className={`hud-board p-8 border-white/5 relative overflow-hidden ${bgColor} group transition-all duration-500`}>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
-        <div className="flex items-center gap-6">
-          <div className={`relative p-4 bg-black/40 border border-white/10 ${color}`}>
-            {React.cloneElement(icon as any, { size: 28, className: "drop-shadow-[0_0_10px_currentColor]" })}
+    <div className={`hud-board p-5 border-white/5 relative overflow-hidden ${bgColor} group transition-all duration-500 hover:bg-slate-950/40`}>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+        <div className="flex items-center gap-5">
+          <div className={`relative p-3 bg-black/60 border border-white/5 ${color}`}>
+            {React.cloneElement(icon as any, { size: 24, className: "opacity-80" })}
           </div>
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className={`w-1 h-3 ${color.replace('text-', 'bg-')}`}></div>
-              <h3 className={`font-game text-[10px] uppercase tracking-[0.4em] font-black opacity-80 ${color}`}>
+            <div className="flex items-center gap-2 mb-0.5">
+              <h3 className={`font-game text-[9px] uppercase tracking-[0.3em] font-bold opacity-60 ${color}`}>
                 {label}
               </h3>
             </div>
-            <p className="font-game text-4xl text-white tracking-widest font-black uppercase">
-              {mainValue} {subValue && <span className={`text-sm font-bold ml-1 opacity-50 ${color}`}>{subValue}</span>}
+            <p className="font-game text-3xl text-white tracking-widest font-black uppercase leading-tight">
+              {mainValue} {subValue && <span className={`text-[12px] font-bold ml-1 opacity-40 ${color}`}>{subValue}</span>}
             </p>
           </div>
         </div>
 
         {bonusText && (
           <div className="flex flex-col items-end gap-2">
-            <div className={`px-5 py-2 border ${color.replace('text-', 'border-')}/20 ${color.replace('text-', 'bg-')}/10 ${color} font-game text-[14px] uppercase tracking-[0.2em] font-black flex items-center gap-3 shadow-[0_0_15px_rgba(0,0,0,0.2)]`}>
+            <div className={`px-4 py-1.5 border ${color.replace('text-', 'border-')}/10 bg-black/40 ${color} font-game text-[11px] uppercase tracking-[0.15em] font-bold flex items-center gap-3 backdrop-blur-md`}>
               {bonusText}
             </div>
           </div>
         )}
       </div>
 
-      <div className="mt-6 space-y-2 border-t border-white/5 pt-4">
-        <div className={`flex justify-between font-game text-[10px] ${color} uppercase`}>
+      <div className="mt-5 space-y-1.5">
+        <div className={`flex justify-between font-game text-[9px] ${color} uppercase tracking-wider opacity-60`}>
           <span>{progressLabel}</span>
-          <span className="font-bold">{remainingLabel}</span>
+          <span>{remainingLabel}</span>
         </div>
-        <div className={`h-8 bg-black border border-current overflow-hidden p-1 ${color} shadow-sm`}>
+        <div className="h-1.5 bg-black/60 overflow-hidden relative">
           <div
-            className={`h-full transition-all duration-1000 ${color} relative overflow-hidden`}
+            className={`h-full transition-all duration-1000 ${color} relative`}
             style={{ width: `${Math.min(100, Math.max(0, progress))}%`, backgroundColor: 'currentColor' }}
           >
-            <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
+            <div className="absolute inset-0 opacity-30 shimmer-gradient shimmer-animated"></div>
           </div>
         </div>
       </div>

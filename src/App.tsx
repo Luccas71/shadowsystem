@@ -1536,30 +1536,30 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <header className={`relative mb-12 overflow-hidden transition-all duration-700 bg-black/20 border-y border-white/5 ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.1)]' : 'border-cyan-500/10'}`}>
+      <header className={`relative mb-8 overflow-hidden transition-all duration-700 bg-black/40 border-b border-white/5 max-w-[1024px] mx-auto ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.1)]' : 'border-cyan-500/10'}`}>
         {/* Decorative Background Elements */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/5 to-transparent pointer-events-none"></div>
         <div className="absolute -left-20 -top-20 w-64 h-64 bg-cyan-600/5 blur-[100px] rounded-full pointer-events-none"></div>
         
-        <div className="hud-board p-1 md:p-1.5 bg-black/40 backdrop-blur-md relative z-10 border-none shadow-none">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center p-6 md:p-8 gap-10">
+        <div className="relative z-10">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center p-4 md:p-6 gap-6 md:gap-10">
             
             {/* Profile Avatar & Rank Section */}
             <div className="relative shrink-0 self-center lg:self-auto">
               <div className="relative group">
                 {/* Rectangular style border */}
-                <div className="relative w-44 h-44 md:w-56 md:h-56">
+                <div className="relative w-32 h-32 md:w-40 md:h-40">
                   {/* Outer border with tilt */}
-                  <div className="absolute inset-0 bg-cyan-500/10 border border-cyan-500/30 -rotate-2 group-hover:rotate-0 transition-transform duration-700"></div>
+                  <div className="absolute inset-0 bg-cyan-500/5 border border-cyan-500/20 -rotate-1 group-hover:rotate-0 transition-transform duration-700"></div>
                   {/* Inner container */}
-                  <div className="absolute inset-0 bg-slate-900 overflow-hidden border border-white/10 group-hover:border-cyan-500/30 transition-colors duration-500">
+                  <div className="absolute inset-0 bg-slate-950 overflow-hidden border border-white/5 group-hover:border-cyan-500/20 transition-colors duration-500">
                     <img 
                       src={profile.avatar} 
                       alt="Hunter" 
-                      className="w-full h-full object-cover filter brightness-[0.8] contrast-[1.2] grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
+                      className="w-full h-full object-cover filter brightness-[0.7] contrast-[1.1] grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
                     />
                     {/* Scanline effect */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-50"></div>
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.04),rgba(0,255,0,0.01),rgba(0,0,255,0.04))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-40"></div>
                   </div>
                 </div>
                 
@@ -1645,16 +1645,16 @@ const App: React.FC = () => {
 
               {/* XP Sync Progress */}
               <div className="space-y-2 mt-4">
-                <div className="flex justify-between font-game text-[10px] text-cyan-400 uppercase">
-                  <span>PROGRESSO PARA NÍVEL {profile.level + 1}</span>
+                <div className="flex justify-between font-game text-[9px] text-cyan-400/70 uppercase tracking-tighter">
+                  <span>Sincronização :: Nível {profile.level + 1}</span>
                   <span className="font-bold">{xpPercentage}%</span>
                 </div>
-                <div className="h-8 bg-black border border-cyan-900 overflow-hidden p-1">
+                <div className="h-2 bg-black/40 border-x border-cyan-900/30 overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]' : 'bg-gradient-to-r from-cyan-950 via-cyan-500 to-white'} relative overflow-hidden`}
+                    className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]' : 'bg-cyan-500'} relative overflow-hidden`}
                     style={{ width: `${xpPercentage}%` }}
                   >
-                    <div className="absolute inset-0 shimmer-gradient shimmer-animated"></div>
+                    <div className="absolute inset-0 shimmer-gradient shimmer-animated opacity-30"></div>
                   </div>
                 </div>
               </div>
@@ -1663,75 +1663,73 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-[60] safe-area-bottom bg-black/80 backdrop-blur-2xl border-t border-cyan-500/20">
-        <div className="max-w-[1000px] mx-auto grid grid-cols-5 gap-1 px-2 py-4">
+      <nav className="fixed bottom-0 left-0 right-0 z-[60] safe-area-bottom bg-black/95 backdrop-blur-xl border-t border-white/5">
+        <div className="max-w-[1024px] mx-auto grid grid-cols-5 gap-0 px-2 py-4">
           <button
             onClick={() => setActiveTab('status')}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-cyan-400' : 'text-slate-600 hover:text-slate-400'}`}
           >
-            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'status' ? 'bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.2)] ring-1 ring-cyan-500/30' : 'group-hover:bg-white/5'}`}>
-              <Monitor size={20} className={activeTab === 'status' ? 'animate-pulse' : ''} />
+            <div className="p-1 transition-all duration-500">
+              <Monitor size={20} className={activeTab === 'status' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
             </div>
-            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Status</span>
-            {activeTab === 'status' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-cyan-500 shadow-[0_0_15px_#06b6d4]"></div>}
+            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Status</span>
+            {activeTab === 'status' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-cyan-400"></div>}
           </button>
 
           <button
             onClick={() => setActiveTab('quests')}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'quests' ? 'text-blue-400' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'quests' ? 'text-blue-400' : 'text-slate-600 hover:text-slate-400'}`}
           >
-            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'quests' ? 'bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.2)] ring-1 ring-blue-500/30' : 'group-hover:bg-white/5'}`}>
-              <ScrollText size={20} className={activeTab === 'quests' ? 'animate-pulse' : ''} />
+            <div className="p-1 transition-all duration-500">
+              <ScrollText size={20} className={activeTab === 'quests' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
             </div>
-            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Quests</span>
-            {activeTab === 'quests' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-blue-500 shadow-[0_0_15px_#3b82f6]"></div>}
+            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Quests</span>
+            {activeTab === 'quests' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-blue-400"></div>}
           </button>
 
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'inventory' ? 'text-purple-400' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'inventory' ? 'text-purple-400' : 'text-slate-600 hover:text-slate-400'}`}
           >
-            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'inventory' ? 'bg-purple-500/10 shadow-[0_0_20px_rgba(168,85,247,0.2)] ring-1 ring-purple-500/30' : 'group-hover:bg-white/5'}`}>
-              <Package size={20} className={activeTab === 'inventory' ? 'animate-pulse' : ''} />
+            <div className="p-1 transition-all duration-500">
+              <Package size={20} className={activeTab === 'inventory' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
             </div>
-            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Items</span>
-            {activeTab === 'inventory' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-purple-500 shadow-[0_0_15px_#a855f7]"></div>}
+            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Items</span>
+            {activeTab === 'inventory' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-purple-400"></div>}
           </button>
 
           <button
             onClick={() => setActiveTab('store')}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'store' ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'store' ? 'text-emerald-400' : 'text-slate-600 hover:text-slate-400'}`}
           >
-            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'store' ? 'bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.2)] ring-1 ring-emerald-500/30' : 'group-hover:bg-white/5'}`}>
-              <ShoppingBag size={20} className={activeTab === 'store' ? 'animate-pulse' : ''} />
+            <div className="p-1 transition-all duration-500">
+              <ShoppingBag size={20} className={activeTab === 'store' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
             </div>
-            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Loja</span>
-            {activeTab === 'store' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-emerald-500 shadow-[0_0_15px_#10b981]"></div>}
+            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Loja</span>
+            {activeTab === 'store' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-emerald-400"></div>}
           </button>
 
           <button
             onClick={() => setActiveTab('purification')}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'purification' ? 'text-orange-400' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'purification' ? 'text-orange-400' : 'text-slate-600 hover:text-slate-400'}`}
           >
-            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'purification' ? 'bg-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.2)] ring-1 ring-orange-500/30' : 'group-hover:bg-white/5'}`}>
-              <Activity size={20} className={activeTab === 'purification' ? 'animate-pulse' : ''} />
+            <div className="p-1 transition-all duration-500">
+              <Activity size={20} className={activeTab === 'purification' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
             </div>
-            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Purify</span>
-            {activeTab === 'purification' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-orange-500 shadow-[0_0_15px_#f97316]"></div>}
+            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Purify</span>
+            {activeTab === 'purification' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-orange-400"></div>}
           </button>
         </div>
       </nav>
 
-      <main className="max-w-[1200px] mx-auto px-4 md:px-8 pb-32 pt-4 relative">
+      <main className="max-w-[1024px] mx-auto px-4 md:px-6 pb-32 pt-4 relative">
         {/* Floating Messages HUD */}
         <div className="fixed top-24 left-4 z-[55] pointer-events-none">
           <button 
             onClick={() => setIsMessageLogOpen(!isMessageLogOpen)}
-            className="pointer-events-auto hud-board p-3 border-cyan-500/30 bg-black/60 text-cyan-500 hover:hud-board-glow transition-all mb-4 flex items-center gap-3 group"
+            className="pointer-events-auto p-2 bg-black/40 border border-white/5 text-cyan-500/60 hover:text-cyan-400 transition-all mb-4 flex items-center justify-center group backdrop-blur-sm"
           >
-            <Bell size={18} className={messages.length > 0 ? "animate-bounce" : ""} />
-            <span className="font-game text-[10px] uppercase tracking-widest font-black hidden group-hover:block">Log do Sistema</span>
-            {messages.length > 0 && <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#dc2626]"></span>}
+            <Bell size={18} className="group-hover:animate-pulse" />
           </button>
 
           {isMessageLogOpen && (
@@ -1755,11 +1753,11 @@ const App: React.FC = () => {
         {/* Tab Content */}
         <div className="min-h-[60vh]">
           {activeTab === 'status' ? (
-             <div className="max-w-[1000px] mx-auto animate-in fade-in zoom-in-95 duration-700">
+             <div className="animate-in fade-in zoom-in-95 duration-700">
                <StatusWindow profile={profile} quests={quests} />
              </div>
           ) : activeTab === 'quests' ? (
-            <div className="max-w-[900px] mx-auto space-y-8 animate-in fade-in duration-700">
+            <div className="space-y-8 animate-in fade-in duration-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <h2 className="font-game text-2xl md:text-3xl flex items-center gap-4 text-slate-200 uppercase tracking-tight">
                   <ScrollText size={24} className="text-cyan-500" /> Missões Ativas
@@ -1895,11 +1893,11 @@ const App: React.FC = () => {
               )}
             </div>
           ) : activeTab === 'inventory' ? (
-            <div className="max-w-[1000px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
               <Inventory items={storeItems} onUseItem={handleUseItem} />
             </div>
           ) : activeTab === 'store' ? (
-            <div className="max-w-[1000px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
               <Store
                 gold={profile.gold}
                 items={storeItems}
@@ -1929,7 +1927,7 @@ const App: React.FC = () => {
               />
             </div>
           ) : (
-            <div className="max-w-[900px] mx-auto animate-in fade-in zoom-in-95 duration-500">
+            <div className="animate-in fade-in zoom-in-95 duration-500">
               <PenaltySystem
                 profile={profile}
                 vices={vices}
