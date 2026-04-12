@@ -113,6 +113,15 @@ export interface Quest {
 
 export type ItemOrigin = 'diário' | 'compra' | 'rank' | 'nível' | 'raro';
 
+export enum ItemRarity {
+  COMUM = 'COMUM',
+  INCOMUM = 'INCOMUM',
+  RARO = 'RARO',
+  ÉPICO = 'ÉPICO',
+  LENDÁRIO = 'LENDÁRIO',
+  MÍTICO = 'MÍTICO'
+}
+
 export interface StoreItem {
   id: string;
   name: string;
@@ -121,6 +130,7 @@ export interface StoreItem {
   purchasedCount: number;
   icon?: string;
   origin?: ItemOrigin;
+  rarity?: ItemRarity;
 }
 
 export interface SystemMessage {

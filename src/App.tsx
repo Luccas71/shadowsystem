@@ -568,9 +568,14 @@ const App: React.FC = () => {
         if (localData) {
           setProfile(localData.profile);
           setQuests(localData.quests);
-          // Cleanup legacy items from local store
-          const cleanedStore = (localData.storeItems as StoreItem[]).filter((item: StoreItem) => item.id !== 'key-1');
-          setStoreItems(cleanedStore);
+          // Cleanup legacy items and enrich with new properties (like rarity)
+          const enrichedStore = (localData.storeItems as StoreItem[])
+            .filter((item: StoreItem) => item.id !== 'key-1')
+            .map(item => {
+              const defaultItem = DEFAULT_STORE_ITEMS.find(di => di.id === item.id);
+              return defaultItem ? { ...defaultItem, purchasedCount: item.purchasedCount, origin: item.origin } : item;
+            });
+          setStoreItems(enrichedStore);
           setVices(localData.vices);
         }
         addSystemMessage("SISTEMA: MODO OFFLINE ATIVADO. AS ALTERAÇÕES SERÃO SINCRONIZADAS POSTERIORMENTE.", "warning");
@@ -604,7 +609,13 @@ const App: React.FC = () => {
           setProfile(cloudProfile);
           setQuests(cloudData.quests || []);
 
-          const cloudStore: StoreItem[] = (cloudData.store_items || DEFAULT_STORE_ITEMS).filter((item: StoreItem) => item.id !== 'key-1');
+          const cloudStore: StoreItem[] = (cloudData.store_items || DEFAULT_STORE_ITEMS)
+            .filter((item: StoreItem) => item.id !== 'key-1')
+            .map((item: StoreItem) => {
+              const defaultItem = DEFAULT_STORE_ITEMS.find(di => di.id === item.id);
+              // Preserve count and origin, but update rarity/description/name/icon from default
+              return defaultItem ? { ...defaultItem, purchasedCount: item.purchasedCount, origin: item.origin } : item;
+            });
           const mergedStore = [...cloudStore];
           DEFAULT_STORE_ITEMS.forEach(defaultItem => {
             if (!mergedStore.some((item: StoreItem) => item.id === defaultItem.id)) mergedStore.push(defaultItem);

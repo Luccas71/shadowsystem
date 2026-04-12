@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { StoreItem } from '../types';
+import { StoreItem, ItemRarity } from '../types';
+import { ITEM_RARITY_CONFIG } from '../constants';
 import { Package, Zap, Sparkles } from 'lucide-react';
 
 interface InventoryProps {
@@ -54,19 +55,24 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
                         {item.name}
                       </h3>
                       <div className="flex flex-wrap gap-2 mt-1">
+                        {item.rarity && ITEM_RARITY_CONFIG[item.rarity] && (
+                          <div className={`inline-block px-2 py-0.5 text-[8px] font-game border uppercase tracking-widest ${ITEM_RARITY_CONFIG[item.rarity].color}`}>
+                            {ITEM_RARITY_CONFIG[item.rarity].label}
+                          </div>
+                        )}
                         {item.origins?.map((origin, idx) => (
-                          <div key={idx} className={`inline-block px-2 py-0.5 text-[8px] font-game border uppercase tracking-widest ${
+                          <div key={idx} className={`inline-block px-2 py-0.5 text-[8px] font-game border uppercase tracking-widest opacity-80 ${
                             origin === 'compra' ? 'border-orange-500/50 text-orange-500 bg-orange-950/20' :
                             origin === 'diário' ? 'border-cyan-500/50 text-cyan-500 bg-cyan-950/20' :
                             origin === 'rank' ? 'border-purple-500/50 text-purple-500 bg-purple-950/20' :
                             origin === 'nível' ? 'border-green-500/50 text-green-500 bg-green-950/20' :
                             'border-slate-500/40 text-slate-400 bg-slate-950/20'
                           }`}>
-                            {origin === 'compra' ? 'ADQUIRIDO NA LOJA' : 
-                             origin === 'diário' ? 'RECOMPENSA DIÁRIA' :
-                             origin === 'rank' ? 'DROP DE RANK' :
-                             origin === 'nível' ? 'PROGRESSÃO DE NÍVEL' :
-                             'RELÍQUIA LEGADA'}
+                            {origin === 'compra' ? 'LOJA' : 
+                             origin === 'diário' ? 'DIÁRIO' :
+                             origin === 'rank' ? 'RANK' :
+                             origin === 'nível' ? 'NÍVEL' :
+                             'LEGADO'}
                           </div>
                         ))}
                       </div>
