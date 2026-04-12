@@ -166,7 +166,8 @@ const App: React.FC = () => {
   const [vices, setVices] = useState<Vice[]>([]);
 
   const [messages, setMessages] = useState<SystemMessage[]>([]);
-  const [activeTab, setActiveTab] = useState<'quests' | 'status' | 'penalties' | 'inventory' | 'store'>('quests');
+  const [activeTab, setActiveTab] = useState<'status' | 'quests' | 'inventory' | 'store' | 'purification'>('status');
+  const [isMessageLogOpen, setIsMessageLogOpen] = useState(false);
   const [showInactiveQuests, setShowInactiveQuests] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [questForm, setQuestForm] = useState<{ isOpen: boolean }>({ isOpen: false });
@@ -909,7 +910,7 @@ const App: React.FC = () => {
       }));
 
       setQuests(nextQuests);
-      addSystemMessage(`QUEST CONCLUÍDA. RECOMPENSA: +${finalGoldReward} OURO.`, 'success');
+      addSystemMessage(`QUEST CONCLUÍDA. RECOMPENSA: +${finalGoldReward} OURO / +${finalXpReward} XP.`, 'success');
     }
   };
 
@@ -1662,76 +1663,103 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 grid grid-cols-5 gap-1 md:gap-4 p-2 md:p-1 bg-slate-950/95 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none border-t border-cyan-500/30 md:border-none mb-0 md:mb-12">
-        {[
-          { id: 'quests', label: 'MISSÕES', icon: Target, color: 'cyan' },
-          { id: 'status', label: 'STATUS', icon: Activity, color: 'green' },
-          { id: 'inventory', label: 'INVENTÁRIO', icon: Package, color: 'purple' },
-          { id: 'store', label: 'LOJA', icon: ShoppingBag, color: 'orange' },
-          { id: 'penalties', label: 'PURIFICAÇÃO', icon: HeartPulse, color: 'red' },
-        ].map(tab => {
-          const isActive = activeTab === tab.id;
-          const colorClasses: Record<string, string> = {
-            cyan: isActive ? 'text-cyan-400 border-cyan-500 bg-cyan-500/10' : 'text-slate-500 border-cyan-900/40 hover:text-cyan-400 hover:border-cyan-500/50',
-            green: isActive ? 'text-emerald-400 border-emerald-500 bg-emerald-500/10' : 'text-slate-500 border-emerald-900/40 hover:text-emerald-400 hover:border-emerald-500/50',
-            purple: isActive ? 'text-purple-400 border-purple-500 bg-purple-500/10' : 'text-slate-500 border-purple-900/40 hover:text-purple-400 hover:border-purple-500/50',
-            orange: isActive ? 'text-orange-400 border-orange-500 bg-orange-500/10' : 'text-slate-500 border-orange-900/40 hover:text-orange-400 hover:border-orange-500/50',
-            red: isActive ? 'text-red-400 border-red-500 bg-red-500/10' : 'text-slate-500 border-red-900/40 hover:text-red-400 hover:border-red-500/50',
-          };
+      <nav className="fixed bottom-0 left-0 right-0 z-[60] safe-area-bottom bg-black/80 backdrop-blur-2xl border-t border-cyan-500/20">
+        <div className="max-w-[1000px] mx-auto grid grid-cols-5 gap-1 px-2 py-4">
+          <button
+            onClick={() => setActiveTab('status')}
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'status' ? 'bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.2)] ring-1 ring-cyan-500/30' : 'group-hover:bg-white/5'}`}>
+              <Monitor size={20} className={activeTab === 'status' ? 'animate-pulse' : ''} />
+            </div>
+            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Status</span>
+            {activeTab === 'status' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-cyan-500 shadow-[0_0_15px_#06b6d4]"></div>}
+          </button>
 
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`group/nav p-3 md:p-5 font-game text-[9px] md:text-[13px] flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 transition-all duration-500 border relative overflow-hidden ${colorClasses[tab.color]} ${isActive ? 'shadow-[inset_0_0_20px_rgba(0,0,0,0.4),0_0_15px_rgba(0,229,255,0.1)] scale-[1.02] z-10' : 'bg-black/40 hover:bg-black/60'}`}
-            >
-              {/* Active indicator line */}
-              {isActive && (
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-current animate-pulse shadow-[0_0_10px_currentColor]"></div>
-              )}
-              
-              <tab.icon size={isActive ? 20 : 18} className={`shrink-0 transition-transform duration-500 ${isActive ? 'scale-110' : 'group-hover/nav:scale-110 opacity-60 group-hover/nav:opacity-100'}`} />
-              <span className={`truncate max-w-full tracking-[0.2em] font-black ${isActive ? 'opacity-100' : 'opacity-40 group-hover/nav:opacity-80'}`}>
-                {tab.label}
-              </span>
+          <button
+            onClick={() => setActiveTab('quests')}
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'quests' ? 'text-blue-400' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'quests' ? 'bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.2)] ring-1 ring-blue-500/30' : 'group-hover:bg-white/5'}`}>
+              <ScrollText size={20} className={activeTab === 'quests' ? 'animate-pulse' : ''} />
+            </div>
+            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Quests</span>
+            {activeTab === 'quests' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-blue-500 shadow-[0_0_15px_#3b82f6]"></div>}
+          </button>
 
-              {/* Decorative scanline for active tab */}
-              {isActive && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite] pointer-events-none"></div>
-              )}
-            </button>
-          );
-        })}
+          <button
+            onClick={() => setActiveTab('inventory')}
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'inventory' ? 'text-purple-400' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'inventory' ? 'bg-purple-500/10 shadow-[0_0_20px_rgba(168,85,247,0.2)] ring-1 ring-purple-500/30' : 'group-hover:bg-white/5'}`}>
+              <Package size={20} className={activeTab === 'inventory' ? 'animate-pulse' : ''} />
+            </div>
+            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Items</span>
+            {activeTab === 'inventory' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-purple-500 shadow-[0_0_15px_#a855f7]"></div>}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('store')}
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'store' ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'store' ? 'bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.2)] ring-1 ring-emerald-500/30' : 'group-hover:bg-white/5'}`}>
+              <ShoppingBag size={20} className={activeTab === 'store' ? 'animate-pulse' : ''} />
+            </div>
+            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Loja</span>
+            {activeTab === 'store' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-emerald-500 shadow-[0_0_15px_#10b981]"></div>}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('purification')}
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative group ${activeTab === 'purification' ? 'text-orange-400' : 'text-slate-500 hover:text-slate-300'}`}
+          >
+            <div className={`p-2 rounded-xl transition-all duration-500 ${activeTab === 'purification' ? 'bg-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.2)] ring-1 ring-orange-500/30' : 'group-hover:bg-white/5'}`}>
+              <Activity size={20} className={activeTab === 'purification' ? 'animate-pulse' : ''} />
+            </div>
+            <span className="font-game text-[7px] tracking-[0.1em] uppercase font-black">Purify</span>
+            {activeTab === 'purification' && <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-orange-500 shadow-[0_0_15px_#f97316]"></div>}
+          </button>
+        </div>
       </nav>
 
-      <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        <aside className="lg:col-span-3 space-y-6">
-          <div className="hud-board p-6 min-h-[200px] lg:min-h-[300px] border-cyan-500/20">
-            <h2 className="font-game text-[11px] md:text-[12px] text-cyan-500 mb-6 flex items-center gap-2 border-b border-cyan-900/40 pb-4 uppercase tracking-widest font-bold"><Bell size={14} /> ALERTAS</h2>
-            <div className="space-y-4 max-h-[150px] md:max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-              {messages.map((m: SystemMessage) => {
-                const messageDate = new Date(m.timestamp);
-                const isToday = messageDate.toDateString() === new Date().toDateString();
-                const dateStr = isToday 
-                  ? messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                  : messageDate.toLocaleDateString([], { day: '2-digit', month: '2-digit' }) + ' ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                return (
-                  <div key={m.id} className={`text-[12px] md:text-[13px] font-medium animate-in slide-in-from-left duration-200 ${m.type === 'success' ? 'text-cyan-500' : m.type === 'error' ? 'text-red-500' : 'text-cyan-600'}`}>
-                    <span className="opacity-30 text-[9px]">[{dateStr}]</span> <br />
-                    <span className="font-game uppercase tracking-tight break-words">&gt; {m.text}</span>
-                  </div>
-                );
-              })}
-              {messages.length === 0 && <p className="text-[11px] text-slate-700 italic font-game uppercase">SINCRONIZANDO...</p>}
-            </div>
-          </div>
-        </aside>
+      <main className="max-w-[1200px] mx-auto px-4 md:px-8 pb-32 pt-4 relative">
+        {/* Floating Messages HUD */}
+        <div className="fixed top-24 left-4 z-[55] pointer-events-none">
+          <button 
+            onClick={() => setIsMessageLogOpen(!isMessageLogOpen)}
+            className="pointer-events-auto hud-board p-3 border-cyan-500/30 bg-black/60 text-cyan-500 hover:hud-board-glow transition-all mb-4 flex items-center gap-3 group"
+          >
+            <Bell size={18} className={messages.length > 0 ? "animate-bounce" : ""} />
+            <span className="font-game text-[10px] uppercase tracking-widest font-black hidden group-hover:block">Log do Sistema</span>
+            {messages.length > 0 && <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#dc2626]"></span>}
+          </button>
 
-        <div className="lg:col-span-9 min-w-0">
-          {activeTab === 'quests' ? (
-            <>
-            <div className="space-y-8 animate-in fade-in duration-700">
+          {isMessageLogOpen && (
+            <div className="pointer-events-auto hud-board p-6 w-72 md:w-80 border-cyan-500/20 bg-black/90 backdrop-blur-xl animate-in slide-in-from-left duration-300">
+              <div className="flex justify-between items-center mb-4 border-b border-cyan-900/40 pb-2">
+                <h2 className="font-game text-[11px] text-cyan-500 uppercase tracking-widest font-bold">ALERTAS</h2>
+                <button onClick={() => setIsMessageLogOpen(false)} className="text-slate-500 hover:text-white"><X size={14} /></button>
+              </div>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {messages.map((m: SystemMessage) => (
+                  <div key={m.id} className={`text-[12px] font-medium border-l-2 pl-3 ${m.type === 'success' ? 'text-cyan-500 border-cyan-500' : m.type === 'error' ? 'text-red-500 border-red-500' : 'text-slate-500 border-slate-700'}`}>
+                    <p className="font-game uppercase tracking-tight break-words">&gt; {m.text}</p>
+                  </div>
+                ))}
+                {messages.length === 0 && <p className="text-[10px] text-slate-700 italic font-game uppercase">LOG VAZIO</p>}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Tab Content */}
+        <div className="min-h-[60vh]">
+          {activeTab === 'status' ? (
+             <div className="max-w-[1000px] mx-auto animate-in fade-in zoom-in-95 duration-700">
+               <StatusWindow profile={profile} quests={quests} />
+             </div>
+          ) : activeTab === 'quests' ? (
+            <div className="max-w-[900px] mx-auto space-y-8 animate-in fade-in duration-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <h2 className="font-game text-2xl md:text-3xl flex items-center gap-4 text-slate-200 uppercase tracking-tight">
                   <ScrollText size={24} className="text-cyan-500" /> Missões Ativas
@@ -1781,19 +1809,8 @@ const App: React.FC = () => {
                   </DraggableQuestItem>
                 ))}
               </Reorder.Group>
-                {quests.filter(q => {
-                  if (q.completed || q.failed) return false;
-                  if (q.isScheduled && q.repeatDays) {
-                    return q.repeatDays.includes(new Date().getDay());
-                  }
-                  return true;
-                }).length === 0 && (
-                  <div className="text-center py-20 hud-board border-dashed border border-cyan-900/30 opacity-40">
-                    <p className="font-game text-[12px] text-cyan-700 tracking-widest uppercase">AGUARDANDO NOVAS MISSÕES...</p>
-                  </div>
-                )}
 
-              {/* Seção de Missões Programadas Inativas (Fora de Agenda) */}
+              {/* Seção de Missões Inativas / Fora de Agenda */}
               {quests.filter(q => {
                 if (q.completed || q.failed) return false;
                 if (q.isScheduled && q.repeatDays) {
@@ -1846,109 +1863,112 @@ const App: React.FC = () => {
                 const completedDate = new Date(q.completedAt).toDateString();
                 return today === completedDate;
               }).length > 0 && (
-                  <div className="mt-12 space-y-8 animate-in fade-in duration-700">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 opacity-60">
-                      <h2 className="font-game text-xl md:text-2xl flex items-center gap-4 text-slate-400 uppercase tracking-tight">
-                        <Check size={20} className="text-cyan-800" /> Missões Concluídas (Hoje)
-                      </h2>
-                    </div>
-
-                    <div className="space-y-4 opacity-40 hover:opacity-100 transition-opacity duration-500">
-                      {quests.filter(q => {
-                        if (!q.completed || !q.completedAt) return false;
-                        const today = new Date().toDateString();
-                        const completedDate = new Date(q.completedAt).toDateString();
-                        return today === completedDate;
-                      })
-                        .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
-                        .map(q => (
-                          <QuestCard
-                            key={q.id}
-                            quest={q}
-                            onToggleComplete={handleToggleComplete}
-                            onToggleSubQuest={handleToggleSubQuest}
-                            onDelete={handleDeleteQuest}
-                            onEdit={handleEditQuest}
-                            onAddSubQuest={handleAddSubQuest}
-                            onRemoveSubQuest={handleRemoveSubQuest}
-                          />
-                        ))}
-                    </div>
+                <div className="mt-12 space-y-8 animate-in fade-in duration-700">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 opacity-60">
+                    <h2 className="font-game text-xl md:text-2xl flex items-center gap-4 text-slate-400 uppercase tracking-tight">
+                      <Check size={20} className="text-cyan-800" /> Missões Concluídas (Hoje)
+                    </h2>
                   </div>
-                )}
+
+                  <div className="space-y-4 opacity-40 hover:opacity-100 transition-opacity duration-500">
+                    {quests.filter(q => {
+                      if (!q.completed || !q.completedAt) return false;
+                      const today = new Date().toDateString();
+                      const completedDate = new Date(q.completedAt).toDateString();
+                      return today === completedDate;
+                    })
+                      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
+                      .map(q => (
+                        <QuestCard
+                          key={q.id}
+                          quest={q}
+                          onToggleComplete={handleToggleComplete}
+                          onToggleSubQuest={handleToggleSubQuest}
+                          onDelete={handleDeleteQuest}
+                          onEdit={handleEditQuest}
+                          onAddSubQuest={handleAddSubQuest}
+                          onRemoveSubQuest={handleRemoveSubQuest}
+                        />
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
-            </>
-          ) : activeTab === 'status' ? (
-            <StatusWindow profile={profile} quests={quests} />
-          ) : activeTab === 'penalties' ? (
-            <PenaltySystem
-              profile={profile}
-              vices={vices}
-              onAddVice={(title, corruption) => setVices(prev => [...prev, { id: Math.random().toString(36).substr(2, 9), title, corruptionIncrease: corruption, penaltyXp: 0 }])}
-              onRemoveVice={id => setVices(prev => prev.filter(v => v.id !== id))}
-              onSuccumb={v => {
-                updateCorruption(v.corruptionIncrease);
-                const today = new Date().toISOString().split('T')[0];
-                setProfile(p => {
-                  const history = [...(p.fragilityHistory || [])];
-                  const idx = history.findIndex(h => h.date === today);
-                  if (idx > -1) {
-                    history[idx] = { ...history[idx], count: history[idx].count + 1 };
-                  } else {
-                    history.push({ date: today, count: 1 });
-                  }
-                  return { ...p, fragilityHistory: history };
-                });
-              }}
-              onStartSurvival={() => {
-                if (profile.corruption >= 100) {
-                  const now = Date.now();
-                  const penalties: HunterProfile['penaltyType'][] = ['gold_drain', 'xp_drain', 'block_rewards', 'corruption_spike'];
-                  const randomPenalty = penalties[Math.floor(Math.random() * penalties.length)];
-
-                  setProfile(p => ({
-                    ...p,
-                    isPenaltyZoneActive: true,
-                    penaltyEndTime: now + PENALTY_DURATION,
-                    penaltyType: randomPenalty,
-                    corruption: 100
-                  }));
-                  addSystemMessage(`SISTEMA: PROTOCOLO DE PURIFICAÇÃO VOLUNTÁRIO ATIVADO: ${randomPenalty?.toUpperCase().replace('_', ' ')}`, "warning");
-                } else {
-                  addSystemMessage("SISTEMA: ESTADO DE MANA ESTÁVEL. PURIFICAÇÃO NEGADA.", "info");
-                }
-              }}
-            />
           ) : activeTab === 'inventory' ? (
-            <Inventory items={storeItems} onUseItem={handleUseItem} />
-          ) : (
-            <Store
-              gold={profile.gold}
-              items={storeItems}
-              onAddItem={handleAddItem}
-              onRemoveItem={handleRemoveItem}
-              onPurchaseItem={i => {
-                const contractBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-contract').length;
-                const discount = 1 - (contractBuffs * 0.01);
-                const finalCost = Math.floor(i.cost * discount);
+            <div className="max-w-[1000px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <Inventory items={storeItems} onUseItem={handleUseItem} />
+            </div>
+          ) : activeTab === 'store' ? (
+            <div className="max-w-[1000px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <Store
+                gold={profile.gold}
+                items={storeItems}
+                onAddItem={handleAddItem}
+                onRemoveItem={handleRemoveItem}
+                onPurchaseItem={i => {
+                  const contractBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-contract').length;
+                  const discount = 1 - (contractBuffs * 0.01);
+                  const finalCost = Math.floor(i.cost * discount);
 
-                if (profile.gold >= finalCost) {
-                  setProfile(p => ({ ...p, gold: p.gold - finalCost }));
-                  setStoreItems(prev => {
-                    const existingIdx = prev.findIndex(si => si.id === i.id && si.origin === 'compra');
-                    if (existingIdx > -1) {
-                      return prev.map((si, idx) => idx === existingIdx ? { ...si, purchasedCount: si.purchasedCount + 1 } : si);
+                  if (profile.gold >= finalCost) {
+                    setProfile(p => ({ ...p, gold: p.gold - finalCost }));
+                    setStoreItems(prev => {
+                      const existingIdx = prev.findIndex(si => si.id === i.id && si.origin === 'compra');
+                      if (existingIdx > -1) {
+                        return prev.map((si, idx) => idx === existingIdx ? { ...si, purchasedCount: si.purchasedCount + 1 } : si);
+                      } else {
+                        return [...prev, { ...i, purchasedCount: 1, origin: 'compra' }];
+                      }
+                    });
+                    addSystemMessage(`SISTEMA: ARTEFATO "${i.name.toUpperCase()}" ADQUIRIDO.`, 'success');
+                    setActiveEffect({ type: 'purchase' });
+                  } else {
+                    addSystemMessage("SISTEMA: OURO INSUFICIENTE.", "error");
+                  }
+                }}
+              />
+            </div>
+          ) : (
+            <div className="max-w-[900px] mx-auto animate-in fade-in zoom-in-95 duration-500">
+              <PenaltySystem
+                profile={profile}
+                vices={vices}
+                onAddVice={(title, corruption) => setVices(prev => [...prev, { id: Math.random().toString(36).substr(2, 9), title, corruptionIncrease: corruption, penaltyXp: 0 }])}
+                onRemoveVice={id => setVices(prev => prev.filter(v => v.id !== id))}
+                onSuccumb={v => {
+                  updateCorruption(v.corruptionIncrease);
+                  const today = new Date().toISOString().split('T')[0];
+                  setProfile(p => {
+                    const history = [...(p.fragilityHistory || [])];
+                    const idx = history.findIndex(h => h.date === today);
+                    if (idx > -1) {
+                      history[idx] = { ...history[idx], count: history[idx].count + 1 };
                     } else {
-                      return [...prev, { ...i, purchasedCount: 1, origin: 'compra' }];
+                      history.push({ date: today, count: 1 });
                     }
+                    return { ...p, fragilityHistory: history };
                   });
-                  addSystemMessage(`SISTEMA: ARTEFATO "${i.name.toUpperCase()}" ADQUIRIDO.`, 'success');
-                  setActiveEffect({ type: 'purchase' });
-                } else {
-                  addSystemMessage("SISTEMA: OURO INSUFICIENTE.", "error");
-                }
-              }}
-            />
+                }}
+                onStartSurvival={() => {
+                  if (profile.corruption >= 100) {
+                    const now = Date.now();
+                    const penalties: HunterProfile['penaltyType'][] = ['gold_drain', 'xp_drain', 'block_rewards', 'corruption_spike'];
+                    const randomPenalty = penalties[Math.floor(Math.random() * penalties.length)];
+
+                    setProfile(p => ({
+                      ...p,
+                      isPenaltyZoneActive: true,
+                      penaltyEndTime: now + PENALTY_DURATION,
+                      penaltyType: randomPenalty,
+                      corruption: 100
+                    }));
+                    addSystemMessage(`SISTEMA: PROTOCOLO DE PURIFICAÇÃO VOLUNTÁRIO ATIVADO: ${randomPenalty?.toUpperCase().replace('_', ' ')}`, "warning");
+                  } else {
+                    addSystemMessage("SISTEMA: ESTADO DE MANA ESTÁVEL. PURIFICAÇÃO NEGADA.", "info");
+                  }
+                }}
+              />
+            </div>
           )}
         </div>
       </main>
