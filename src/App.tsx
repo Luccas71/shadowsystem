@@ -166,7 +166,7 @@ const App: React.FC = () => {
   const [vices, setVices] = useState<Vice[]>([]);
 
   const [messages, setMessages] = useState<SystemMessage[]>([]);
-  const [activeTab, setActiveTab] = useState<'status' | 'quests' | 'inventory' | 'store' | 'purification'>('status');
+  const [activeTab, setActiveTab] = useState<'status' | 'quests' | 'inventory' | 'store' | 'purification'>('quests');
   const [isMessageLogOpen, setIsMessageLogOpen] = useState(false);
   const [showInactiveQuests, setShowInactiveQuests] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -1486,14 +1486,8 @@ const App: React.FC = () => {
 
       <div className="min-h-screen pb-24 pt-6 md:pt-10 px-4 md:px-12 max-w-[95%] lg:max-w-[1300px] mx-auto relative z-10 overflow-x-hidden">
 
-      {completingQuest && (
-        <QuestCompletionOverlay
-          difficulty={completingQuest.quest.difficulty}
-          title={completingQuest.quest.title}
-          rewards={completingQuest.rewards}
-          onComplete={() => setCompletingQuest(null)}
-        />
-      )}
+      {/* Global System Overlays are now consolidated at the end of the file */}
+
 
       {isEditingProfile && (
         <ProfileEditor
@@ -1504,26 +1498,6 @@ const App: React.FC = () => {
         />
       )}
 
-      <SystemEffectOverlay
-        effect={activeEffect}
-        onComplete={() => setActiveEffect(null)}
-      />
-
-      {levelUpData && (
-        <LevelUpOverlay
-          oldLevel={levelUpData.oldLevel}
-          newLevel={levelUpData.newLevel}
-          onComplete={() => setLevelUpData(null)}
-        />
-      )}
-
-      {rankUpData && (
-        <RankUpOverlay
-          oldRank={rankUpData.oldRank}
-          newRank={rankUpData.newRank}
-          onComplete={() => setRankUpData(null)}
-        />
-      )}
 
 
       <div className="flex items-center justify-between mb-4">
@@ -1536,128 +1510,84 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <header className={`relative mb-8 overflow-hidden transition-all duration-700 bg-black/40 border-b border-white/5 max-w-[1024px] mx-auto ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_50px_rgba(220,38,38,0.1)]' : 'border-cyan-500/10'}`}>
-        {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/5 to-transparent pointer-events-none"></div>
-        <div className="absolute -left-20 -top-20 w-64 h-64 bg-cyan-600/5 blur-[100px] rounded-full pointer-events-none"></div>
-        
-        <div className="relative z-10">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center p-4 md:p-6 gap-6 md:gap-10">
-            
-            {/* Profile Avatar & Rank Section */}
-            <div className="relative shrink-0 self-center lg:self-auto">
-              <div className="relative group">
-                {/* Rectangular style border */}
-                <div className="relative w-32 h-32 md:w-40 md:h-40">
-                  {/* Outer border with tilt */}
-                  <div className="absolute inset-0 bg-cyan-500/5 border border-cyan-500/20 -rotate-1 group-hover:rotate-0 transition-transform duration-700"></div>
-                  {/* Inner container */}
-                  <div className="absolute inset-0 bg-slate-950 overflow-hidden border border-white/5 group-hover:border-cyan-500/20 transition-colors duration-500">
-                    <img 
-                      src={profile.avatar} 
-                      alt="Hunter" 
-                      className="w-full h-full object-cover filter brightness-[0.7] contrast-[1.1] grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
-                    />
-                    {/* Scanline effect */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.04),rgba(0,255,0,0.01),rgba(0,0,255,0.04))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-40"></div>
+      <header className={`relative mb-6 bg-black/40 border-b border-white/5 max-w-[1024px] mx-auto ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]' : 'border-cyan-500/10'}`}>
+        <div className="relative z-10 p-4 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 md:w-20 md:h-20 border border-white/10 bg-slate-950 overflow-hidden relative group">
+                  <img 
+                    src={profile.avatar} 
+                    alt="Hunter" 
+                    className="w-full h-full object-cover filter brightness-[0.8] grayscale group-hover:grayscale-0 transition-all duration-500" 
+                  />
+                  <div className={`absolute bottom-0 right-0 w-6 h-6 flex items-center justify-center font-game text-[10px] bg-black border-tl border-white/10 ${RANK_COLORS[profile.rank]}`}>
+                    {profile.rank}
                   </div>
                 </div>
-                
-                {/* Rank Badge - Floating style */}
-                <div className={`absolute -bottom-2 -right-2 font-game text-5xl md:text-7xl px-6 py-2 bg-black border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] z-20 transition-all duration-500 ${RANK_COLORS[profile.rank]} drop-shadow-[0_0_15px_currentColor]`}>
-                  {profile.rank}
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-0.5 h-4 bg-cyan-500"></div>
+                  <h1 className="font-game text-xl md:text-2xl text-white tracking-widest leading-none uppercase truncate">
+                    {profile.name}
+                  </h1>
                 </div>
+                <span className="text-[9px] font-game text-slate-500 uppercase tracking-[0.2em] ml-2.5">
+                  {profile.title}
+                </span>
               </div>
             </div>
 
-            {/* Profile Info & Core Stats */}
-            <div className="flex-1 flex flex-col justify-between gap-10 min-w-0">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-3 min-w-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-1 h-6 bg-cyan-500 shadow-[0_0_10px_#06b6d4]"></div>
-                    <h1 className="font-game text-3xl md:text-5xl text-white tracking-widest leading-none uppercase truncate drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-                      {profile.name}
-                    </h1>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3 ml-4">
-                    <span className="text-[11px] font-game text-cyan-400 bg-cyan-950/60 px-3 py-1 border-y border-cyan-500/40 tracking-[0.2em]">{profile.title}</span>
-                    <div className="flex items-center gap-1.5 opacity-40">
-                      <div className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse"></div>
-                      <span className="text-[9px] font-game text-slate-500 uppercase tracking-widest">SISTEMA_V1.2_SINCRONIZADO</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Control Icons */}
-                <div className="flex gap-2 self-end md:self-auto">
-                  <button onClick={() => setIsEditingProfile(true)} className="p-3 bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 text-slate-500 hover:text-cyan-400 transition-all group shadow-sm">
-                    <Settings size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-                  </button>
-                  <button onClick={handleLogout} className="p-3 bg-white/5 border border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all shadow-sm">
-                    <LogOut size={18} />
-                  </button>
+            <div className="flex flex-wrap items-center gap-6 md:gap-10">
+              <div className="flex flex-col">
+                <span className="text-[7px] font-game text-slate-600 uppercase tracking-widest mb-1">Level</span>
+                <div className="flex items-center gap-2">
+                  <Zap size={12} className="text-cyan-500 opacity-50" />
+                  <span className="font-game text-xl text-white neon-text-cyan-strong">{profile.level}</span>
                 </div>
               </div>
 
-              {/* Status Modules Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                {/* Level Module */}
-                <div className="hud-board p-4 border-white/5 bg-slate-900/40 relative group overflow-hidden">
-                  <div className="absolute bottom-0 right-0 p-2 opacity-5 scale-150 rotate-12 transition-transform group-hover:scale-110">
-                    <Zap size={40} className="text-cyan-500" />
-                  </div>
-                  <span className="block text-[8px] font-game text-slate-500 uppercase tracking-widest mb-1">NÍVEL_ATUAL</span>
-                  <p className="font-game text-2xl md:text-3xl text-white neon-text-cyan-strong">{profile.level}</p>
-                </div>
-
-                {/* Gold Module */}
-                <div className="hud-board p-4 border-white/5 bg-slate-900/40 relative group overflow-hidden">
-                  <div className="absolute bottom-0 right-0 p-2 opacity-5 scale-150 rotate-12 transition-transform group-hover:scale-110">
-                    <Coins size={40} className="text-orange-500" />
-                  </div>
-                  <span className="block text-[8px] font-game text-slate-500 uppercase tracking-widest mb-1">RESERVA_DE_OURO</span>
-                  <p className="font-game text-2xl md:text-3xl text-orange-400">{profile.gold.toLocaleString()}</p>
-                </div>
-
-                {/* Streak Module */}
-                <div className="hud-board p-4 border-amber-500/20 bg-amber-950/10 relative group overflow-hidden col-span-2 md:col-span-1 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)]">
-                   <div className="flex items-center justify-between">
-                     <div>
-                       <span className="block text-[8px] font-game text-amber-600 uppercase tracking-widest mb-1">OFENSIVA_ATIVA</span>
-                       <div className="flex items-baseline gap-2">
-                         <p className="font-game text-3xl text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{profile.dailyStreak || 0}</p>
-                         <span className="text-[10px] font-game text-slate-500 uppercase tracking-tighter">DIAS</span>
-                       </div>
-                     </div>
-                     <div className={`p-2 bg-black/40 border border-white/5 ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
-                       <Flame size={20} className="animate-pulse" />
-                     </div>
-                   </div>
-                   <div className="mt-2 text-[8px] font-game flex justify-between uppercase tracking-tighter italic">
-                     <span className={getCurrentStreakTier(profile.dailyStreak || 0).color}>{getCurrentStreakTier(profile.dailyStreak || 0).name}</span>
-                     {(profile.dailyStreak || 0) >= 7 && (
-                       <span className="text-cyan-400">+{Math.round((getStreakMultiplier(profile.dailyStreak || 0) - 1) * 100)}% BÔNUS</span>
-                     )}
-                   </div>
+              <div className="flex flex-col">
+                <span className="text-[7px] font-game text-slate-600 uppercase tracking-widest mb-1">Gold</span>
+                <div className="flex items-center gap-2">
+                  <Coins size={12} className="text-orange-500 opacity-50" />
+                  <span className="font-game text-xl text-orange-400">{profile.gold.toLocaleString()}</span>
                 </div>
               </div>
 
-              {/* XP Sync Progress */}
-              <div className="space-y-2 mt-4">
-                <div className="flex justify-between font-game text-[9px] text-cyan-400/70 uppercase tracking-tighter">
-                  <span>Sincronização :: Nível {profile.level + 1}</span>
-                  <span className="font-bold">{xpPercentage}%</span>
-                </div>
-                <div className="h-2 bg-black/40 border-x border-cyan-900/30 overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]' : 'bg-cyan-500'} relative overflow-hidden`}
-                    style={{ width: `${xpPercentage}%` }}
-                  >
-                    <div className="absolute inset-0 shimmer-gradient shimmer-animated opacity-30"></div>
-                  </div>
+              <div className="flex flex-col">
+                <span className="text-[7px] font-game text-slate-600 uppercase tracking-widest mb-1">Streak</span>
+                <div className="flex items-center gap-2">
+                  <Flame size={12} className={`${getCurrentStreakTier(profile.dailyStreak || 0).color} opacity-50`} />
+                  <span className={`font-game text-xl ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
+                    {profile.dailyStreak || 0}
+                  </span>
                 </div>
               </div>
+
+              <div className="flex gap-1 ml-auto md:ml-4">
+                <button onClick={() => setIsEditingProfile(true)} className="p-2 text-slate-600 hover:text-cyan-400 transition-colors">
+                  <Settings size={16} />
+                </button>
+                <button onClick={handleLogout} className="p-2 text-slate-600 hover:text-red-400 transition-colors">
+                  <LogOut size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="h-1 bg-white/5 relative overflow-hidden">
+              <div
+                className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600' : 'bg-cyan-500'}`}
+                style={{ width: `${xpPercentage}%` }}
+              />
+            </div>
+            <div className="flex justify-between mt-1.5 opacity-30">
+              <span className="font-game text-[6px] text-slate-500 tracking-widest uppercase">Sync_Protocol_v1.2</span>
+              <span className="font-game text-[6px] text-slate-500 tracking-widest uppercase">{profile.xp.toLocaleString()} / {profile.maxXp.toLocaleString()} XP</span>
             </div>
           </div>
         </div>
@@ -1665,17 +1595,6 @@ const App: React.FC = () => {
 
       <nav className="fixed bottom-0 left-0 right-0 z-[60] safe-area-bottom bg-black/95 backdrop-blur-xl border-t border-white/5">
         <div className="max-w-[1024px] mx-auto grid grid-cols-5 gap-0 px-2 py-4">
-          <button
-            onClick={() => setActiveTab('status')}
-            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-cyan-400' : 'text-slate-600 hover:text-slate-400'}`}
-          >
-            <div className="p-1 transition-all duration-500">
-              <Monitor size={20} className={activeTab === 'status' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
-            </div>
-            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Status</span>
-            {activeTab === 'status' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-cyan-400"></div>}
-          </button>
-
           <button
             onClick={() => setActiveTab('quests')}
             className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'quests' ? 'text-blue-400' : 'text-slate-600 hover:text-slate-400'}`}
@@ -1685,6 +1604,17 @@ const App: React.FC = () => {
             </div>
             <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Quests</span>
             {activeTab === 'quests' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-blue-400"></div>}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('status')}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-cyan-400' : 'text-slate-600 hover:text-slate-400'}`}
+          >
+            <div className="p-1 transition-all duration-500">
+              <Monitor size={20} className={activeTab === 'status' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
+            </div>
+            <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Status</span>
+            {activeTab === 'status' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-cyan-400"></div>}
           </button>
 
           <button
@@ -2180,10 +2110,36 @@ const App: React.FC = () => {
 
       {/* Sync and Connection Overlay Removed */}
 
+      {/* Consolidated System Overlays */}
+      {completingQuest && (
+        <QuestCompletionOverlay
+          difficulty={completingQuest.quest.difficulty}
+          title={completingQuest.quest.title}
+          rewards={completingQuest.rewards}
+          onComplete={() => setCompletingQuest(null)}
+        />
+      )}
+
       {activeEffect && (
         <SystemEffectOverlay
           effect={activeEffect}
           onComplete={() => setActiveEffect(null)}
+        />
+      )}
+
+      {levelUpData && (
+        <LevelUpOverlay
+          oldLevel={levelUpData.oldLevel}
+          newLevel={levelUpData.newLevel}
+          onComplete={() => setLevelUpData(null)}
+        />
+      )}
+
+      {rankUpData && (
+        <RankUpOverlay
+          oldRank={rankUpData.oldRank}
+          newRank={rankUpData.newRank}
+          onComplete={() => setRankUpData(null)}
         />
       )}
       </div>
