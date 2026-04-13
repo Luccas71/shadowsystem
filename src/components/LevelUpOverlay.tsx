@@ -10,16 +10,35 @@ interface LevelUpOverlayProps {
 
 const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onComplete }) => {
     const [show, setShow] = useState(false);
+    const [displayLevel, setDisplayLevel] = useState(oldLevel);
+    const [isImpacted, setIsImpacted] = useState(false);
 
     useEffect(() => {
         setShow(true);
-        const timer = setTimeout(() => {
-            setShow(false);
-            setTimeout(onComplete, 800); // Aguarda animação de saída
-        }, 4500);
+        
+        // Impact effect
+        setTimeout(() => setIsImpacted(true), 300);
 
-        return () => clearTimeout(timer);
-    }, [onComplete]);
+        // Count-up animation
+        const duration = 2000; // 2 seconds for count up
+        const steps = newLevel - oldLevel;
+        if (steps > 0) {
+            let current = oldLevel;
+            const stepTime = duration / steps;
+            const timer = setInterval(() => {
+                current++;
+                setDisplayLevel(current);
+                if (current >= newLevel) clearInterval(timer);
+            }, stepTime);
+        }
+
+        const closeTimer = setTimeout(() => {
+            setShow(false);
+            setTimeout(onComplete, 800);
+        }, 5000);
+
+        return () => setShow(false);
+    }, [oldLevel, newLevel, onComplete]);
 
     return (
         <AnimatePresence>
@@ -28,14 +47,19 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none overflow-hidden backdrop-blur-md bg-black/60"
+                    className={`fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none overflow-hidden backdrop-blur-md bg-black/60 ${isImpacted ? 'animate-epic-shake' : ''}`}
                 >
-                    {/* Fundo radiante */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.15)_0%,transparent_70%)]" />
+                    {/* Impact Flash Overlay */}
+                    {isImpacted && (
+                        <div className="absolute inset-0 bg-white z-[10001] animate-impact-flash pointer-events-none" />
+                    )}
 
-                    {/* Partículas de luz */}
+                    {/* Fundo radiante */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.2)_0%,transparent_70%)]" />
+
+                    {/* Partículas de luz avançadas */}
                     <div className="absolute inset-0">
-                        {[...Array(20)].map((_, i) => (
+                        {[...Array(30)].map((_, i) => (
                             <motion.div
                                 key={i}
                                 initial={{
@@ -45,15 +69,18 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                                     scale: Math.random() * 0.5 + 0.5
                                 }}
                                 animate={{
-                                    y: -100,
+                                    y: [window.innerHeight + 100, Math.random() * window.innerHeight, -100],
+                                    x: [undefined, Math.random() * window.innerWidth, undefined] as any,
                                     opacity: [0, 0.8, 0],
+                                    scale: [0.5, 1.2, 0.5],
                                 }}
                                 transition={{
-                                    duration: Math.random() * 2 + 3,
+                                    duration: Math.random() * 2 + 2,
                                     repeat: Infinity,
-                                    delay: Math.random() * 2
+                                    delay: Math.random() * 2,
+                                    ease: "easeInOut"
                                 }}
-                                className="absolute w-1 h-1 bg-cyan-400 rounded-full blur-[1px]"
+                                className="absolute w-1.5 h-1.5 bg-cyan-400 rounded-full blur-[2px]"
                             />
                         ))}
                     </div>
@@ -67,23 +94,31 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                         {/* Círculo de poder central */}
                         <div className="relative">
                             <motion.div
-                                animate={{ rotate: 360 }}
+                                animate={{ rotate: 360, scale: [1, 1.05, 1] }}
                                 transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                className="w-48 h-48 border-2 border-dashed border-cyan-500/30 rounded-full"
+                                className="w-56 h-56 border-2 border-dashed border-cyan-500/30 rounded-full shadow-[0_0_30px_rgba(0,229,255,0.2)]"
                             />
                             <motion.div
-                                animate={{ rotate: -360 }}
+                                animate={{ rotate: -360, scale: [1, 1.1, 1] }}
                                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                className="absolute inset-2 border-2 border-dotted border-cyan-400/20 rounded-full"
+                                className="absolute inset-4 border-2 border-dotted border-cyan-400/20 rounded-full"
                             />
+                            
+                            {/* Mana Surge Circles */}
+                            <motion.div 
+                                animate={{ scale: [1, 2], opacity: [0.5, 0] }}
+                                transition={{ duration: 1, repeat: Infinity }}
+                                className="absolute inset-0 border border-cyan-500/30 rounded-full"
+                            />
+
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <motion.div
-                                    initial={{ rotateY: 180, opacity: 0 }}
-                                    animate={{ rotateY: 0, opacity: 1 }}
-                                    transition={{ delay: 0.5, duration: 1 }}
-                                    className="p-6 bg-cyan-950/40 border border-cyan-500/50 rounded-2xl shadow-[0_0_50px_rgba(16,185,129,0.3)] backdrop-blur-xl"
+                                    initial={{ rotateY: 180, opacity: 0, scale: 0 }}
+                                    animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.5, duration: 0.8, type: "spring" }}
+                                    className="p-8 bg-cyan-950/40 border-2 border-cyan-500/50 rounded-full shadow-[0_0_60px_rgba(0,229,255,0.4)] backdrop-blur-xl"
                                 >
-                                    <Zap size={64} className="text-cyan-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]" />
+                                    <Zap size={72} className="text-white drop-shadow-[0_0_20px_rgba(0,229,255,1)]" />
                                 </motion.div>
                             </div>
                         </div>
@@ -91,54 +126,61 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                         {/* Texto principal */}
                         <div className="text-center space-y-4">
                             <motion.h2
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
+                                initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
+                                animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
                                 transition={{ delay: 0.8 }}
-                                className="font-game text-5xl md:text-7xl text-white tracking-[0.3em] uppercase neon-text-cyan-strong"
+                                className="font-game text-6xl md:text-8xl text-white tracking-[0.3em] uppercase animate-glitch-chromatic"
                             >
-                                SUBIU DE NÍVEL
+                                LEVEL UP
                             </motion.h2>
 
                             <motion.div
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 1.1 }}
-                                className="flex items-center justify-center gap-6"
+                                className="flex items-center justify-center gap-10"
                             >
                                 <div className="flex flex-col items-center">
-                                    <span className="text-[10px] font-game text-cyan-700 uppercase tracking-widest">Nível Anterior</span>
-                                    <span className="font-game text-3xl text-slate-500">{oldLevel}</span>
+                                    <span className="text-[10px] font-game text-slate-500 uppercase tracking-widest">Status Atual</span>
+                                    <span className="font-game text-3xl text-slate-600">NV.{oldLevel}</span>
                                 </div>
 
-                                <ChevronRight className="text-cyan-500 animate-pulse" size={32} />
+                                <motion.div
+                                    animate={{ x: [0, 5, 0] }}
+                                    transition={{ repeat: Infinity, duration: 1.5 }}
+                                >
+                                    <ChevronRight className="text-cyan-500" size={40} />
+                                </motion.div>
 
                                 <div className="flex flex-col items-center">
-                                    <span className="text-[10px] font-game text-cyan-400 uppercase tracking-widest">Novo Nível</span>
-                                    <span className="font-game text-5xl text-white neon-text-cyan-strong">{newLevel}</span>
+                                    <span className="text-[10px] font-game text-cyan-400 uppercase tracking-[0.2em]">Novo Patamar</span>
+                                    <motion.span 
+                                        key={displayLevel}
+                                        initial={{ scale: 1.5, color: "#fff" }}
+                                        animate={{ scale: 1, color: "#00e5ff" }}
+                                        className="font-game text-7xl text-white neon-text-cyan-strong"
+                                    >
+                                        {displayLevel}
+                                    </motion.span>
                                 </div>
                             </motion.div>
                         </div>
 
                         {/* Rodapé do Sistema */}
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 2 }}
-                            className="flex items-center gap-3 px-6 py-2 border border-cyan-500/20 bg-cyan-950/20 rounded-full"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 2.5 }}
+                            className="flex items-center gap-4 px-8 py-3 border border-cyan-500/30 bg-cyan-950/30 rounded-sm relative overflow-hidden"
                         >
-                            <TrendingUp size={14} className="text-cyan-500" />
-                            <span className="font-game text-[10px] text-cyan-400/70 tracking-[0.2em] uppercase">Status de Combate Incrementado</span>
+                            <div className="absolute inset-0 bg-cyan-500/5 animate-pulse" />
+                            <TrendingUp size={18} className="text-cyan-400" />
+                            <span className="font-game text-xs text-cyan-300 tracking-[0.4em] uppercase">Limites de Mana Expandidos</span>
                         </motion.div>
                     </motion.div>
 
-                    {/* Efeito de Flash Scanline */}
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
-                        <motion.div
-                            animate={{ y: ["0%", "100%", "0%"] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                            className="w-full h-1/4 bg-gradient-to-b from-transparent via-cyan-500 to-transparent blur-xl"
-                        />
-                    </div>
+                    {/* Efeito de Scanline Vertical */}
+                    <div className="scan-line-effect" />
                 </motion.div>
             )}
         </AnimatePresence>

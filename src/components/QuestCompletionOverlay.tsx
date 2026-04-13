@@ -17,18 +17,33 @@ interface QuestCompletionOverlayProps {
 
 const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficulty, title, rewards, onComplete }) => {
   const [showContent, setShowContent] = useState(false);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     setShowContent(true);
-    const timer = setTimeout(() => {
-      setShowContent(false);
-      setTimeout(onComplete, 500); // Wait for exit animation
-    }, 1500); // Duration adjusted to 1.5s per USER request
+    
+    // Animation sequence
+    const timers = [
+      setTimeout(() => setStep(1), 600),  // Show Notification Title
+      setTimeout(() => setStep(2), 1200), // Show Quest Title
+      setTimeout(() => setStep(3), 1800), // Show EXP
+      setTimeout(() => setStep(4), 2000), // Show Gold
+      setTimeout(() => setStep(5), 2200), // Show Items
+      setTimeout(() => setStep(6), 2500), // Show Item Detail Drops
+    ];
 
-    return () => clearTimeout(timer);
+    const closeTimer = setTimeout(() => {
+      setShowContent(false);
+      setTimeout(onComplete, 500);
+    }, 6500);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(closeTimer);
+    };
   }, [onComplete]);
 
-  const getRankConfig = () => {
+  const getRankConfig = (difficulty: QuestDifficulty) => {
     switch (difficulty) {
       case QuestDifficulty.S:
         return {
@@ -37,11 +52,9 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           textColor: 'text-red-500',
           title: 'MISSÃO DE RANK S CONCLUÍDA',
           subtitle: 'A ESCURIDÃO SE CURVA À SUA VONTADE',
-          icon: <Skull size={80} className="text-red-600" />,
           glowColor: 'rgba(239, 68, 68, 0.5)',
           neonClass: 'neon-text-red',
           accentHex: '#ef4444',
-          // Classes estáticas para evitar purge
           wrapperBg: 'bg-red-500/20',
           barBg: 'bg-red-400',
           panelBorder: 'border-red-500/30',
@@ -60,7 +73,6 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           textColor: 'text-orange-500',
           title: 'MISSÃO DE RANK A CONCLUÍDA',
           subtitle: 'UM PODER QUE DESAFIA O DESTINO',
-          icon: <Trophy size={70} className="text-orange-400" />,
           glowColor: 'rgba(249, 115, 22, 0.4)',
           neonClass: 'neon-text-orange',
           accentHex: '#f97316',
@@ -82,7 +94,6 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           textColor: 'text-amber-500',
           title: 'MISSÃO DE RANK B CONCLUÍDA',
           subtitle: 'EXPERIÊNCIA TRANSFORMADA EM FORÇA',
-          icon: <Zap size={60} className="text-amber-400" />,
           glowColor: 'rgba(245, 158, 11, 0.3)',
           neonClass: 'neon-text-lime',
           accentHex: '#f59e0b',
@@ -104,7 +115,6 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           textColor: 'text-blue-500',
           title: 'MISSÃO DE RANK C CONCLUÍDA',
           subtitle: 'PROGRESSO DO SISTEMA OTIMIZADO',
-          icon: <Sword size={50} className="text-blue-400" />,
           glowColor: 'rgba(59, 130, 246, 0.3)',
           neonClass: 'neon-text-blue',
           accentHex: '#3b82f6',
@@ -126,7 +136,6 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           textColor: 'text-teal-500',
           title: 'MISSÃO DE RANK D CONCLUÍDA',
           subtitle: 'NÚCLEO DE MANA ESTABILIZADO',
-          icon: <ShieldCheck size={45} className="text-teal-500" />,
           glowColor: 'rgba(20, 184, 166, 0.2)',
           neonClass: 'neon-text-green',
           accentHex: '#14b8a6',
@@ -148,7 +157,6 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           textColor: 'text-slate-400',
           title: 'MISSÃO CONCLUÍDA',
           subtitle: 'REGISTRO BÁSICO SINCRONIZADO',
-          icon: <Sparkles size={40} className="text-slate-400" />,
           glowColor: 'rgba(148, 163, 184, 0.1)',
           neonClass: 'text-slate-400',
           accentHex: '#94a3b8',
@@ -166,7 +174,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
     }
   };
 
-  const config = getRankConfig();
+  const config = getRankConfig(difficulty);
 
   return (
     <AnimatePresence>
@@ -175,87 +183,146 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden"
+          className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden bg-black/80"
         >
-          {/* Background with rank-specific gradient */}
+          {/* Background Data Rain Effect */}
+          <div className="absolute inset-0 opacity-20 bg-data-rain pointer-events-none" />
+          
+          {/* Rank-specific Background Gradient */}
           <motion.div
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            className={`absolute inset-0 bg-gradient-to-b ${config.bgGradient} backdrop-blur-xl`}
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.4 }}
+            className={`absolute inset-0 bg-gradient-to-b ${config.bgGradient} backdrop-blur-sm`}
           />
 
-          {/* Animated Scanlines */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
+          {/* Laser Scan Initial Effect */}
+          <div className="scan-line-effect" style={{ background: `linear-gradient(to bottom, transparent, ${config.accentHex}, transparent)` }} />
 
-          <div className="relative z-10 flex flex-col items-center">
+          <div className="relative z-10 flex flex-col items-center w-full px-4">
             {/* Holographic Notification Box */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className={`relative w-full max-w-2xl p-1 ${config.wrapperBg} rounded-sm overflow-hidden`}
+              initial={{ scale: 0.8, opacity: 0, rotateX: 45 }}
+              animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+              transition={{ duration: 0.6, type: "spring" }}
+              className={`relative w-full max-w-2xl p-1 ${config.wrapperBg} rounded-sm overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)]`}
             >
-              {/* Top/Bottom Glowing Bars */}
-              <div className={`absolute top-0 left-0 right-0 h-1 ${config.barBg} z-20`} style={{ boxShadow: `0 0 15px ${config.accentHex}` }} />
-              <div className={`absolute bottom-0 left-0 right-0 h-1 ${config.barBg} z-20`} style={{ boxShadow: `0 0 15px ${config.accentHex}` }} />
+              {/* Animated Glow Borders */}
+              <motion.div 
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className={`absolute top-0 left-0 right-0 h-1 ${config.barBg} z-20`} 
+                style={{ boxShadow: `0 0 20px ${config.accentHex}` }} 
+              />
+              <motion.div 
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                className={`absolute bottom-0 left-0 right-0 h-1 ${config.barBg} z-20`} 
+                style={{ boxShadow: `0 0 20px ${config.accentHex}` }} 
+              />
 
-              <div className={`system-panel p-8 md:p-12 bg-slate-950/90 ${config.panelBorder}`}>
-                {/* Header like the image */}
-                <div className={`flex items-center gap-4 mb-8 border-b ${config.headerBorder} pb-4`}>
-                  <div className={`p-2 border-2 ${config.headerCircle} rounded-full`}>
-                    <Monitor size={24} className={config.headerIcon} />
-                  </div>
-                  <h1 className={`font-game text-2xl md:text-3xl text-white tracking-[0.4em] uppercase ${config.neonClass}`}>
-                    NOTIFICAÇÃO
-                  </h1>
+              <div className={`system-panel p-8 md:p-12 bg-slate-950/95 ${config.panelBorder} backdrop-blur-3xl`}>
+                {/* Header Sequence */}
+                <AnimatePresence>
+                  {step >= 1 && (
+                    <motion.div 
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      className={`flex items-center gap-4 mb-8 border-b ${config.headerBorder} pb-4`}
+                    >
+                      <div className={`p-2 border-2 ${config.headerCircle} rounded-full animate-pulse`}>
+                        <Monitor size={24} className={config.headerIcon} />
+                      </div>
+                      <h1 className={`font-game text-3xl md:text-5xl text-white tracking-[0.4em] uppercase animate-glitch-chromatic`}>
+                        NOTIFICAÇÃO
+                      </h1>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="space-y-8 text-center min-h-[200px] flex flex-col justify-center">
+                  {step >= 2 && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                    >
+                      <p className={`font-game text-sm md:text-xl ${config.subtitleText} tracking-[0.3em] leading-relaxed mb-4`}>
+                        Sincronização de Objetivo Concluída:
+                      </p>
+                      <h2 className={`font-game text-3xl md:text-5xl text-white tracking-[0.1em] uppercase ${config.neonClass} py-6 border-y border-white/5`}>
+                        {title}
+                      </h2>
+                      <p className={`font-game text-[10px] md:text-xs ${config.captionText} tracking-[0.5em] uppercase italic mt-6`}>
+                        &lt; {config.subtitle} &gt;
+                      </p>
+                    </motion.div>
+                  )}
                 </div>
 
-                <div className="space-y-6 text-center">
-                  <p className={`font-game text-sm md:text-lg ${config.subtitleText} tracking-widest leading-relaxed`}>
-                    Você completou o objetivo com sucesso:
-                  </p>
-                  <h2 className={`font-game text-xl md:text-3xl text-white tracking-[0.2em] uppercase ${config.neonClass} py-4`}>
-                    {title}
-                  </h2>
-                  <p className={`font-game text-xs md:text-sm ${config.captionText} tracking-[0.3em] uppercase italic`}>
-                    {config.subtitle}
-                  </p>
-                </div>
-
-                {/* Rewards Section */}
-                <div className="mt-12 grid grid-cols-3 gap-4">
-                  <div className="flex flex-col items-center gap-1">
-                    <Database size={16} className={config.xpIcon} />
-                    <span className={`text-[8px] font-game ${config.xpLabel}`}>EXP</span>
-                    <span className="font-game text-lg text-white">+{rewards.xp}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <Coins size={16} className="text-amber-400" />
-                    <span className="text-[8px] font-game text-amber-600">OURO</span>
-                    <span className="font-game text-lg text-amber-400">+{rewards.gold}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <Package size={16} className="text-purple-400" />
-                    <span className="text-[8px] font-game text-purple-600">ITENS</span>
-                    <span className="font-game text-lg text-white">{rewards.items.length}</span>
-                  </div>
+                {/* Rewards Grid */}
+                <div className="mt-12 grid grid-cols-3 gap-8">
+                  <AnimatePresence>
+                    {step >= 3 && (
+                      <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex flex-col items-center gap-2 group"
+                      >
+                        <div className={`p-3 bg-white/5 rounded-full mb-2 group-hover:bg-red-500/20 transition-colors`}>
+                           <Database size={24} className={config.xpIcon} />
+                        </div>
+                        <span className={`text-[10px] font-game ${config.xpLabel} tracking-widest`}>XP</span>
+                        <span className="font-game text-2xl text-white">+{rewards.xp}</span>
+                      </motion.div>
+                    )}
+                    {step >= 4 && (
+                      <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex flex-col items-center gap-2 group"
+                      >
+                        <div className={`p-3 bg-white/5 rounded-full mb-2 group-hover:bg-amber-500/20 transition-colors`}>
+                          <Coins size={24} className="text-amber-400" />
+                        </div>
+                        <span className="text-[10px] font-game text-amber-600 tracking-widest">GOLD</span>
+                        <span className="font-game text-2xl text-amber-400">+{rewards.gold}</span>
+                      </motion.div>
+                    )}
+                    {step >= 5 && (
+                      <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex flex-col items-center gap-2 group"
+                      >
+                        <div className={`p-3 bg-white/5 rounded-full mb-2 group-hover:bg-purple-500/20 transition-colors`}>
+                          <Package size={24} className="text-purple-400" />
+                        </div>
+                        <span className="text-[10px] font-game text-purple-600 tracking-widest">DRPS</span>
+                        <span className="font-game text-2xl text-purple-300">{rewards.items.length}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </motion.div>
 
             {/* Item Drops List */}
-            {rewards.items.length > 0 && (
+            {rewards.items.length > 0 && step >= 6 && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="mt-8 flex flex-wrap justify-center gap-3"
+                className="mt-12 flex flex-wrap justify-center gap-4"
               >
                 {rewards.items.map((item, idx) => (
-                  <div key={`${item.id}-${idx}`} className="px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                    <span className="font-game text-[10px] text-purple-300 uppercase tracking-wider">{item.name}</span>
-                  </div>
+                  <motion.div 
+                    key={`${item.id}-${idx}`} 
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: idx * 0.2 }}
+                    className="px-6 py-3 bg-purple-950/20 border border-purple-500/30 flex items-center gap-4 backdrop-blur-md"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7]" />
+                    <span className="font-game text-xs text-purple-200 uppercase tracking-[0.2em]">{item.name}</span>
+                  </motion.div>
                 ))}
               </motion.div>
             )}
@@ -263,19 +330,19 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
             {/* Closing Hint */}
             <motion.p
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
-              transition={{ delay: 1.5 }}
-              className="mt-16 font-game text-[8px] text-white uppercase tracking-[0.8em]"
+              animate={{ opacity: [0, 0.4, 0.2] }}
+              transition={{ delay: 3, duration: 2, repeat: Infinity }}
+              className="mt-20 font-game text-[10px] text-white uppercase tracking-[1em]"
             >
-              Sincronização concluída. Retornando ao sistema...
+              Transferência concluída. Encerrando interface de rede...
             </motion.p>
           </div>
 
-          {/* Corner Decorations */}
-          <div className="absolute top-10 left-10 w-32 h-32 border-t-2 border-l-2 opacity-20" style={{ borderColor: config.color }} />
-          <div className="absolute top-10 right-10 w-32 h-32 border-t-2 border-r-2 opacity-20" style={{ borderColor: config.color }} />
-          <div className="absolute bottom-10 left-10 w-32 h-32 border-b-2 border-l-2 opacity-20" style={{ borderColor: config.color }} />
-          <div className="absolute bottom-10 right-10 w-32 h-32 border-b-2 border-r-2 opacity-20" style={{ borderColor: config.color }} />
+          {/* Holographic Corners */}
+          <div className="absolute top-10 left-10 w-48 h-48 border-t-2 border-l-2 opacity-10 animate-pulse" style={{ borderColor: config.color }} />
+          <div className="absolute top-10 right-10 w-48 h-48 border-t-2 border-r-2 opacity-10 animate-pulse" style={{ borderColor: config.color }} />
+          <div className="absolute bottom-10 left-10 w-48 h-48 border-b-2 border-l-2 opacity-10 animate-pulse" style={{ borderColor: config.color }} />
+          <div className="absolute bottom-10 right-10 w-48 h-48 border-b-2 border-r-2 opacity-10 animate-pulse" style={{ borderColor: config.color }} />
         </motion.div>
       )}
     </AnimatePresence>
