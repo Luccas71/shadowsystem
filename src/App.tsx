@@ -1542,7 +1542,7 @@ const App: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-6 md:gap-10">
               <div className="flex flex-col">
-                <span className="text-[7px] font-game text-slate-600 uppercase tracking-widest mb-1">Level</span>
+                <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Level</span>
                 <div className="flex items-center gap-2">
                   <Zap size={12} className="text-cyan-500 opacity-50" />
                   <span className="font-game text-xl text-white neon-text-cyan-strong">{profile.level}</span>
@@ -1550,7 +1550,7 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-col">
-                <span className="text-[7px] font-game text-slate-600 uppercase tracking-widest mb-1">Gold</span>
+                <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Gold</span>
                 <div className="flex items-center gap-2">
                   <Coins size={12} className="text-orange-500 opacity-50" />
                   <span className="font-game text-xl text-orange-400">{profile.gold.toLocaleString()}</span>
@@ -1558,7 +1558,7 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-col">
-                <span className="text-[7px] font-game text-slate-600 uppercase tracking-widest mb-1">Streak</span>
+                <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Streak</span>
                 <div className="flex items-center gap-2">
                   <Flame size={12} className={`${getCurrentStreakTier(profile.dailyStreak || 0).color} opacity-50`} />
                   <span className={`font-game text-xl ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
@@ -1585,9 +1585,9 @@ const App: React.FC = () => {
                 style={{ width: `${xpPercentage}%` }}
               />
             </div>
-            <div className="flex justify-between mt-1.5 opacity-30">
-              <span className="font-game text-[6px] text-slate-500 tracking-widest uppercase">Sync_Protocol_v1.2</span>
-              <span className="font-game text-[6px] text-slate-500 tracking-widest uppercase">{profile.xp.toLocaleString()} / {profile.maxXp.toLocaleString()} XP</span>
+            <div className="flex justify-between mt-1.5 opacity-70">
+              <span className="font-game text-[9px] text-slate-400 tracking-widest uppercase">Sync_Protocol_v1.2</span>
+              <span className="font-game text-[9px] text-slate-300 tracking-widest uppercase font-bold">{profile.xp.toLocaleString()} / {profile.maxXp.toLocaleString()} XP</span>
             </div>
           </div>
         </div>
