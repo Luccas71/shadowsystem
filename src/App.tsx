@@ -910,7 +910,7 @@ const App: React.FC = () => {
       }));
 
       setQuests(nextQuests);
-      addSystemMessage(`QUEST CONCLUÍDA. RECOMPENSA: +${finalGoldReward} OURO / +${finalXpReward} XP.`, 'success');
+      addSystemMessage(`MISSÃO CONCLUÍDA: ${quest.title.toUpperCase()}. RECOMPENSA: +${finalGoldReward} OURO / +${finalXpReward} XP.`, 'success');
     }
   };
 
