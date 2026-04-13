@@ -17,12 +17,12 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
         setShow(true);
         
         // Impact effect after some preparation
-        const impactTimer = setTimeout(() => setIsImpacted(true), 1200);
+        const impactTimer = setTimeout(() => setIsImpacted(true), 600);
 
         const closeTimer = setTimeout(() => {
             setShow(false);
-            setTimeout(onComplete, 800);
-        }, 6000);
+            setTimeout(onComplete, 500);
+        }, 4000);
 
         return () => {
           clearTimeout(impactTimer);
@@ -80,7 +80,8 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className={`fixed inset-0 z-[10001] flex items-center justify-center pointer-events-none overflow-hidden backdrop-blur-2xl bg-black/90 ${isImpacted ? 'animate-epic-shake' : ''}`}
+                    onClick={onComplete}
+                    className={`fixed inset-0 z-[10001] flex items-center justify-center pointer-events-auto cursor-pointer overflow-hidden backdrop-blur-2xl bg-black/90 ${isImpacted ? 'animate-epic-shake' : ''}`}
                 >
                     {/* Impact Flash */}
                     {isImpacted && (

@@ -20,7 +20,7 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
         setTimeout(() => setIsImpacted(true), 300);
 
         // Count-up animation
-        const duration = 2000; // 2 seconds for count up
+        const duration = 1000; // 1 second for count up
         const steps = newLevel - oldLevel;
         if (steps > 0) {
             let current = oldLevel;
@@ -34,8 +34,8 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
 
         const closeTimer = setTimeout(() => {
             setShow(false);
-            setTimeout(onComplete, 800);
-        }, 5000);
+            setTimeout(onComplete, 500);
+        }, 3000);
 
         return () => setShow(false);
     }, [oldLevel, newLevel, onComplete]);
@@ -47,7 +47,8 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className={`fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none overflow-hidden backdrop-blur-md bg-black/60 ${isImpacted ? 'animate-epic-shake' : ''}`}
+                    onClick={onComplete}
+                    className={`fixed inset-0 z-[10000] flex items-center justify-center pointer-events-auto cursor-pointer overflow-hidden backdrop-blur-md bg-black/60 ${isImpacted ? 'animate-epic-shake' : ''}`}
                 >
                     {/* Impact Flash Overlay */}
                     {isImpacted && (

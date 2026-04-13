@@ -24,18 +24,18 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
     
     // Animation sequence
     const timers = [
-      setTimeout(() => setStep(1), 600),  // Show Notification Title
-      setTimeout(() => setStep(2), 1200), // Show Quest Title
-      setTimeout(() => setStep(3), 1800), // Show EXP
-      setTimeout(() => setStep(4), 2000), // Show Gold
-      setTimeout(() => setStep(5), 2200), // Show Items
-      setTimeout(() => setStep(6), 2500), // Show Item Detail Drops
+      setTimeout(() => setStep(1), 300),  // Show Notification Title
+      setTimeout(() => setStep(2), 600),  // Show Quest Title
+      setTimeout(() => setStep(3), 900),  // Show EXP
+      setTimeout(() => setStep(4), 1000), // Show Gold
+      setTimeout(() => setStep(5), 1100), // Show Items
+      setTimeout(() => setStep(6), 1250), // Show Item Detail Drops
     ];
 
     const closeTimer = setTimeout(() => {
       setShowContent(false);
       setTimeout(onComplete, 500);
-    }, 6500);
+    }, 3500);
 
     return () => {
       timers.forEach(clearTimeout);
@@ -183,7 +183,8 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden bg-black/80"
+          onClick={onComplete}
+          className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto overflow-hidden bg-black/80 cursor-pointer"
         >
           {/* Background Data Rain Effect */}
           <div className="absolute inset-0 opacity-20 bg-data-rain pointer-events-none" />
