@@ -28,7 +28,7 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
           clearTimeout(impactTimer);
           clearTimeout(closeTimer);
         };
-    }, [onComplete]);
+    }, []);
 
     const getRankConfig = (rank: Rank) => {
         switch (rank) {

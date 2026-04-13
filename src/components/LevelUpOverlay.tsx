@@ -38,7 +38,7 @@ const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ oldLevel, newLevel, onC
         }, 3000);
 
         return () => setShow(false);
-    }, [oldLevel, newLevel, onComplete]);
+    }, [oldLevel, newLevel]);
 
     return (
         <AnimatePresence>

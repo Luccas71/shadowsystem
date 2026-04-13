@@ -30,7 +30,7 @@ const SystemEffectOverlay: React.FC<SystemEffectOverlayProps> = ({ effect, onCom
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [effect, onComplete]);
+  }, [effect]);
 
   const renderEffect = () => {
     if (!activeEffect) return null;

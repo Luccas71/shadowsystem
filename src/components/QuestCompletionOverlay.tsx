@@ -41,7 +41,7 @@ const QuestCompletionOverlay: React.FC<QuestCompletionOverlayProps> = ({ difficu
       timers.forEach(clearTimeout);
       clearTimeout(closeTimer);
     };
-  }, [onComplete]);
+  }, []);
 
   const getRankConfig = (difficulty: QuestDifficulty) => {
     switch (difficulty) {
