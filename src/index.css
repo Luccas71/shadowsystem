@@ -8,12 +8,12 @@
 
 :root {
     font-size: 16px;
-    --void-deep: #020b18;
-    --shadow-energy: #00e5ff;
-    --system-blue: #00bfff;
+    --void-deep: #05111c;
+    --shadow-energy: #38bdf8;
+    --system-blue: #0ea5e9;
     --penalty-red: #ff3333;
-    --system-orange: #ffaa00;
-    --neon-cyan: #00e5ff;
+    --system-orange: #f97316;
+    --neon-cyan: #38bdf8;
     --neon-green: #10b981;
     --neon-purple: #a855f7;
 }
@@ -30,11 +30,8 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     -webkit-font-smoothing: antialiased;
-    background-image:
-        linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
-        radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
-    background-size: 30px 30px, 30px 30px, 100% 100%;
+    background-color: var(--void-deep);
+    position: relative;
     background-attachment: fixed;
     user-select: none;
     position: relative;
@@ -56,6 +53,11 @@ body::after {
     z-index: 9999;
 }
 
+.text-glow-cyan {
+    text-shadow: 0 0 5px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.4);
+    color: #ffffff;
+}
+
 .font-game {
     font-family: 'Rajdhani', sans-serif;
     letter-spacing: 0.15em;
@@ -64,35 +66,36 @@ body::after {
 }
 
 .system-panel {
-    background: rgba(1, 4, 10, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 229, 255, 0.1);
+    background: rgba(5, 17, 28, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(56, 189, 248, 0.4);
     box-shadow: 
-        0 4px 40px rgba(0, 0, 0, 0.9);
+        0 8px 32px rgba(0, 0, 0, 0.8);
     position: relative;
     transition: all 0.3s ease;
 }
 
 .system-border {
-    border: 1px solid rgba(0, 229, 255, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.5);
 }
 
 .system-border-glow {
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.05);
+    border: 1px solid rgba(56, 189, 248, 0.8);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
 }
 
 .hud-board {
     position: relative;
-    background: rgba(1, 4, 10, 0.9);
-    border: 1px solid rgba(0, 229, 255, 0.08);
+    background: rgba(5, 17, 28, 0.8);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(56, 189, 248, 0.3);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 0;
 }
 
 .hud-board-glow {
-    box-shadow: 0 0 30px rgba(0, 229, 255, 0.05);
-    border: 1px solid rgba(0, 229, 255, 0.2);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.6);
 }
 
 .holographic-border-top {

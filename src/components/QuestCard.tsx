@@ -106,16 +106,16 @@ const QuestCard: React.FC<QuestCardProps> = ({
       flameIcon: 'text-teal-600',
       checkboxFill: 'bg-teal-400 shadow-[0_0_15px_#2dd4bf]',
     },
-    blue: {
-      badge: 'text-blue-400 border-blue-500/30 bg-blue-950/60',
+    sky: {
+      badge: 'text-sky-400 border-sky-500/30 bg-sky-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
-      subHeader: 'text-blue-600',
-      subBorder: 'border-blue-900/30',
-      subCheckActive: 'bg-blue-600 border-blue-500 text-white',
-      inputBorder: 'border-blue-900/40 text-blue-100 focus:border-blue-500',
-      addBtnClasses: 'bg-blue-900/20 border-blue-900 text-blue-500 hover:bg-blue-600 hover:text-white',
-      flameIcon: 'text-blue-600',
-      checkboxFill: 'bg-blue-400 shadow-[0_0_15px_#60a5fa]',
+      subHeader: 'text-sky-600',
+      subBorder: 'border-sky-900/30',
+      subCheckActive: 'bg-sky-600 border-sky-500 text-white',
+      inputBorder: 'border-sky-900/40 text-sky-100 focus:border-sky-500',
+      addBtnClasses: 'bg-sky-900/20 border-sky-900 text-sky-500 hover:bg-sky-600 hover:text-white',
+      flameIcon: 'text-sky-600',
+      checkboxFill: 'bg-sky-400 shadow-[0_0_15px_#38bdf8]',
     },
     amber: {
       badge: 'text-amber-400 border-amber-500/30 bg-amber-950/60',
@@ -139,7 +139,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
       flameIcon: 'text-orange-600',
       checkboxFill: 'bg-orange-400 shadow-[0_0_15px_#fb923c]',
     },
-    red: {
+    rose: {
       badge: 'text-red-400 border-red-500/30 bg-red-950/60',
       badgeFailed: 'text-red-500 border-red-500 bg-red-950/60',
       subHeader: 'text-red-600',
@@ -173,7 +173,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
         ? 'border-slate-800 bg-slate-950/40 opacity-50'
         : quest.failed
           ? 'border-red-600/50 bg-red-950/20 shadow-[0_0_20px_rgba(220,38,38,0.2)]'
-          : `hud-board-glow ${rankBorderClass} border-opacity-50`
+          : `border-sky-500/30`
         }`}>
 
         <div className="p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 md:gap-7 relative z-10 min-w-0">
@@ -197,7 +197,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
             >
               <div className="flex items-center justify-center relative z-20">
                 {quest.completed ? (
-                  <div className={`w-3 h-3 ${colors.checkboxFill}`}></div>
+                  <Check size={20} className="text-emerald-400 drop-shadow-[0_0_8px_#34d399] -rotate-45" strokeWidth={3} />
                 ) : quest.failed ? (
                   <AlertCircle size={18} className="text-red-900 -rotate-45" />
                 ) : (
@@ -234,7 +234,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
                   </span>
                 )}
               </div>
-              <h3 className={`font-game text-lg md:text-xl tracking-wide transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-slate-100'
+              <h3 className={`font-game text-lg md:text-xl tracking-wide transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-glow-cyan'
                 }`}>
                 {quest.title}
               </h3>
@@ -298,9 +298,9 @@ const QuestCard: React.FC<QuestCardProps> = ({
                     onClick={() => onToggleSubQuest(quest.id, sq.id)}
                     className={`shrink-0 w-3.5 h-3.5 rotate-45 border flex items-center justify-center transition-all ${sq.completed ? colors.subCheckActive : 'border-slate-700'}`}
                   >
-                    {sq.completed && <div className="w-1.5 h-1.5 bg-white shadow-[0_0_8px_white]"></div>}
+                    {sq.completed && <Check size={18} className="text-emerald-400 drop-shadow-[0_0_5px_#34d399] -rotate-45" strokeWidth={3} />}
                   </button>
-                  <span className={`text-[11px] md:text-xs font-medium flex-1 truncate ${sq.completed ? 'line-through text-slate-700' : 'text-slate-300'}`}>
+                  <span className={`text-[11px] md:text-xs min-w-0 font-game uppercase tracking-wide truncate transition-colors duration-500 ${sq.completed ? 'line-through text-slate-700' : 'text-glow-cyan'}`}>
                     {sq.title}
                   </span>
                   <button

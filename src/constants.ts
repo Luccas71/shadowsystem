@@ -3,11 +3,11 @@ import { Rank, QuestDifficulty, StoreItem, ItemRarity } from './types';
 
 export const RANK_COLORS: Record<Rank, string> = {
   [Rank.E]: 'text-slate-500 border-slate-500',
-  [Rank.D]: 'text-teal-500 border-teal-500 neon-text-green',
-  [Rank.C]: 'text-blue-500 border-blue-500 neon-text-blue',
-  [Rank.B]: 'text-amber-500 border-amber-500 neon-text-lime',
-  [Rank.A]: 'text-orange-500 border-orange-500 neon-text-orange',
-  [Rank.S]: 'text-red-500 border-red-500 font-bold neon-text-red animate-pulse',
+  [Rank.D]: 'text-teal-400 border-teal-500/50',
+  [Rank.C]: 'text-sky-400 border-sky-500/50',
+  [Rank.B]: 'text-amber-400 border-amber-500/50',
+  [Rank.A]: 'text-orange-400 border-orange-500/50',
+  [Rank.S]: 'text-rose-500 border-rose-500/50 font-bold',
 };
 
 export const ITEM_RARITY_CONFIG: Record<ItemRarity, { color: string, label: string }> = {
@@ -16,7 +16,7 @@ export const ITEM_RARITY_CONFIG: Record<ItemRarity, { color: string, label: stri
   [ItemRarity.RARO]: { color: 'border-blue-500/50 text-blue-400 bg-blue-950/20', label: 'RARO' },
   [ItemRarity.ÉPICO]: { color: 'border-purple-500/50 text-purple-400 bg-purple-950/20', label: 'ÉPICO' },
   [ItemRarity.LENDÁRIO]: { color: 'border-orange-500/50 text-orange-400 bg-orange-950/20', label: 'LENDÁRIO' },
-  [ItemRarity.MÍTICO]: { color: 'border-red-500/50 text-red-500 bg-red-950/20 neon-text-red', label: 'MÍTICO' },
+  [ItemRarity.MÍTICO]: { color: 'border-rose-500/50 text-rose-500 bg-rose-950/20', label: 'MÍTICO' },
 };
 
 export interface StreakTier {

@@ -56,13 +56,13 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
   return (
     <div className="space-y-8">
       {/* Header Perigo */}
-      <div className={`relative p-6 border-2 overflow-hidden ${profile.corruption >= 100 ? 'border-red-600 bg-red-950/40' : 'border-cyan-900/50 bg-cyan-950/10'}`}>
-        <div className={`absolute top-0 left-0 w-full h-1 bg-cyan-600 shadow-[0_0_10px_#06b6d4]`} style={{ width: `${profile.corruption}%` }}></div>
+      <div className={`relative p-6 border-2 overflow-hidden ${profile.corruption >= 100 ? 'border-red-600 bg-red-950/40' : 'border-sky-500/30 bg-[rgba(5,17,28,0.9)]'}`}>
+        <div className={`absolute top-0 left-0 w-full h-1 bg-sky-500 shadow-[0_0_10px_#38bdf8]`} style={{ width: `${profile.corruption}%` }}></div>
         <div className="flex items-center justify-between mb-4 relative z-10">
-          <h2 className={`font-game text-xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-cyan-400'}`}>
+          <h2 className={`font-game text-xl flex items-center gap-3 uppercase italic ${profile.corruption >= 100 ? 'text-red-500' : 'text-glow-cyan'}`}>
             <Skull size={20} /> Purificação
           </h2>
-          <span className="font-game text-[9px] text-cyan-600/60 tracking-[0.2em] font-bold">
+          <span className="font-game text-[9px] text-sky-500 tracking-[0.2em] font-bold">
             {profile.corruption >= 100 ? "⚠️ ALERTA CRÍTICO" : "SINC_ALMA // ATIVO"}
           </span>
         </div>
@@ -73,12 +73,11 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
             <span>Nível de Instabilidade</span>
             <span className={profile.corruption >= 100 ? "text-red-600 font-bold" : ""}>{profile.corruption.toFixed(2)}%</span>
           </div>
-          <div className="h-2 bg-black/40 border-x border-cyan-900/30 overflow-hidden">
+          <div className="h-3 rounded-full border border-sky-600 bg-transparent overflow-hidden p-[2px] shadow-[0_0_5px_rgba(6,182,212,0.5)]">
             <div
-              className={`h-full transition-all duration-1000 ${profile.corruption >= 100 ? 'bg-red-600' : profile.corruption > 50 ? 'bg-cyan-800' : 'bg-cyan-600'} relative overflow-hidden`}
+              className={`h-full rounded-full transition-all duration-1000 ${profile.corruption >= 100 ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]'} relative overflow-hidden`}
               style={{ width: `${profile.corruption}%` }}
             >
-              <div className="absolute inset-0 shimmer-gradient opacity-20"></div>
             </div>
           </div>
         </div>
@@ -240,12 +239,11 @@ const PenaltySystem: React.FC<PenaltySystemProps> = ({
                     <span className="text-[8px] font-game text-red-900 uppercase font-black tracking-widest">GRAVIDADE DA FALHA</span>
                     <span className="text-[8px] font-game text-red-600 font-black uppercase">{entry.count > 5 ? 'CRÍTICO' : entry.count > 2 ? 'ALTO' : 'MONITORADO'}</span>
                   </div>
-                  <div className="h-1.5 bg-black border border-red-900/30 overflow-hidden p-[1px]">
+                  <div className="h-2.5 rounded-full border border-red-900 bg-transparent overflow-hidden p-[2px]">
                     <div 
-                      className={`h-full relative overflow-hidden transition-all duration-1000 ${entry.count > 5 ? 'bg-red-500' : 'bg-red-800'}`} 
+                      className={`h-full rounded-full relative overflow-hidden transition-all duration-1000 ${entry.count > 5 ? 'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]' : 'bg-red-300 shadow-[0_0_5px_rgba(252,165,165,0.8)]'}`} 
                       style={{ width: `${Math.min(100, entry.count * 15)}%` }}
                     >
-                      <div className="absolute inset-0 shimmer-gradient shimmer-animated opacity-40"></div>
                     </div>
                   </div>
                 </div>

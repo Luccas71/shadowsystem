@@ -28,8 +28,8 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center">
-        <h2 className="font-game text-2xl text-purple-400 flex items-center gap-3 uppercase tracking-tighter font-bold">
-          <Package className="text-purple-400" /> INVENTÁRIO DO SISTEMA
+        <h2 className="font-game text-2xl text-glow-cyan flex items-center gap-3 uppercase tracking-tighter font-bold">
+          <Package className="text-sky-400" /> INVENTÁRIO DO SISTEMA
         </h2>
       </div>
 
@@ -41,7 +41,7 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
           </div>
         ) : (
           consolidatedItems.map((item, index) => (
-            <div key={`${item.id}-${item.origin || 'legacy'}-${index}`} className="group relative flex flex-col bg-slate-950/60 border border-white/5 transition-all duration-500 hover:border-purple-500/30 p-4">
+            <div key={`${item.id}-${item.origin || 'legacy'}-${index}`} className="hud-board group relative flex flex-col transition-all duration-500 p-4">
               {/* Minimal Accent */}
               <div className="absolute top-0 left-0 w-[1px] h-0 group-hover:h-full bg-purple-500/50 transition-all duration-700"></div>
               
@@ -49,7 +49,7 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
                 <div className="flex justify-between items-start gap-3 mb-4">
                   <div className="min-w-0">
                     <div className="text-[7px] font-game text-purple-600/60 tracking-[0.2em] mb-1 uppercase">Slot_{String(index + 1).padStart(2, '0')}</div>
-                    <h3 className="font-game text-md text-white group-hover:text-purple-400 transition-all uppercase tracking-widest truncate font-bold">
+                    <h3 className="font-game text-md text-glow-cyan transition-all uppercase tracking-widest truncate font-bold">
                       {item.name}
                     </h3>
                     <div className="flex flex-wrap gap-1.5 mt-2">
@@ -90,8 +90,8 @@ const Inventory: React.FC<InventoryProps> = ({ items, onUseItem }) => {
       </div>
 
       {ownedItems.length > 0 && (
-        <div className="p-4 bg-purple-950/10 border border-purple-900/30">
-          <p className="text-[10px] font-game text-purple-600 uppercase tracking-[0.2em] text-center">
+        <div className="p-4 bg-sky-950/10 border border-sky-900/30">
+          <p className="text-[10px] font-game text-sky-500 uppercase tracking-[0.2em] text-center">
             "A FORÇA DE UM CAÇADOR NÃO ESTÁ APENAS EM SEUS ATRIBUTOS, MAS NO USO ESTRATÉGICO DE SEUS RECURSOS."
           </p>
         </div>

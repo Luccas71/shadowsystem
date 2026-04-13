@@ -10,7 +10,15 @@ import {
   Flame,
   CalendarDays,
   Check,
-  X
+  X,
+  Plus,
+  FlaskConical,
+  Sun,
+  Dumbbell,
+  Heart,
+  Wind,
+  Brain,
+  Eye
 } from 'lucide-react';
 
 interface StatusWindowProps {
@@ -32,7 +40,7 @@ const StatusCard: React.FC<{
   bgColor?: string;
 }> = ({ icon, label, mainValue, subValue, bonusText, progress, progressLabel, remainingLabel, color, bgColor = "bg-slate-950/20" }) => {
   return (
-    <div className={`hud-board p-5 border-white/5 relative overflow-hidden ${bgColor} group transition-all duration-500 hover:bg-slate-950/40`}>
+    <div className={`hud-board p-5 relative overflow-hidden ${bgColor} group transition-all duration-500 hover:bg-slate-900/40`}>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
         <div className="flex items-center gap-5">
           <div className={`relative p-3 bg-black/60 border border-white/5 ${color}`}>
@@ -44,7 +52,7 @@ const StatusCard: React.FC<{
                 {label}
               </h3>
             </div>
-            <p className="font-game text-3xl text-white tracking-widest font-black uppercase leading-tight">
+            <p className="font-game text-3xl text-white tracking-widest font-black uppercase leading-tight text-glow-cyan">
               {mainValue} {subValue && <span className={`text-[12px] font-bold ml-1 opacity-40 ${color}`}>{subValue}</span>}
             </p>
           </div>
@@ -64,12 +72,144 @@ const StatusCard: React.FC<{
           <span>{progressLabel}</span>
           <span>{remainingLabel}</span>
         </div>
-        <div className="h-1.5 bg-black/60 overflow-hidden relative">
+        <div className={`h-3 rounded-full border border-white/30 bg-transparent overflow-hidden relative p-[2px] shadow-[0_0_5px_currentColor]`}>
           <div
-            className={`h-full transition-all duration-1000 ${color} relative`}
-            style={{ width: `${Math.min(100, Math.max(0, progress))}%`, backgroundColor: 'currentColor' }}
+            className={`h-full rounded-full transition-all duration-1000 bg-white relative shadow-[0_0_8px_rgba(255,255,255,0.8)]`}
+            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
           >
-            <div className="absolute inset-0 opacity-30 shimmer-gradient shimmer-animated"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SystemStatusBoard: React.FC<{ profile: HunterProfile }> = ({ profile }) => {
+  const hp = 100 - Math.round(profile.corruption);
+  const mp = profile.level * 10;
+  
+  return (
+    <div className="space-y-4 mb-10 w-full animate-in fade-in zoom-in duration-500">
+      {/* Top Box: HP / MP / Fatigue */}
+      <div className="hud-board border border-white/50 p-6 bg-transparent flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_0_15px_rgba(255,255,255,0.1)] rounded-md">
+        
+        {/* HP */}
+        <div className="flex items-center gap-4 flex-1 w-full">
+          <div className="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+            <Plus size={24} strokeWidth={3} />
+            <span className="font-sans text-[10px] font-bold uppercase mt-1">HP</span>
+          </div>
+          <div className="flex-1 max-w-[200px]">
+            <div className="h-[14px] rounded-full border-[1.5px] border-white/80 p-[2px] bg-transparent shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+              <div 
+                className="h-full rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] transition-all duration-1000" 
+                style={{ width: `${hp}%` }}
+              />
+            </div>
+            <div className="text-right mt-1 font-sans text-[10px] font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] leading-none">
+              {hp}/100
+            </div>
+          </div>
+        </div>
+
+        {/* C divider */}
+        <div className="hidden md:block w-px h-12 bg-white/20"></div>
+
+        {/* MP */}
+        <div className="flex items-center gap-4 flex-1 w-full">
+          <div className="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+            <FlaskConical size={24} strokeWidth={2} />
+            <span className="font-sans text-[10px] font-bold uppercase mt-1">MP</span>
+          </div>
+          <div className="flex-1 max-w-[200px]">
+            <div className="h-[14px] rounded-full border-[1.5px] border-white/80 p-[2px] bg-transparent shadow-[0_0_8px_rgba(255,255,255,0.5)]">
+              <div 
+                className="h-full rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] transition-all duration-1000" 
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div className="text-right mt-1 font-sans text-[10px] font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] leading-none">
+              {mp}/{mp}
+            </div>
+          </div>
+        </div>
+
+        {/* C divider */}
+        <div className="hidden md:block w-px h-12 bg-white/20"></div>
+
+        {/* Fatigue */}
+        <div className="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] md:ml-4">
+           <Sun size={28} className="animate-[spin_4s_linear_infinite]" />
+           <div className="flex items-center gap-1 mt-2">
+             <span className="font-sans text-[12px] font-bold uppercase tracking-widest">FATIGUE:</span>
+             <span className="font-sans text-[14px] font-black">0</span>
+           </div>
+        </div>
+      </div>
+
+      {/* Bottom Box: Stats */}
+      <div className="hud-board border border-white/50 p-8 pt-10 pb-10 bg-transparent flex flex-col md:flex-row gap-12 justify-between shadow-[0_0_15px_rgba(255,255,255,0.1)] rounded-md">
+        
+        {/* Left Column */}
+        <div className="flex-1 space-y-8">
+          {/* STR */}
+          <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
+             <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+               <Dumbbell size={28} />
+               <span className="font-sans text-xl font-medium tracking-wider">STR:</span>
+             </div>
+             <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.strength}</span>
+          </div>
+          
+          {/* AGI */}
+          <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
+             <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+               <Wind size={28} />
+               <span className="font-sans text-xl font-medium tracking-wider">AGI:</span>
+             </div>
+             <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.agility}</span>
+          </div>
+
+          {/* PER */}
+          <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
+             <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+               <Eye size={28} />
+               <span className="font-sans text-xl font-medium tracking-wider">PER:</span>
+             </div>
+             <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.sense}</span>
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="flex-1 space-y-8 flex flex-col justify-between">
+          <div className="space-y-8">
+            {/* VIT */}
+            <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
+               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                 <Heart size={28} />
+                 <span className="font-sans text-xl font-medium tracking-wider">VIT:</span>
+               </div>
+               <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.vitality}</span>
+            </div>
+
+            {/* INT */}
+            <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
+               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                 <Brain size={28} />
+                 <span className="font-sans text-xl font-medium tracking-wider">INT:</span>
+               </div>
+               <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.intelligence}</span>
+            </div>
+          </div>
+          
+          {/* Available Points */}
+          <div className="flex items-end justify-center md:justify-end gap-3 mt-8 md:mt-0 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+             <div className="flex flex-col items-end text-right">
+                <span className="font-sans text-[10px] leading-[1.2]">Available</span>
+                <span className="font-sans text-[10px] leading-[1.2]">Ability</span>
+                <span className="font-sans text-[10px] leading-[1.2]">Points:</span>
+             </div>
+             <span className="font-sans text-4xl font-semibold leading-none pb-1 relative top-1">0</span>
           </div>
         </div>
       </div>
@@ -127,7 +267,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact })
       </div>
 
       {!compact && (
-        <div className="hud-board p-8 border-white/5 relative overflow-hidden bg-slate-950/20">
+        <div className="hud-board p-8 relative overflow-hidden bg-black/60">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
             <div className="flex items-center gap-6">
               <div className="relative p-4 bg-black/40 border border-white/10 text-emerald-400">
@@ -138,7 +278,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact })
                   <div className="w-1 h-3 bg-emerald-600"></div>
                   <h3 className="font-game text-[10px] text-emerald-700 uppercase tracking-[0.4em] font-black opacity-80">RESERVA_ESTÁVEL_DE_MANA</h3>
                 </div>
-                <p className="font-game text-4xl text-white tracking-widest font-black">
+                <p className="font-game text-4xl text-white tracking-widest font-black text-glow-cyan">
                   {(profile.totalXpGained || 0).toLocaleString()} <span className="text-sm text-emerald-900 font-bold ml-1 opacity-50">XP_TOTAL</span>
                 </p>
               </div>
@@ -194,7 +334,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact })
             </div>
           ) : (
             profile.activeBuffs.map(buff => (
-              <div key={buff.id} className={`hud-board border-white/10 ${compact ? 'p-4' : 'p-6'} relative overflow-hidden group bg-slate-950/40 hover:bg-slate-900/40 transition-all duration-300`}>
+              <div key={buff.id} className={`hud-board ${compact ? 'p-4' : 'p-6'} relative overflow-hidden group bg-black/60 hover:bg-black/40 transition-all duration-300`}>
                 <div className="flex justify-between items-start mb-2 relative z-10">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-black/60 border border-white/10 text-emerald-400 font-game">
@@ -250,7 +390,7 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact })
                  const completedCount = (quest.history || []).filter(h => h.status === 'completed').length + (quest.completed ? 1 : 0);
 
                  return (
-                   <div key={quest.id} className="hud-board bg-slate-950/40 p-5 md:p-6 border-white/10 flex flex-col gap-5 group hover:bg-slate-900/40 transition-colors duration-500">
+                   <div key={quest.id} className="hud-board bg-black/40 p-5 md:p-6 flex flex-col gap-5 group hover:bg-black/20 transition-colors duration-500">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-game text-[14px] text-white uppercase tracking-tight font-black flex items-center gap-2">
@@ -302,11 +442,11 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact })
                               
                               if (status === 'completed') {
                                 // varying opacity could depend on how many times completed but quests are binary, so just bright green
-                                colorClass = 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)] border-emerald-400 z-10 relative scale-[1.05]';
+                                colorClass = 'bg-emerald-500/80 shadow-[0_0_6px_rgba(16,185,129,0.2)] border-emerald-400/50 z-10 relative scale-[1.05]';
                               } else if (status === 'ignored') {
-                                colorClass = 'bg-red-950/60 border border-red-900/40 relative group/tile';
+                                colorClass = 'bg-rose-900/40 border border-rose-900/30 relative group/tile';
                               } else if (status === 'pending') {
-                                colorClass = 'bg-cyan-900/50 border border-cyan-500/50 shadow-[inset_0_0_5px_#06b6d4] animate-[pulse_2s_ease-in-out_infinite] relative';
+                                colorClass = 'bg-sky-900/40 border border-sky-500/40 shadow-[inset_0_0_5px_rgba(14,165,233,0.3)] animate-[pulse_2s_ease-in-out_infinite] relative';
                               }
   
                               return (

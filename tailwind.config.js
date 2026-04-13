@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        game: ['Rajdhani', 'sans-serif'],
-        sans: ['Inter', 'sans-serif'],
+        game: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         void: '#0a1125',

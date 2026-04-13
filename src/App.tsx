@@ -49,6 +49,7 @@ import {
   ScrollText,
   HeartPulse,
   Coins,
+  Shield,
   Package,
   ShoppingBag,
   Database,
@@ -99,12 +100,12 @@ const DraggableQuestItem: React.FC<{ quest: Quest; children: React.ReactNode }> 
   const pressTimer = React.useRef<NodeJS.Timeout | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === 'touch') {
-      pressTimer.current = setTimeout(() => {
-        controls.start(e);
-        if (navigator.vibrate) navigator.vibrate(50);
-      }, 1000);
-    }
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    
+    pressTimer.current = setTimeout(() => {
+      controls.start(e);
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, 400);
   };
 
   const clearTimer = () => {
@@ -122,20 +123,9 @@ const DraggableQuestItem: React.FC<{ quest: Quest; children: React.ReactNode }> 
       onContextMenu={(e: React.MouseEvent) => {
         if ((e.nativeEvent as PointerEvent).pointerType === 'touch') e.preventDefault();
       }}
+      className="w-full relative touch-pan-y"
     >
-      <div className="flex items-center gap-2">
-         <div 
-           className="cursor-grab active:cursor-grabbing p-2 text-cyan-900/40 hover:text-cyan-600 transition-colors hidden md:block shrink-0"
-           onPointerDown={(e: React.PointerEvent) => {
-             if (e.pointerType === 'mouse') controls.start(e);
-           }}
-         >
-           <GripVertical size={20} />
-         </div>
-         <div className="flex-1 min-w-0">
-           {children}
-         </div>
-      </div>
+      {children}
     </Reorder.Item>
   );
 };
@@ -1509,91 +1499,101 @@ const App: React.FC = () => {
         <div className="flex items-center gap-3">
         </div>
       </div>
+      <div className="max-w-[1024px] mx-auto w-full px-2 sm:px-4 md:px-6 z-10 pt-4 md:pt-6 flex-1 flex flex-col">
+        <header className={`relative mb-6 bg-[rgba(5,17,28,0.7)] backdrop-blur-md rounded-md border ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_30px_rgba(220,38,38,0.2)]' : 'border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.05)]'}`}>
+          <div className="relative z-10 p-5 md:p-6 flex flex-col md:flex-row gap-6 md:gap-8">
+            {/* Avatar Column */}
+            <div className="relative shrink-0 flex items-center md:items-stretch">
+              <div className="w-24 h-24 md:w-32 md:h-full md:min-h-[140px] border border-white/10 bg-slate-950 overflow-hidden relative group">
+                <img 
+                  src={profile.avatar} 
+                  alt="Hunter" 
+                  className="w-full h-full object-cover filter brightness-[0.8] grayscale group-hover:grayscale-0 transition-all duration-500" 
+                />
+              </div>
+            </div>
 
-      <header className={`relative mb-6 bg-black/40 border-b border-white/5 max-w-[1024px] mx-auto ${profile.isPenaltyZoneActive ? 'border-red-500/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]' : 'border-cyan-500/10'}`}>
-        <div className="relative z-10 p-4 md:p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="relative shrink-0">
-                <div className="w-16 h-16 md:w-20 md:h-20 border border-white/10 bg-slate-950 overflow-hidden relative group">
-                  <img 
-                    src={profile.avatar} 
-                    alt="Hunter" 
-                    className="w-full h-full object-cover filter brightness-[0.8] grayscale group-hover:grayscale-0 transition-all duration-500" 
-                  />
-                  <div className={`absolute bottom-0 right-0 w-6 h-6 flex items-center justify-center font-game text-[10px] bg-black border-tl border-white/10 ${RANK_COLORS[profile.rank]}`}>
-                    {profile.rank}
+            {/* Right Column (Info + Stats + Sync Bar) */}
+            <div className="flex-1 flex flex-col justify-between min-w-0 gap-4">
+              
+              {/* Top Row: Name/Rank & Stats */}
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+                
+                {/* Name & Rank */}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-1.5 h-6 bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]"></div>
+                    <h1 className="font-game text-2xl md:text-3xl text-white tracking-widest leading-none uppercase truncate text-glow-cyan font-black">
+                      {profile.name}
+                    </h1>
+                  </div>
+                  <div className="flex items-end gap-3 ml-4 md:ml-5 mt-2">
+                    <span className="font-game text-[10px] md:text-xs text-slate-400 uppercase tracking-[0.3em] mb-1">
+                      Rank
+                    </span>
+                    <span className={`font-game text-4xl md:text-5xl leading-none font-bold ${RANK_COLORS[profile.rank].split(' ')[0]} drop-shadow-[0_0_20px_currentColor]`}>
+                      {profile.rank}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="flex flex-wrap items-center gap-6 md:gap-10">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Level</span>
+                    <div className="flex items-center gap-2">
+                      <Zap size={14} className="text-sky-500 opacity-50" />
+                      <span className="font-game text-2xl text-glow-cyan">{profile.level}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Gold</span>
+                    <div className="flex items-center gap-2">
+                      <Coins size={14} className="text-orange-500 opacity-50" />
+                      <span className="font-game text-2xl text-orange-400">{profile.gold.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Streak</span>
+                    <div className="flex items-center gap-2">
+                      <Flame size={14} className={`${getCurrentStreakTier(profile.dailyStreak || 0).color} opacity-50`} />
+                      <span className={`font-game text-2xl ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
+                        {profile.dailyStreak || 0}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-1 ml-auto md:ml-4">
+                    <button onClick={() => setIsEditingProfile(true)} className="p-2 text-slate-600 hover:text-sky-400 transition-colors">
+                      <Settings size={18} />
+                    </button>
+                    <button onClick={handleLogout} className="p-2 text-slate-600 hover:text-red-400 transition-colors">
+                      <LogOut size={18} />
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-0.5 h-4 bg-cyan-500"></div>
-                  <h1 className="font-game text-xl md:text-2xl text-white tracking-widest leading-none uppercase truncate">
-                    {profile.name}
-                  </h1>
+              {/* Bottom Row: Sync Bar */}
+              <div className="mt-auto pt-4 md:pt-2">
+                <div className="h-3 rounded-full border border-sky-500/50 relative overflow-hidden p-[2px] shadow-[0_0_5px_rgba(56,189,248,0.3)]">
+                  <div
+                    className={`h-full rounded-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]'}`}
+                    style={{ width: `${xpPercentage}%` }}
+                  />
                 </div>
-                <span className="text-[9px] font-game text-slate-500 uppercase tracking-[0.2em] ml-2.5">
-                  {profile.title}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-6 md:gap-10">
-              <div className="flex flex-col">
-                <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Level</span>
-                <div className="flex items-center gap-2">
-                  <Zap size={12} className="text-cyan-500 opacity-50" />
-                  <span className="font-game text-xl text-white neon-text-cyan-strong">{profile.level}</span>
+                <div className="flex justify-between mt-1.5 opacity-70">
+                  <span className="font-game text-[9px] text-slate-400 tracking-widest uppercase">Sync_Protocol_v1.2</span>
+                  <span className="font-game text-[9px] text-slate-300 tracking-widest uppercase font-bold">{profile.xp.toLocaleString()} / {profile.maxXp.toLocaleString()} XP</span>
                 </div>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Gold</span>
-                <div className="flex items-center gap-2">
-                  <Coins size={12} className="text-orange-500 opacity-50" />
-                  <span className="font-game text-xl text-orange-400">{profile.gold.toLocaleString()}</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                <span className="text-[9px] font-game text-slate-600 uppercase tracking-widest mb-1">Streak</span>
-                <div className="flex items-center gap-2">
-                  <Flame size={12} className={`${getCurrentStreakTier(profile.dailyStreak || 0).color} opacity-50`} />
-                  <span className={`font-game text-xl ${getCurrentStreakTier(profile.dailyStreak || 0).color}`}>
-                    {profile.dailyStreak || 0}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-1 ml-auto md:ml-4">
-                <button onClick={() => setIsEditingProfile(true)} className="p-2 text-slate-600 hover:text-cyan-400 transition-colors">
-                  <Settings size={16} />
-                </button>
-                <button onClick={handleLogout} className="p-2 text-slate-600 hover:text-red-400 transition-colors">
-                  <LogOut size={16} />
-                </button>
               </div>
             </div>
           </div>
-
-          <div className="mt-6">
-            <div className="h-1 bg-white/5 relative overflow-hidden">
-              <div
-                className={`h-full transition-all duration-[1.5s] ease-[cubic-bezier(0.19,1,0.22,1)] ${profile.isPenaltyZoneActive ? 'bg-red-600' : 'bg-cyan-500'}`}
-                style={{ width: `${xpPercentage}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-1.5 opacity-70">
-              <span className="font-game text-[9px] text-slate-400 tracking-widest uppercase">Sync_Protocol_v1.2</span>
-              <span className="font-game text-[9px] text-slate-300 tracking-widest uppercase font-bold">{profile.xp.toLocaleString()} / {profile.maxXp.toLocaleString()} XP</span>
-            </div>
-          </div>
-        </div>
       </header>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-[60] safe-area-bottom bg-black/95 backdrop-blur-xl border-t border-white/5">
+      <nav className="fixed bottom-0 left-0 right-0 z-[60] safe-area-bottom bg-[rgba(5,17,28,0.95)] border-t border-sky-500/20">
         <div className="max-w-[1024px] mx-auto grid grid-cols-5 gap-0 px-2 py-4">
           <button
             onClick={() => setActiveTab('quests')}
@@ -1608,13 +1608,13 @@ const App: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('status')}
-            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-cyan-400' : 'text-slate-600 hover:text-slate-400'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative group ${activeTab === 'status' ? 'text-sky-400' : 'text-slate-600 hover:text-slate-400'}`}
           >
             <div className="p-1 transition-all duration-500">
               <Monitor size={20} className={activeTab === 'status' ? 'drop-shadow-[0_0_8px_currentColor]' : 'opacity-70'} />
             </div>
             <span className="font-game text-[8px] tracking-[0.05em] uppercase font-bold">Status</span>
-            {activeTab === 'status' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-cyan-400"></div>}
+            {activeTab === 'status' && <div className="absolute -top-[17px] left-1/2 -translate-x-1/2 w-6 h-[1.5px] bg-sky-400"></div>}
           </button>
 
           <button
@@ -1652,7 +1652,8 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      <main className="max-w-[1024px] mx-auto px-4 md:px-6 pb-32 pt-4 relative">
+      {/* Replaced <main> container to just flex-1 w-full without horizontal padding because it's in the wrapper */}
+      <main className="w-full pb-32 relative flex-1">
         {/* Floating Messages HUD */}
         <div className="fixed top-24 left-4 z-[55] pointer-events-none">
           <button 
@@ -1716,7 +1717,7 @@ const App: React.FC = () => {
                   return false;
                 });
                 setQuests([...newOrder, ...inactive, ...completedOrFailed]);
-              }} className="space-y-4">
+              }} className="space-y-4 w-full p-0 m-0 list-none">
                 {quests.filter(q => {
                   if (q.completed || q.failed) return false;
                   if (q.isScheduled && q.repeatDays) {
@@ -1900,6 +1901,7 @@ const App: React.FC = () => {
           )}
         </div>
       </main>
+      </div>
 
       {/* Modal de Criação / Edição */}
       {questForm.isOpen && (
