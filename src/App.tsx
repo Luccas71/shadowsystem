@@ -1831,7 +1831,7 @@ const App: React.FC = () => {
             <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
               <Store
                 gold={profile.gold}
-                items={storeItems}
+                items={storeItems.filter(i => !i.origin)}
                 onAddItem={handleAddItem}
                 onRemoveItem={handleRemoveItem}
                 onPurchaseItem={i => {
