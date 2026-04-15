@@ -95,6 +95,16 @@ const INITIAL_PROFILE: HunterProfile = {
 const XP_DROP_THRESHOLD = 50000;
 const PENALTY_DURATION = 12 * 3600000; // 12 Horas em ms
 
+// Ordem de rank para ordenação (menor = mais alto)
+const DIFFICULTY_ORDER: Record<QuestDifficulty, number> = {
+  [QuestDifficulty.S]: 0,
+  [QuestDifficulty.A]: 1,
+  [QuestDifficulty.B]: 2,
+  [QuestDifficulty.C]: 3,
+  [QuestDifficulty.D]: 4,
+  [QuestDifficulty.E]: 5,
+};
+
 const DraggableQuestItem: React.FC<{ quest: Quest; children: React.ReactNode }> = ({ quest, children }) => {
   const controls = useDragControls();
   const pressTimer = React.useRef<NodeJS.Timeout | null>(null);
@@ -1707,7 +1717,7 @@ const App: React.FC = () => {
                   return q.repeatDays.includes(new Date().getDay());
                 }
                 return true;
-              })} onReorder={(newOrder) => {
+              }).sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty])} onReorder={(newOrder) => {
                 const completedOrFailed = quests.filter(q => q.completed || q.failed);
                 const inactive = quests.filter(q => {
                   if (q.completed || q.failed) return false;
@@ -1724,7 +1734,7 @@ const App: React.FC = () => {
                     return q.repeatDays.includes(new Date().getDay());
                   }
                   return true;
-                }).map(q => (
+                }).sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]).map(q => (
                   <DraggableQuestItem key={q.id} quest={q}>
                     <QuestCard
                       quest={q}
@@ -1768,7 +1778,7 @@ const App: React.FC = () => {
                           return !q.repeatDays.includes(new Date().getDay());
                         }
                         return false;
-                      }).map(q => (
+                      }).sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]).map(q => (
                         <QuestCard
                           key={q.id}
                           quest={q}
@@ -1806,7 +1816,7 @@ const App: React.FC = () => {
                       const completedDate = new Date(q.completedAt).toDateString();
                       return today === completedDate;
                     })
-                      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0))
+                      .sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty] || (b.completedAt || 0) - (a.completedAt || 0))
                       .map(q => (
                         <QuestCard
                           key={q.id}
