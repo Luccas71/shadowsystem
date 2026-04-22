@@ -117,23 +117,19 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
              <div className="flex flex-col items-start gap-1">
                <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                  <Dumbbell size={28} />
-                 <span className="font-sans text-xl font-medium tracking-wider">STR: {profile.allocatedStats?.strength || 0}</span>
+                 <div className="flex items-center gap-3">
+                   <span className="font-sans text-xl font-medium tracking-wider">STR: {str.total}</span>
+                   {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                     <button onClick={() => onAllocateStat('strength')} className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                       <Plus size={14} />
+                     </button>
+                   )}
+                 </div>
                </div>
                <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
-                 <span className="text-emerald-400 font-bold mr-1">+{((str.base + str.bonus) * 1).toFixed(1)}%</span> 
+                 <span className="text-emerald-400 font-bold mr-1">+{((str.total) * 1).toFixed(1)}%</span> 
                  | +1% DE OURO GANHO POR PONTO
                </span>
-             </div>
-             <div className="flex items-center gap-4">
-               <div className="flex flex-col items-end">
-                 <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{str.base}</span>
-                 {str.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{str.bonus} bônus</span>}
-               </div>
-               {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
-                 <button onClick={() => onAllocateStat('strength')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
-                   <Plus size={16} />
-                 </button>
-               )}
              </div>
           </div>
           
@@ -142,23 +138,19 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
              <div className="flex flex-col items-start gap-1">
                <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                  <Wind size={28} />
-                 <span className="font-sans text-xl font-medium tracking-wider">AGI: {profile.allocatedStats?.agility || 0}</span>
+                 <div className="flex items-center gap-3">
+                   <span className="font-sans text-xl font-medium tracking-wider">AGI: {agi.total}</span>
+                   {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                     <button onClick={() => onAllocateStat('agility')} className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                       <Plus size={14} />
+                     </button>
+                   )}
+                 </div>
                </div>
                <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
-                 <span className="text-emerald-400 font-bold mr-1">-{((agi.base + agi.bonus) * 0.5).toFixed(1)}%</span> 
+                 <span className="text-emerald-400 font-bold mr-1">-{((agi.total) * 0.5).toFixed(1)}%</span> 
                  | -0.5% DE CUSTO NA LOJA POR PONTO
                </span>
-             </div>
-             <div className="flex items-center gap-4">
-               <div className="flex flex-col items-end">
-                 <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{agi.base}</span>
-                 {agi.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{agi.bonus} bônus</span>}
-               </div>
-               {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
-                 <button onClick={() => onAllocateStat('agility')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
-                   <Plus size={16} />
-                 </button>
-               )}
              </div>
           </div>
 
@@ -167,23 +159,19 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
              <div className="flex flex-col items-start gap-1">
                <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                  <Eye size={28} />
-                 <span className="font-sans text-xl font-medium tracking-wider">PER: {profile.allocatedStats?.sense || 0}</span>
+                 <div className="flex items-center gap-3">
+                   <span className="font-sans text-xl font-medium tracking-wider">PER: {per.total}</span>
+                   {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                     <button onClick={() => onAllocateStat('sense')} className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                       <Plus size={14} />
+                     </button>
+                   )}
+                 </div>
                </div>
                <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
-                 <span className="text-emerald-400 font-bold mr-1">+{((per.base + per.bonus) * 0.5).toFixed(1)}%</span> 
+                 <span className="text-emerald-400 font-bold mr-1">+{((per.total) * 0.5).toFixed(1)}%</span> 
                  | +0.5% DE CHANCE DE DROP POR PONTO
                </span>
-             </div>
-             <div className="flex items-center gap-4">
-               <div className="flex flex-col items-end">
-                 <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{per.base}</span>
-                 {per.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{per.bonus} bônus</span>}
-               </div>
-               {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
-                 <button onClick={() => onAllocateStat('sense')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
-                   <Plus size={16} />
-                 </button>
-               )}
              </div>
           </div>
         </div>
@@ -196,23 +184,19 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
                <div className="flex flex-col items-start gap-1">
                  <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                    <Heart size={28} />
-                   <span className="font-sans text-xl font-medium tracking-wider">VIT: {profile.allocatedStats?.vitality || 0}</span>
+                   <div className="flex items-center gap-3">
+                     <span className="font-sans text-xl font-medium tracking-wider">VIT: {vit.total}</span>
+                     {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                       <button onClick={() => onAllocateStat('vitality')} className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                         <Plus size={14} />
+                       </button>
+                     )}
+                   </div>
                  </div>
                  <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
-                   <span className="text-emerald-400 font-bold mr-1">-{((vit.base + vit.bonus) * 0.5).toFixed(1)}%</span> 
+                   <span className="text-emerald-400 font-bold mr-1">-{((vit.total) * 0.5).toFixed(1)}%</span> 
                    | -0.5% DE CORRUPÇÃO GANHA POR PONTO
                  </span>
-               </div>
-               <div className="flex items-center gap-4">
-                 <div className="flex flex-col items-end">
-                   <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{vit.base}</span>
-                   {vit.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{vit.bonus} bônus</span>}
-                 </div>
-                 {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
-                   <button onClick={() => onAllocateStat('vitality')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
-                     <Plus size={16} />
-                   </button>
-                 )}
                </div>
             </div>
 
@@ -221,23 +205,19 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
                <div className="flex flex-col items-start gap-1">
                  <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                    <Brain size={28} />
-                   <span className="font-sans text-xl font-medium tracking-wider">INT: {profile.allocatedStats?.intelligence || 0}</span>
+                   <div className="flex items-center gap-3">
+                     <span className="font-sans text-xl font-medium tracking-wider">INT: {int.total}</span>
+                     {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                       <button onClick={() => onAllocateStat('intelligence')} className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                         <Plus size={14} />
+                       </button>
+                     )}
+                   </div>
                  </div>
                  <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
-                   <span className="text-emerald-400 font-bold mr-1">+{((int.base + int.bonus) * 1).toFixed(1)}%</span> 
+                   <span className="text-emerald-400 font-bold mr-1">+{((int.total) * 1).toFixed(1)}%</span> 
                    | +1% DE XP GANHA POR PONTO
                  </span>
-               </div>
-               <div className="flex items-center gap-4">
-                 <div className="flex flex-col items-end">
-                   <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{int.base}</span>
-                   {int.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{int.bonus} bônus</span>}
-                 </div>
-                 {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
-                   <button onClick={() => onAllocateStat('intelligence')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
-                     <Plus size={16} />
-                 </button>
-                 )}
                </div>
             </div>
           </div>
@@ -259,20 +239,23 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
 
 const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact, onAllocateStat }) => {
   const rankProgression = [
-    { rank: Rank.E, minLevel: 1, maxLevel: 19, label: 'CAÇADOR RANK E' },
-    { rank: Rank.D, minLevel: 20, maxLevel: 39, label: 'CAÇADOR DESPERTO' },
-    { rank: Rank.C, minLevel: 40, maxLevel: 59, label: 'MEMBRO DE ELITE' },
-    { rank: Rank.B, minLevel: 60, maxLevel: 79, label: 'CAÇADOR DE ALTO NÍVEL' },
-    { rank: Rank.A, minLevel: 80, maxLevel: 99, label: 'REI DOS CAÇADORES' },
-    { rank: Rank.S, minLevel: 100, maxLevel: 999, label: 'MONARCA DAS SOMBRAS' },
+    { rank: Rank.E, minLevel: 1, maxLevel: 14, label: 'CAÇADOR INICIANTE' },
+    { rank: Rank.D, minLevel: 15, maxLevel: 29, label: 'CAÇADOR DESPERTO' },
+    { rank: Rank.C, minLevel: 30, maxLevel: 44, label: 'MEMBRO DE ELITE' },
+    { rank: Rank.B, minLevel: 45, maxLevel: 59, label: 'CAÇADOR DE ALTO NÍVEL' },
+    { rank: Rank.A, minLevel: 60, maxLevel: 74, label: 'REI DOS CAÇADORES' },
+    { rank: Rank.S, minLevel: 75, maxLevel: 999, label: 'MONARCA DAS SOMBRAS' },
   ];
 
   const XP_DROP_THRESHOLD = 50000;
   
   const currentRankIdx = rankProgression.findIndex(r => r.rank === profile.rank);
   const nextRank = rankProgression[currentRankIdx + 1];
+  
+  // Lógica de progresso: (Nível Atual - Nível Mínimo + fração de XP) / (Nível Mínimo Próximo - Nível Mínimo)
+  const xpFraction = profile.xp / profile.maxXp;
   const rankProgress = nextRank 
-    ? ((profile.level - (rankProgression[currentRankIdx].minLevel)) / (nextRank.minLevel - rankProgression[currentRankIdx].minLevel)) * 100 
+    ? (((profile.level - (rankProgression[currentRankIdx].minLevel)) + xpFraction) / (nextRank.minLevel - rankProgression[currentRankIdx].minLevel)) * 100 
     : 100;
 
   const rareDropProgress = ((profile.totalXpGained || 0) % XP_DROP_THRESHOLD) / XP_DROP_THRESHOLD * 100;
