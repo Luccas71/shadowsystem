@@ -44,12 +44,12 @@ export const getStreakMultiplier = (streak: number) => {
 
 // Valores base sem o buff de 15%
 export const DIFFICULTY_XP: Record<QuestDifficulty, number> = {
-  [QuestDifficulty.E]: 500,
-  [QuestDifficulty.D]: 1500,
-  [QuestDifficulty.C]: 4800,
-  [QuestDifficulty.B]: 12500,
-  [QuestDifficulty.A]: 38000,
-  [QuestDifficulty.S]: 110000,
+  [QuestDifficulty.E]: 650,
+  [QuestDifficulty.D]: 2000,
+  [QuestDifficulty.C]: 6000,
+  [QuestDifficulty.B]: 16000,
+  [QuestDifficulty.A]: 50000,
+  [QuestDifficulty.S]: 150000,
 };
 
 // Valores base sem o buff de 15%
@@ -76,15 +76,24 @@ export const DIFFICULTY_PENALTY: Record<QuestDifficulty, number> = {
  * f(x) = 1000x + 60x^2
  */
 export const calculateMaxXp = (level: number) => {
-  return Math.floor(600 * level + 30 * Math.pow(level, 2));
+  return Math.floor(700 * level + 45 * Math.pow(level, 2));
 };
 
+export const RANK_PROGRESSION_CONFIG = [
+  { rank: Rank.E, minLevel: 1, maxLevel: 19, label: 'CAÇADOR INICIANTE' },
+  { rank: Rank.D, minLevel: 20, maxLevel: 39, label: 'CAÇADOR DESPERTO' },
+  { rank: Rank.C, minLevel: 40, maxLevel: 59, label: 'MEMBRO DE ELITE' },
+  { rank: Rank.B, minLevel: 60, maxLevel: 79, label: 'CAÇADOR DE ALTO NÍVEL' },
+  { rank: Rank.A, minLevel: 80, maxLevel: 99, label: 'REI DOS CAÇADORES' },
+  { rank: Rank.S, minLevel: 100, maxLevel: 999, label: 'MONARCA DAS SOMBRAS' },
+];
+
 export const getRankByLevel = (level: number): Rank => {
-  if (level >= 75) return Rank.S;
-  if (level >= 60) return Rank.A;
-  if (level >= 45) return Rank.B;
-  if (level >= 30) return Rank.C;
-  if (level >= 15) return Rank.D;
+  if (level >= 100) return Rank.S;
+  if (level >= 80) return Rank.A;
+  if (level >= 60) return Rank.B;
+  if (level >= 40) return Rank.C;
+  if (level >= 20) return Rank.D;
   return Rank.E;
 };
 

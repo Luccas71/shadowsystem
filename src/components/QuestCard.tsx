@@ -246,10 +246,16 @@ const QuestCard: React.FC<QuestCardProps> = ({
             </p>
 
             <div className="flex items-center gap-6 pt-2">
-              <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-slate-400">
-                 <Flame size={12} className={!quest.completed && !quest.failed ? colors.flameIcon : 'text-slate-700'} />
-                 <span>{quest.xpReward.toLocaleString()}</span>
+              <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-slate-400 group/xp">
+                 <div className="relative">
+                   <Flame size={12} className={!quest.completed && !quest.failed ? `${colors.flameIcon} animate-pulse` : 'text-slate-700'} />
+                   {!quest.completed && !quest.failed && <div className={`absolute inset-0 blur-sm bg-current opacity-20 animate-ping ${colors.flameIcon}`}></div>}
+                 </div>
+                 <span className={!quest.completed && !quest.failed ? "text-glow-cyan" : ""}>{quest.xpReward.toLocaleString()}</span>
                  <span className="opacity-40 text-[9px]">XP</span>
+                 {!quest.completed && !quest.failed && (
+                   <span className="ml-1 text-[7px] bg-cyan-500/10 text-cyan-400 px-1 border border-cyan-500/30 rounded-[2px] animate-pulse">SISTEMA+</span>
+                 )}
               </div>
 
               <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-amber-500/80">

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { HunterProfile, Rank, Quest, HunterStats } from '../types';
-import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier, getRankBenefits } from '../constants';
+import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier, getRankBenefits, RANK_PROGRESSION_CONFIG } from '../constants';
 import {
   Sparkles,
   Clock,
@@ -238,16 +238,7 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (st
 };
 
 const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact, onAllocateStat }) => {
-  const rankProgression = [
-    { rank: Rank.E, minLevel: 1, maxLevel: 14, label: 'CAÇADOR INICIANTE' },
-    { rank: Rank.D, minLevel: 15, maxLevel: 29, label: 'CAÇADOR DESPERTO' },
-    { rank: Rank.C, minLevel: 30, maxLevel: 44, label: 'MEMBRO DE ELITE' },
-    { rank: Rank.B, minLevel: 45, maxLevel: 59, label: 'CAÇADOR DE ALTO NÍVEL' },
-    { rank: Rank.A, minLevel: 60, maxLevel: 74, label: 'REI DOS CAÇADORES' },
-    { rank: Rank.S, minLevel: 75, maxLevel: 999, label: 'MONARCA DAS SOMBRAS' },
-  ];
-
-  const XP_DROP_THRESHOLD = 50000;
+  const rankProgression = RANK_PROGRESSION_CONFIG;
   
   const currentRankIdx = rankProgression.findIndex(r => r.rank === profile.rank);
   const nextRank = rankProgression[currentRankIdx + 1];
