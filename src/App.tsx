@@ -25,7 +25,8 @@ import {
   STREAK_TIERS,
   getCurrentStreakTier,
   getStreakMultiplier,
-  calculateQuestRewards
+  calculateQuestRewards,
+  XP_DROP_THRESHOLD
 } from './constants';
 import QuestCard from './components/QuestCard';
 import ProfileEditor from './components/ProfileEditor';
@@ -94,7 +95,6 @@ const INITIAL_PROFILE: HunterProfile = {
   fragilityHistory: []
 };
 
-const XP_DROP_THRESHOLD = 50000;
 const PENALTY_DURATION = 12 * 3600000; // 12 Horas em ms
 
 // Ordem de rank para ordenação (menor = mais alto)

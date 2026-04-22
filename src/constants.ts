@@ -1,6 +1,8 @@
 
 import { Rank, QuestDifficulty, StoreItem, ItemRarity, HunterStats, DetailedStat } from './types';
 
+export const XP_DROP_THRESHOLD = 50000;
+
 export const RANK_COLORS: Record<Rank, string> = {
   [Rank.E]: 'text-slate-500 border-slate-500',
   [Rank.D]: 'text-teal-400 border-teal-500/50',

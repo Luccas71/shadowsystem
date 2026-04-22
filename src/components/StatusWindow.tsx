@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { HunterProfile, Rank, Quest, HunterStats } from '../types';
-import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier, getRankBenefits, RANK_PROGRESSION_CONFIG } from '../constants';
+import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier, getRankBenefits, RANK_PROGRESSION_CONFIG, XP_DROP_THRESHOLD } from '../constants';
 import {
   Sparkles,
   Clock,
