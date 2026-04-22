@@ -1,5 +1,5 @@
 
-import { Rank, QuestDifficulty, StoreItem, ItemRarity } from './types';
+import { Rank, QuestDifficulty, StoreItem, ItemRarity, HunterStats, DetailedStat } from './types';
 
 export const RANK_COLORS: Record<Rank, string> = {
   [Rank.E]: 'text-slate-500 border-slate-500',
@@ -76,27 +76,171 @@ export const DIFFICULTY_PENALTY: Record<QuestDifficulty, number> = {
  * f(x) = 1000x + 60x^2
  */
 export const calculateMaxXp = (level: number) => {
-  return Math.floor(1000 * level + 60 * Math.pow(level, 2));
+  return Math.floor(800 * level + 40 * Math.pow(level, 2));
 };
 
 export const getRankByLevel = (level: number): Rank => {
-  if (level >= 100) return Rank.S;
-  if (level >= 80) return Rank.A;
-  if (level >= 60) return Rank.B;
-  if (level >= 40) return Rank.C;
-  if (level >= 20) return Rank.D;
+  if (level >= 75) return Rank.S;
+  if (level >= 60) return Rank.A;
+  if (level >= 45) return Rank.B;
+  if (level >= 30) return Rank.C;
+  if (level >= 15) return Rank.D;
   return Rank.E;
 };
 
-export const calculateStats = (level: number) => {
-  const base = 10;
-  const growth = 1.2; // Retorno ao crescimento padrão
+// ─── RANK BENEFITS SYSTEM ─────────────────────────────────────────────
+
+export interface RankBenefits {
+  label: string;
+  xpMultiplier: number;       // 1.0 = no bonus, 1.05 = +5%
+  goldMultiplier: number;
+  corruptionReduction: number; // 0 = no reduction, 0.05 = -5%
+  maxDailyDrops: number;
+  shopDiscount: number;        // 0 = no discount, 0.05 = -5%
+  penaltyDurationReduction: number; // 0 = no reduction, 0.15 = -15%
+  statBonus: number;           // 0 = no bonus, 0.05 = +5%
+  rareDropThreshold: number;   // XP needed for rare drop
+  passiveGoldPerQuest: number; // Flat gold bonus per quest
+  corruptionRegen: number;     // Passive corruption regen per cycle (0 = none)
+  immunities: string[];        // Penalty types immune to
+  doubleDropChance: boolean;   // Whether drop chances are doubled
+  streakFreeze: boolean;       // Whether streak freezes instead of breaking
+  streakSafeguard: boolean;    // Whether streak is never zeroed (rank B+)
+}
+
+export const RANK_BENEFITS: Record<Rank, RankBenefits> = {
+  [Rank.E]: {
+    label: 'CAÇADOR INICIANTE',
+    xpMultiplier: 1.0,
+    goldMultiplier: 1.0,
+    corruptionReduction: 0,
+    maxDailyDrops: 2,
+    shopDiscount: 0,
+    penaltyDurationReduction: 0,
+    statBonus: 0,
+    rareDropThreshold: 50000,
+    passiveGoldPerQuest: 0,
+    corruptionRegen: 0,
+    immunities: [],
+    doubleDropChance: false,
+    streakFreeze: false,
+    streakSafeguard: false,
+  },
+  [Rank.D]: {
+    label: 'CAÇADOR DESPERTO',
+    xpMultiplier: 1.05,
+    goldMultiplier: 1.05,
+    corruptionReduction: 0.05,
+    maxDailyDrops: 3,
+    shopDiscount: 0,
+    penaltyDurationReduction: 0,
+    statBonus: 0.05,
+    rareDropThreshold: 50000,
+    passiveGoldPerQuest: 0,
+    corruptionRegen: 0,
+    immunities: [],
+    doubleDropChance: false,
+    streakFreeze: true,
+    streakSafeguard: false,
+  },
+  [Rank.C]: {
+    label: 'MEMBRO DE ELITE',
+    xpMultiplier: 1.10,
+    goldMultiplier: 1.10,
+    corruptionReduction: 0.10,
+    maxDailyDrops: 4,
+    shopDiscount: 0.05,
+    penaltyDurationReduction: 0.15,
+    statBonus: 0.10,
+    rareDropThreshold: 40000,
+    passiveGoldPerQuest: 0,
+    corruptionRegen: 0,
+    immunities: [],
+    doubleDropChance: false,
+    streakFreeze: true,
+    streakSafeguard: false,
+  },
+  [Rank.B]: {
+    label: 'CAÇADOR DE ALTO NÍVEL',
+    xpMultiplier: 1.15,
+    goldMultiplier: 1.20,
+    corruptionReduction: 0.15,
+    maxDailyDrops: 5,
+    shopDiscount: 0.10,
+    penaltyDurationReduction: 0.25,
+    statBonus: 0.15,
+    rareDropThreshold: 35000,
+    passiveGoldPerQuest: 50,
+    corruptionRegen: 0,
+    immunities: [],
+    doubleDropChance: false,
+    streakFreeze: true,
+    streakSafeguard: true,
+  },
+  [Rank.A]: {
+    label: 'REI DOS CAÇADORES',
+    xpMultiplier: 1.25,
+    goldMultiplier: 1.30,
+    corruptionReduction: 0.25,
+    maxDailyDrops: 6,
+    shopDiscount: 0.15,
+    penaltyDurationReduction: 0.40,
+    statBonus: 0.20,
+    rareDropThreshold: 30000,
+    passiveGoldPerQuest: 150,
+    corruptionRegen: 2,
+    immunities: ['block_rewards'],
+    doubleDropChance: false,
+    streakFreeze: true,
+    streakSafeguard: true,
+  },
+  [Rank.S]: {
+    label: 'MONARCA DAS SOMBRAS',
+    xpMultiplier: 1.35,
+    goldMultiplier: 1.40,
+    corruptionReduction: 0.35,
+    maxDailyDrops: 8,
+    shopDiscount: 0.20,
+    penaltyDurationReduction: 0.50,
+    statBonus: 0.30,
+    rareDropThreshold: 25000,
+    passiveGoldPerQuest: 300,
+    corruptionRegen: 5,
+    immunities: ['block_rewards', 'corruption_spike'],
+    doubleDropChance: true,
+    streakFreeze: true,
+    streakSafeguard: true,
+  },
+};
+
+export const getRankBenefits = (rank: Rank): RankBenefits => RANK_BENEFITS[rank];
+
+// ─── STATS CALCULATION ────────────────────────────────────────────────
+
+export const calculateStats = (
+  level: number, 
+  allocatedStats: { strength: number; agility: number; vitality: number; intelligence: number; sense: number } = { strength: 0, agility: 0, vitality: 0, intelligence: 0, sense: 0 }
+): HunterStats => {
+  const baseValue = level;
+  const rank = getRankByLevel(level);
+  const rankBonusMultiplier = RANK_BENEFITS[rank].statBonus;
+
+  const buildDetailedStat = (base: number, allocated: number): DetailedStat => {
+    const rawTotal = base + allocated;
+    const rankBonus = Math.floor(rawTotal * rankBonusMultiplier);
+    return {
+      base: rawTotal,
+      bonus: rankBonus,
+      total: rawTotal + rankBonus
+    };
+  };
+
   return {
-    strength: Math.floor(base + level * growth),
-    agility: Math.floor(base + level * growth),
-    vitality: Math.floor(base + level * growth),
-    intelligence: Math.floor(base + level * growth),
-    sense: Math.floor(base + level * growth),
+    strength: buildDetailedStat(baseValue, allocatedStats.strength),
+    agility: buildDetailedStat(baseValue, allocatedStats.agility),
+    vitality: buildDetailedStat(baseValue, allocatedStats.vitality),
+    intelligence: buildDetailedStat(baseValue, allocatedStats.intelligence),
+    sense: buildDetailedStat(baseValue, allocatedStats.sense),
   };
 };
 
@@ -260,5 +404,45 @@ export const DEFAULT_STORE_ITEMS: StoreItem[] = [
     cost: 60000,
     purchasedCount: 0,
     rarity: ItemRarity.MÍTICO
+  },
+  {
+    id: 'elixir-str',
+    name: 'Elixir da Força',
+    description: 'Aumenta permanentemente sua FORÇA base em +1 ponto.',
+    cost: 10000,
+    purchasedCount: 0,
+    rarity: ItemRarity.ÉPICO
+  },
+  {
+    id: 'elixir-agi',
+    name: 'Elixir da Agilidade',
+    description: 'Aumenta permanentemente sua AGILIDADE base em +1 ponto.',
+    cost: 10000,
+    purchasedCount: 0,
+    rarity: ItemRarity.ÉPICO
+  },
+  {
+    id: 'elixir-vit',
+    name: 'Elixir da Vitalidade',
+    description: 'Aumenta permanentemente sua VITALIDADE base em +1 ponto.',
+    cost: 10000,
+    purchasedCount: 0,
+    rarity: ItemRarity.ÉPICO
+  },
+  {
+    id: 'elixir-int',
+    name: 'Elixir da Inteligência',
+    description: 'Aumenta permanentemente sua INTELIGÊNCIA base em +1 ponto.',
+    cost: 10000,
+    purchasedCount: 0,
+    rarity: ItemRarity.ÉPICO
+  },
+  {
+    id: 'elixir-per',
+    name: 'Elixir da Percepção',
+    description: 'Aumenta permanentemente sua PERCEPÇÃO base em +1 ponto.',
+    cost: 10000,
+    purchasedCount: 0,
+    rarity: ItemRarity.ÉPICO
   }
 ];

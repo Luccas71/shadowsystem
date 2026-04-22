@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Rank } from '../types';
+import { getRankBenefits } from '../constants';
 import { Shield, Sparkles, Trophy, Skull, Zap, Target, ChevronRight } from 'lucide-react';
 
 interface RankUpOverlayProps {
@@ -22,7 +23,7 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
         const closeTimer = setTimeout(() => {
             setShow(false);
             setTimeout(onComplete, 500);
-        }, 4000);
+        }, 6000);
 
         return () => {
           clearTimeout(impactTimer);
@@ -72,6 +73,41 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
     };
 
     const config = getRankConfig(newRank);
+    const benefits = getRankBenefits(newRank);
+    const oldBenefits = getRankBenefits(oldRank);
+
+    // Build list of NEW benefits (delta from old rank)
+    const newPerks: string[] = [];
+    if (benefits.xpMultiplier > oldBenefits.xpMultiplier)
+      newPerks.push(`XP +${Math.round((benefits.xpMultiplier - 1) * 100)}%`);
+    if (benefits.goldMultiplier > oldBenefits.goldMultiplier)
+      newPerks.push(`OURO +${Math.round((benefits.goldMultiplier - 1) * 100)}%`);
+    if (benefits.corruptionReduction > oldBenefits.corruptionReduction)
+      newPerks.push(`CORRUPÇÃO -${Math.round(benefits.corruptionReduction * 100)}%`);
+    if (benefits.maxDailyDrops > oldBenefits.maxDailyDrops)
+      newPerks.push(`DROPS DIÁRIOS: ${benefits.maxDailyDrops}`);
+    if (benefits.shopDiscount > oldBenefits.shopDiscount)
+      newPerks.push(`LOJA -${Math.round(benefits.shopDiscount * 100)}%`);
+    if (benefits.statBonus > oldBenefits.statBonus)
+      newPerks.push(`STATS +${Math.round(benefits.statBonus * 100)}%`);
+    if (benefits.penaltyDurationReduction > oldBenefits.penaltyDurationReduction)
+      newPerks.push(`PENALIDADE -${Math.round(benefits.penaltyDurationReduction * 100)}%`);
+    if (benefits.passiveGoldPerQuest > oldBenefits.passiveGoldPerQuest)
+      newPerks.push(`OURO PASSIVO +${benefits.passiveGoldPerQuest}/QUEST`);
+    if (benefits.rareDropThreshold < oldBenefits.rareDropThreshold)
+      newPerks.push(`DROP RARO A CADA ${(benefits.rareDropThreshold / 1000).toFixed(0)}K XP`);
+    if (benefits.corruptionRegen > oldBenefits.corruptionRegen)
+      newPerks.push(`REGEN SINCRONIA -${benefits.corruptionRegen}%/CICLO`);
+    if (benefits.streakSafeguard && !oldBenefits.streakSafeguard)
+      newPerks.push('SALVAGUARDA DE OFENSIVA');
+    if (benefits.streakFreeze && !oldBenefits.streakFreeze)
+      newPerks.push('CONGELAMENTO DE OFENSIVA');
+    benefits.immunities.forEach(imm => {
+      if (!oldBenefits.immunities.includes(imm))
+        newPerks.push(`IMUNIDADE: ${imm.replace('_', ' ').toUpperCase()}`);
+    });
+    if (benefits.doubleDropChance && !oldBenefits.doubleDropChance)
+      newPerks.push('CHANCE DE DROP DOBRADA');
 
     return (
         <AnimatePresence>
@@ -103,7 +139,7 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
                         initial={{ scale: 0.5, opacity: 0, rotate: -20 }}
                         animate={{ scale: 1, opacity: 1, rotate: 0 }}
                         transition={{ duration: 0.8, type: "spring", damping: 12, stiffness: 100 }}
-                        className="relative flex flex-col items-center gap-12"
+                        className="relative flex flex-col items-center gap-8"
                     >
                         {/* Círculo de Despertar */}
                         <div className="relative">
@@ -126,7 +162,7 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
                                 initial={{ rotate: 180, scale: 0 }}
                                 animate={{ rotate: 0, scale: 1 }}
                                 transition={{ delay: 0.3, duration: 1, type: "spring" }}
-                                className={`w-72 h-72 flex items-center justify-center bg-black border-4 ${config.border} rounded-full z-10 relative ${config.shadow}`}
+                                className={`w-56 h-56 md:w-72 md:h-72 flex items-center justify-center bg-black border-4 ${config.border} rounded-full z-10 relative ${config.shadow}`}
                             >
                                 <div style={{ color: config.color }} className="drop-shadow-[0_0_30px_currentColor]">
                                     {config.icon}
@@ -202,11 +238,39 @@ const RankUpOverlay: React.FC<RankUpOverlayProps> = ({ oldRank, newRank, onCompl
                             </div>
                         </div>
 
+                        {/* Novos Benefícios Desbloqueados */}
+                        {newPerks.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 2.5 }}
+                            className="w-full max-w-md px-6"
+                          >
+                            <div className={`border ${config.border} ${config.bg} backdrop-blur-md p-4 space-y-2`}>
+                              <div className="font-game text-[10px] text-white/60 uppercase tracking-[0.3em] text-center mb-3">
+                                ▸ NOVOS PRIVILÉGIOS DESBLOQUEADOS ▸
+                              </div>
+                              {newPerks.map((perk, i) => (
+                                <motion.div
+                                  key={i}
+                                  initial={{ x: -20, opacity: 0 }}
+                                  animate={{ x: 0, opacity: 1 }}
+                                  transition={{ delay: 2.8 + i * 0.15 }}
+                                  className="flex items-center gap-3"
+                                >
+                                  <Sparkles size={12} style={{ color: config.color }} />
+                                  <span className="font-game text-[11px] text-white uppercase tracking-wider">{perk}</span>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+
                         {/* Log de Ajuste de Autoridade */}
                         <motion.div
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 3 }}
+                            transition={{ delay: 3.5 }}
                             className={`flex items-center gap-6 px-12 py-4 border-2 ${config.border} ${config.bg} rounded-sm relative overflow-hidden group backdrop-blur-sm`}
                         >
                             <div className="absolute inset-0 bg-white/10 animate-pulse" />

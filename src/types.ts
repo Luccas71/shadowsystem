@@ -8,12 +8,18 @@ export enum Rank {
   S = 'S'
 }
 
+export interface DetailedStat {
+  base: number;
+  bonus: number;
+  total: number;
+}
+
 export interface HunterStats {
-  strength: number;
-  agility: number;
-  vitality: number;
-  intelligence: number;
-  sense: number;
+  strength: DetailedStat;
+  agility: DetailedStat;
+  vitality: DetailedStat;
+  intelligence: DetailedStat;
+  sense: DetailedStat;
 }
 
 export interface ActiveBuff {
@@ -51,6 +57,14 @@ export interface HunterProfile {
   lastDailyCheckDate?: string; // Data da última verificação diária de streak
   lastUpdate?: string; // ISO timestamp
   fragilityHistory?: FragilityHistoryEntry[];
+  unspentStatPoints?: number;
+  allocatedStats?: {
+    strength: number;
+    agility: number;
+    vitality: number;
+    intelligence: number;
+    sense: number;
+  };
 }
 
 export interface FragilityHistoryEntry {

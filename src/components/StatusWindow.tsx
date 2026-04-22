@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { HunterProfile, Rank, Quest } from '../types';
-import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier } from '../constants';
+import { HunterProfile, Rank, Quest, HunterStats } from '../types';
+import { RANK_COLORS, STREAK_TIERS, getCurrentStreakTier, getStreakMultiplier, getRankBenefits } from '../constants';
 import {
   Sparkles,
   Clock,
@@ -25,6 +25,7 @@ interface StatusWindowProps {
   profile: HunterProfile;
   quests: Quest[];
   compact?: boolean;
+  onAllocateStat?: (stat: keyof HunterStats) => void;
 }
 
 const StatusCard: React.FC<{
@@ -84,99 +85,106 @@ const StatusCard: React.FC<{
   );
 };
 
-const SystemStatusBoard: React.FC<{ profile: HunterProfile }> = ({ profile }) => {
-  const hp = 100 - Math.round(profile.corruption);
-  const mp = profile.level * 10;
-  
+const SystemStatusBoard: React.FC<{ profile: HunterProfile; onAllocateStat?: (stat: keyof HunterStats) => void }> = ({ profile, onAllocateStat }) => {
+  // Helper to safely get values from DetailedStat or number (fallback for migration)
+  const getStatValues = (statKey: keyof HunterStats) => {
+    const stat = profile.stats[statKey];
+    if (typeof stat === 'number') {
+      return { base: stat, bonus: 0, total: stat };
+    }
+    return {
+      base: stat?.base ?? 0,
+      bonus: stat?.bonus ?? 0,
+      total: stat?.total ?? 0
+    };
+  };
+
+  const str = getStatValues('strength');
+  const agi = getStatValues('agility');
+  const vit = getStatValues('vitality');
+  const int = getStatValues('intelligence');
+  const per = getStatValues('sense');
+
   return (
-    <div className="space-y-4 mb-10 w-full animate-in fade-in zoom-in duration-500">
-      {/* Top Box: HP / MP / Fatigue */}
-      <div className="hud-board border border-white/50 p-6 bg-transparent flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_0_15px_rgba(255,255,255,0.1)] rounded-md">
-        
-        {/* HP */}
-        <div className="flex items-center gap-4 flex-1 w-full">
-          <div className="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-            <Plus size={24} strokeWidth={3} />
-            <span className="font-sans text-[10px] font-bold uppercase mt-1">HP</span>
-          </div>
-          <div className="flex-1 max-w-[200px]">
-            <div className="h-[14px] rounded-full border-[1.5px] border-white/80 p-[2px] bg-transparent shadow-[0_0_8px_rgba(255,255,255,0.5)]">
-              <div 
-                className="h-full rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] transition-all duration-1000" 
-                style={{ width: `${hp}%` }}
-              />
-            </div>
-            <div className="text-right mt-1 font-sans text-[10px] font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] leading-none">
-              {hp}/100
-            </div>
-          </div>
-        </div>
-
-        {/* C divider */}
-        <div className="hidden md:block w-px h-12 bg-white/20"></div>
-
-        {/* MP */}
-        <div className="flex items-center gap-4 flex-1 w-full">
-          <div className="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-            <FlaskConical size={24} strokeWidth={2} />
-            <span className="font-sans text-[10px] font-bold uppercase mt-1">MP</span>
-          </div>
-          <div className="flex-1 max-w-[200px]">
-            <div className="h-[14px] rounded-full border-[1.5px] border-white/80 p-[2px] bg-transparent shadow-[0_0_8px_rgba(255,255,255,0.5)]">
-              <div 
-                className="h-full rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] transition-all duration-1000" 
-                style={{ width: '100%' }}
-              />
-            </div>
-            <div className="text-right mt-1 font-sans text-[10px] font-bold text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)] leading-none">
-              {mp}/{mp}
-            </div>
-          </div>
-        </div>
-
-        {/* C divider */}
-        <div className="hidden md:block w-px h-12 bg-white/20"></div>
-
-        {/* Fatigue */}
-        <div className="flex flex-col items-center justify-center text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] md:ml-4">
-           <Sun size={28} className="animate-[spin_4s_linear_infinite]" />
-           <div className="flex items-center gap-1 mt-2">
-             <span className="font-sans text-[12px] font-bold uppercase tracking-widest">FATIGUE:</span>
-             <span className="font-sans text-[14px] font-black">0</span>
-           </div>
-        </div>
-      </div>
-
+    <div className="space-y-4 mb-8 w-full animate-in fade-in zoom-in duration-500">
       {/* Bottom Box: Stats */}
       <div className="hud-board border border-white/50 p-8 pt-10 pb-10 bg-transparent flex flex-col md:flex-row gap-12 justify-between shadow-[0_0_15px_rgba(255,255,255,0.1)] rounded-md">
         
         {/* Left Column */}
         <div className="flex-1 space-y-8">
           {/* STR */}
-          <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
-             <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-               <Dumbbell size={28} />
-               <span className="font-sans text-xl font-medium tracking-wider">STR:</span>
+          <div className="flex items-center gap-4 justify-between mx-auto md:mx-0">
+             <div className="flex flex-col items-start gap-1">
+               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                 <Dumbbell size={28} />
+                 <span className="font-sans text-xl font-medium tracking-wider">STR: {profile.allocatedStats?.strength || 0}</span>
+               </div>
+               <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
+                 <span className="text-emerald-400 font-bold mr-1">+{((str.base + str.bonus) * 1).toFixed(1)}%</span> 
+                 | +1% DE OURO GANHO POR PONTO
+               </span>
              </div>
-             <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.strength}</span>
+             <div className="flex items-center gap-4">
+               <div className="flex flex-col items-end">
+                 <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{str.base}</span>
+                 {str.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{str.bonus} bônus</span>}
+               </div>
+               {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                 <button onClick={() => onAllocateStat('strength')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                   <Plus size={16} />
+                 </button>
+               )}
+             </div>
           </div>
           
           {/* AGI */}
-          <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
-             <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-               <Wind size={28} />
-               <span className="font-sans text-xl font-medium tracking-wider">AGI:</span>
+          <div className="flex items-center gap-4 justify-between mx-auto md:mx-0">
+             <div className="flex flex-col items-start gap-1">
+               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                 <Wind size={28} />
+                 <span className="font-sans text-xl font-medium tracking-wider">AGI: {profile.allocatedStats?.agility || 0}</span>
+               </div>
+               <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
+                 <span className="text-emerald-400 font-bold mr-1">-{((agi.base + agi.bonus) * 0.5).toFixed(1)}%</span> 
+                 | -0.5% DE CUSTO NA LOJA POR PONTO
+               </span>
              </div>
-             <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.agility}</span>
+             <div className="flex items-center gap-4">
+               <div className="flex flex-col items-end">
+                 <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{agi.base}</span>
+                 {agi.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{agi.bonus} bônus</span>}
+               </div>
+               {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                 <button onClick={() => onAllocateStat('agility')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                   <Plus size={16} />
+                 </button>
+               )}
+             </div>
           </div>
 
           {/* PER */}
-          <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
-             <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-               <Eye size={28} />
-               <span className="font-sans text-xl font-medium tracking-wider">PER:</span>
+          <div className="flex items-center gap-4 justify-between mx-auto md:mx-0">
+             <div className="flex flex-col items-start gap-1">
+               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                 <Eye size={28} />
+                 <span className="font-sans text-xl font-medium tracking-wider">PER: {profile.allocatedStats?.sense || 0}</span>
+               </div>
+               <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
+                 <span className="text-emerald-400 font-bold mr-1">+{((per.base + per.bonus) * 0.5).toFixed(1)}%</span> 
+                 | +0.5% DE CHANCE DE DROP POR PONTO
+               </span>
              </div>
-             <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.sense}</span>
+             <div className="flex items-center gap-4">
+               <div className="flex flex-col items-end">
+                 <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{per.base}</span>
+                 {per.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{per.bonus} bônus</span>}
+               </div>
+               {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                 <button onClick={() => onAllocateStat('sense')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                   <Plus size={16} />
+                 </button>
+               )}
+             </div>
           </div>
         </div>
 
@@ -184,32 +192,64 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile }> = ({ profile }) =>
         <div className="flex-1 space-y-8 flex flex-col justify-between">
           <div className="space-y-8">
             {/* VIT */}
-            <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
-               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-                 <Heart size={28} />
-                 <span className="font-sans text-xl font-medium tracking-wider">VIT:</span>
+            <div className="flex items-center gap-4 justify-between mx-auto md:mx-0">
+               <div className="flex flex-col items-start gap-1">
+                 <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                   <Heart size={28} />
+                   <span className="font-sans text-xl font-medium tracking-wider">VIT: {profile.allocatedStats?.vitality || 0}</span>
+                 </div>
+                 <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
+                   <span className="text-emerald-400 font-bold mr-1">-{((vit.base + vit.bonus) * 0.5).toFixed(1)}%</span> 
+                   | -0.5% DE CORRUPÇÃO GANHA POR PONTO
+                 </span>
                </div>
-               <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.vitality}</span>
+               <div className="flex items-center gap-4">
+                 <div className="flex flex-col items-end">
+                   <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{vit.base}</span>
+                   {vit.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{vit.bonus} bônus</span>}
+                 </div>
+                 {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                   <button onClick={() => onAllocateStat('vitality')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                     <Plus size={16} />
+                   </button>
+                 )}
+               </div>
             </div>
 
             {/* INT */}
-            <div className="flex items-center gap-4 justify-between max-w-[200px] mx-auto md:mx-0">
-               <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
-                 <Brain size={28} />
-                 <span className="font-sans text-xl font-medium tracking-wider">INT:</span>
+            <div className="flex items-center gap-4 justify-between mx-auto md:mx-0">
+               <div className="flex flex-col items-start gap-1">
+                 <div className="flex items-center gap-4 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                   <Brain size={28} />
+                   <span className="font-sans text-xl font-medium tracking-wider">INT: {profile.allocatedStats?.intelligence || 0}</span>
+                 </div>
+                 <span className="text-[9px] text-white/50 uppercase tracking-widest mt-1">
+                   <span className="text-emerald-400 font-bold mr-1">+{((int.base + int.bonus) * 1).toFixed(1)}%</span> 
+                   | +1% DE XP GANHA POR PONTO
+                 </span>
                </div>
-               <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">{profile.stats.intelligence}</span>
+               <div className="flex items-center gap-4">
+                 <div className="flex flex-col items-end">
+                   <span className="font-sans text-3xl font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] leading-none">{int.base}</span>
+                   {int.bonus > 0 && <span className="font-sans text-[10px] font-bold text-emerald-400 mt-1 uppercase">+{int.bonus} bônus</span>}
+                 </div>
+                 {(profile.unspentStatPoints || 0) > 0 && onAllocateStat && (
+                   <button onClick={() => onAllocateStat('intelligence')} className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/30 rounded-md transition-colors text-white font-bold cursor-pointer">
+                     <Plus size={16} />
+                 </button>
+                 )}
+               </div>
             </div>
           </div>
           
           {/* Available Points */}
           <div className="flex items-end justify-center md:justify-end gap-3 mt-8 md:mt-0 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
              <div className="flex flex-col items-end text-right">
-                <span className="font-sans text-[10px] leading-[1.2]">Available</span>
-                <span className="font-sans text-[10px] leading-[1.2]">Ability</span>
-                <span className="font-sans text-[10px] leading-[1.2]">Points:</span>
+                <span className="font-game text-[10px] uppercase text-emerald-400 tracking-[0.2em] font-bold">Available</span>
+                <span className="font-game text-[10px] uppercase text-emerald-400 tracking-[0.2em] font-bold">Ability</span>
+                <span className="font-game text-[10px] uppercase text-emerald-400 tracking-[0.2em] font-bold">Points:</span>
              </div>
-             <span className="font-sans text-4xl font-semibold leading-none pb-1 relative top-1">0</span>
+             <span className="font-game text-5xl font-black text-emerald-400 leading-none pb-1 relative top-2 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">{profile.unspentStatPoints || 0}</span>
           </div>
         </div>
       </div>
@@ -217,7 +257,7 @@ const SystemStatusBoard: React.FC<{ profile: HunterProfile }> = ({ profile }) =>
   );
 };
 
-const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact }) => {
+const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact, onAllocateStat }) => {
   const rankProgression = [
     { rank: Rank.E, minLevel: 1, maxLevel: 19, label: 'CAÇADOR RANK E' },
     { rank: Rank.D, minLevel: 20, maxLevel: 39, label: 'CAÇADOR DESPERTO' },
@@ -240,6 +280,9 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact })
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
+      
+      <SystemStatusBoard profile={profile} onAllocateStat={onAllocateStat} />
+
       {/* HUD Cards Section */}
       <div className={`grid grid-cols-1 ${compact ? '' : 'md:grid-cols-2'} gap-6`}>
         <StatusCard

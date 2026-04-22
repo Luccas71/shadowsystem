@@ -11,9 +11,10 @@ interface StoreProps {
   onPurchaseItem: (item: StoreItem) => void;
   isLocked?: boolean;
   lockUntil?: number;
+  shopDiscount?: number;
 }
 
-const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onPurchaseItem, isLocked, lockUntil }) => {
+const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onPurchaseItem, isLocked, lockUntil, shopDiscount = 0 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -160,8 +161,17 @@ const Store: React.FC<StoreProps> = ({ gold, items, onAddItem, onRemoveItem, onP
                 </div>
 
                 <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 text-amber-500 font-game text-xs font-bold leading-none">
-                    <Coins size={12} className={isExpanded ? 'animate-pulse' : ''} /> {item.cost}
+                  <div className="flex items-center gap-1.5 font-game text-xs font-bold leading-none">
+                    <Coins size={12} className={`text-amber-500 ${isExpanded ? 'animate-pulse' : ''}`} />
+                    {shopDiscount > 0 ? (
+                      <>
+                        <span className="text-amber-500">{Math.floor(item.cost * (1 - shopDiscount))}</span>
+                        <span className="text-slate-600 line-through text-[10px] ml-1">{item.cost}</span>
+                        <span className="text-emerald-500 text-[9px] ml-1">-{Math.round(shopDiscount * 100)}%</span>
+                      </>
+                    ) : (
+                      <span className="text-amber-500">{item.cost}</span>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-3" onClick={e => e.stopPropagation()}>

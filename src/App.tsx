@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from './services/supabaseClient';
 import {
+  HunterStats,
   HunterProfile,
   Quest,
   Rank,
@@ -216,7 +217,6 @@ const App: React.FC = () => {
       return [newMessage, ...prev].slice(0, 30);
     });
   }, []);
-
   const updateCorruption = useCallback((increase: number, goldPenalty: number = 0) => {
     if (increase === 0 && goldPenalty === 0) return;
 
@@ -233,7 +233,8 @@ const App: React.FC = () => {
 
       // Pendant reduction
       const pendantBuffs = p.activeBuffs.filter(b => b.slug === 'buff-pendant').length;
-      const reduction = 1 - (pendantBuffs * 0.05);
+      const vitTotal = (p.stats.vitality?.base || 0) + (p.stats.vitality?.bonus || 0);
+      const reduction = Math.max(0.1, 1 - (pendantBuffs * 0.05) - (vitTotal * 0.005));
       const finalIncrease = Math.max(0, increase * reduction);
 
       const newCorruption = Math.min(100, p.corruption + finalIncrease);
@@ -264,6 +265,42 @@ const App: React.FC = () => {
       };
     });
   }, [addSystemMessage]);
+
+  // Attribute Migration & Retroactive Points Hook
+  useEffect(() => {
+    if (!dataLoaded || isInitializing.current) return;
+
+    setProfile(p => {
+      let needsUpdate = false;
+      const updates: Partial<HunterProfile> = {};
+
+      // 1. Ensure allocatedStats exists
+      if (!p.allocatedStats) {
+        updates.allocatedStats = { strength: 0, agility: 0, vitality: 0, intelligence: 0, sense: 0 };
+        needsUpdate = true;
+      }
+
+      // 2. Ensure unspentStatPoints exists and award retroactive points if missing
+      if (p.unspentStatPoints === undefined) {
+        const allocated = p.allocatedStats ? 
+          (p.allocatedStats.strength + p.allocatedStats.agility + p.allocatedStats.vitality + p.allocatedStats.intelligence + p.allocatedStats.sense) : 0;
+        updates.unspentStatPoints = Math.max(0, p.level - allocated);
+        needsUpdate = true;
+      }
+
+      // 3. Ensure stats is in DetailedStat format (not number)
+      const currentStats: any = p.stats;
+      if (typeof currentStats.strength === 'number') {
+        updates.stats = calculateStats(p.level, updates.allocatedStats || p.allocatedStats);
+        needsUpdate = true;
+      }
+
+      if (needsUpdate) {
+        return { ...p, ...updates };
+      }
+      return p;
+    });
+  }, [dataLoaded]);
 
   useEffect(() => {
     const checkInterval = setInterval(() => {
@@ -763,7 +800,9 @@ const App: React.FC = () => {
       const xpBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-xp-boost').length;
       const shadowEssenceBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-shadow-essence').length;
       const streakMultiplier = getStreakMultiplier(profile.dailyStreak || 0);
-      const xpMultiplier = (1 + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02)) * streakMultiplier;
+      const intTotal = profile.stats.intelligence.base + profile.stats.intelligence.bonus;
+      const statXpBoost = intTotal * 0.01;
+      const xpMultiplier = (1 + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statXpBoost) * streakMultiplier;
 
       const finalXpReward = Math.floor(quest.xpReward * xpMultiplier);
       const newTotalXp = currentTotalXp + finalXpReward;
@@ -783,7 +822,9 @@ const App: React.FC = () => {
       // Calculate Gold Multiplier from buffs
       const orbBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-orb').length;
       const ringBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-ring').length;
-      const goldMultiplier = (1 + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02)) * streakMultiplier;
+      const strTotal = profile.stats.strength.base + profile.stats.strength.bonus;
+      const statGoldBoost = strTotal * 0.01;
+      const goldMultiplier = (1 + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statGoldBoost) * streakMultiplier;
 
       const finalGoldReward = Math.floor(quest.goldReward * goldMultiplier);
 
@@ -815,7 +856,9 @@ const App: React.FC = () => {
             [QuestDifficulty.S]: 0.90,
           };
 
-          const chance = dropChances[quest.difficulty];
+          const perTotal = profile.stats.sense.base + profile.stats.sense.bonus;
+          const statDropChance = perTotal * 0.005;
+          const chance = dropChances[quest.difficulty] + statDropChance;
           if (Math.random() < chance) {
             const randomIdx = Math.floor(Math.random() * pool.length);
             const droppedItem = pool[randomIdx];
@@ -901,17 +944,51 @@ const App: React.FC = () => {
         xp: newXp,
         level: newLevel,
         maxXp: newMaxXp,
+        unspentStatPoints: (p.unspentStatPoints || 0) + levelsGained,
         totalXpGained: newTotalXp,
         rank: getRankByLevel(newLevel),
-        stats: calculateStats(newLevel),
+        stats: calculateStats(newLevel, p.allocatedStats),
         gold: p.gold + finalGoldReward,
         dailyItemDropsCount: dailyDrops,
         lastItemDropDate: today
       }));
 
       setQuests(nextQuests);
-      addSystemMessage(`MISSÃO CONCLUÍDA: ${quest.title.toUpperCase()}. RECOMPENSA: +${finalGoldReward} OURO / +${finalXpReward} XP.`, 'success');
     }
+  };
+
+  const handleAllocateStat = (stat: keyof HunterStats) => {
+    setProfile(p => {
+      if (!p.unspentStatPoints || p.unspentStatPoints <= 0) {
+        addSystemMessage("SISTEMA: PONTOS DE ATRIBUTO INSUFICIENTES.", "error");
+        return p;
+      }
+
+      const statName = stat as string;
+      const currentAllocated = p.allocatedStats || { strength: 0, agility: 0, vitality: 0, intelligence: 0, sense: 0 };
+      
+      const newAllocated = {
+        ...currentAllocated,
+        [statName]: ((currentAllocated as any)[statName] || 0) + 1
+      };
+
+      const newStats = calculateStats(p.level, newAllocated);
+      
+      addSystemMessage(`SISTEMA: ATRIBUTO ${statName.toUpperCase()} AMPLIADO.`, "success");
+      setActiveEffect({
+        type: 'useItem',
+        title: "ATRIBUTO AMPLIADO",
+        subtitle: `${statName.toUpperCase()} AGORA É ${newStats[stat].base}`,
+        icon: <Zap className="text-emerald-400" size={40} />
+      });
+
+      return {
+        ...p,
+        allocatedStats: newAllocated,
+        unspentStatPoints: p.unspentStatPoints - 1,
+        stats: newStats
+      };
+    });
   };
 
   const handleDeleteQuest = (id: string) => {
@@ -1695,7 +1772,11 @@ const App: React.FC = () => {
         <div className="min-h-[60vh]">
           {activeTab === 'status' ? (
              <div className="animate-in fade-in zoom-in-95 duration-700">
-               <StatusWindow profile={profile} quests={quests} />
+               <StatusWindow 
+                 profile={profile} 
+                 quests={quests} 
+                 onAllocateStat={handleAllocateStat}
+               />
              </div>
           ) : activeTab === 'quests' ? (
             <div className="space-y-8 animate-in fade-in duration-700">
@@ -1846,7 +1927,8 @@ const App: React.FC = () => {
                 onRemoveItem={handleRemoveItem}
                 onPurchaseItem={i => {
                   const contractBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-contract').length;
-                  const discount = 1 - (contractBuffs * 0.01);
+                  const agiTotal = profile.stats.agility.base + profile.stats.agility.bonus;
+                  const discount = Math.max(0.1, 1 - (contractBuffs * 0.01) - (agiTotal * 0.005));
                   const finalCost = Math.floor(i.cost * discount);
 
                   if (profile.gold >= finalCost) {
