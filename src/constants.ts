@@ -42,24 +42,24 @@ export const getStreakMultiplier = (streak: number) => {
   return getCurrentStreakTier(streak).multiplier;
 };
 
-// Valores base sem o buff de 15%
+// Valores base (agora com o buff de 15% aplicado)
 export const DIFFICULTY_XP: Record<QuestDifficulty, number> = {
-  [QuestDifficulty.E]: 650,
-  [QuestDifficulty.D]: 2000,
-  [QuestDifficulty.C]: 6000,
-  [QuestDifficulty.B]: 16000,
-  [QuestDifficulty.A]: 50000,
-  [QuestDifficulty.S]: 150000,
+  [QuestDifficulty.E]: 750,
+  [QuestDifficulty.D]: 2300,
+  [QuestDifficulty.C]: 6900,
+  [QuestDifficulty.B]: 18400,
+  [QuestDifficulty.A]: 57500,
+  [QuestDifficulty.S]: 172500,
 };
 
-// Valores base sem o buff de 15%
+// Valores base (agora com o buff de 15% aplicado)
 export const DIFFICULTY_GOLD: Record<QuestDifficulty, number> = {
-  [QuestDifficulty.E]: 100,
-  [QuestDifficulty.D]: 350,
-  [QuestDifficulty.C]: 1100,
-  [QuestDifficulty.B]: 3200,
-  [QuestDifficulty.A]: 11000,
-  [QuestDifficulty.S]: 48000,
+  [QuestDifficulty.E]: 115,
+  [QuestDifficulty.D]: 400,
+  [QuestDifficulty.C]: 1265,
+  [QuestDifficulty.B]: 3680,
+  [QuestDifficulty.A]: 12650,
+  [QuestDifficulty.S]: 55200,
 };
 
 export const DIFFICULTY_PENALTY: Record<QuestDifficulty, number> = {
@@ -251,6 +251,33 @@ export const calculateStats = (
     intelligence: buildDetailedStat(baseValue, allocatedStats.intelligence),
     sense: buildDetailedStat(baseValue, allocatedStats.sense),
   };
+};
+
+// ─── REWARDS CALCULATION ──────────────────────────────────────────────
+
+export const calculateQuestRewards = (quest: Quest, profile: HunterProfile) => {
+  const rankBenefits = RANK_BENEFITS[profile.rank];
+  const streakMultiplier = getStreakMultiplier(profile.dailyStreak || 0);
+  
+  // Buffs de XP
+  const xpBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-xp-boost').length;
+  const shadowEssenceBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-shadow-essence').length;
+  const intTotal = (profile.stats.intelligence?.base || 0) + (profile.stats.intelligence?.bonus || 0);
+  const statXpBoost = intTotal * 0.01;
+  
+  const xpMultiplier = (rankBenefits.xpMultiplier + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statXpBoost) * streakMultiplier;
+  const xpReward = Math.floor(quest.xpReward * xpMultiplier);
+
+  // Buffs de Gold
+  const orbBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-orb').length;
+  const ringBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-ring').length;
+  const strTotal = (profile.stats.strength?.base || 0) + (profile.stats.strength?.bonus || 0);
+  const statGoldBoost = strTotal * 0.01;
+  
+  const goldMultiplier = (rankBenefits.goldMultiplier + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statGoldBoost) * streakMultiplier;
+  const goldReward = Math.floor(quest.goldReward * goldMultiplier);
+
+  return { xpReward, goldReward, xpMultiplier, goldMultiplier };
 };
 
 export const DEFAULT_STORE_ITEMS: StoreItem[] = [

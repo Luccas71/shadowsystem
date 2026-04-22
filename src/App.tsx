@@ -24,7 +24,8 @@ import {
   DEFAULT_STORE_ITEMS,
   STREAK_TIERS,
   getCurrentStreakTier,
-  getStreakMultiplier
+  getStreakMultiplier,
+  calculateQuestRewards
 } from './constants';
 import QuestCard from './components/QuestCard';
 import ProfileEditor from './components/ProfileEditor';
@@ -796,15 +797,7 @@ const App: React.FC = () => {
 
       const currentTotalXp = profile.totalXpGained;
 
-      // Calculate XP Multiplier from buffs
-      const xpBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-xp-boost').length;
-      const shadowEssenceBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-shadow-essence').length;
-      const streakMultiplier = getStreakMultiplier(profile.dailyStreak || 0);
-      const intTotal = profile.stats.intelligence.base + profile.stats.intelligence.bonus;
-      const statXpBoost = intTotal * 0.01;
-      const xpMultiplier = (1 + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statXpBoost) * streakMultiplier;
-
-      const finalXpReward = Math.floor(quest.xpReward * xpMultiplier);
+      const { xpReward: finalXpReward, goldReward: finalGoldReward } = calculateQuestRewards(quest, profile);
       const newTotalXp = currentTotalXp + finalXpReward;
 
       let newXp = profile.xp + finalXpReward;
@@ -818,15 +811,6 @@ const App: React.FC = () => {
         newMaxXp = calculateMaxXp(newLevel);
         levelsGained++;
       }
-
-      // Calculate Gold Multiplier from buffs
-      const orbBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-orb').length;
-      const ringBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-ring').length;
-      const strTotal = profile.stats.strength.base + profile.stats.strength.bonus;
-      const statGoldBoost = strTotal * 0.01;
-      const goldMultiplier = (1 + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statGoldBoost) * streakMultiplier;
-
-      const finalGoldReward = Math.floor(quest.goldReward * goldMultiplier);
 
       // Random Item Drop System (Max 2 per day)
       const today = new Date().toDateString();
@@ -1819,6 +1803,7 @@ const App: React.FC = () => {
                   <DraggableQuestItem key={q.id} quest={q}>
                     <QuestCard
                       quest={q}
+                      profile={profile}
                       onToggleComplete={handleToggleComplete}
                       onToggleSubQuest={handleToggleSubQuest}
                       onDelete={handleDeleteQuest}
@@ -1863,6 +1848,7 @@ const App: React.FC = () => {
                         <QuestCard
                           key={q.id}
                           quest={q}
+                          profile={profile}
                           onToggleComplete={handleToggleComplete}
                           onToggleSubQuest={handleToggleSubQuest}
                           onDelete={handleDeleteQuest}
@@ -1902,6 +1888,7 @@ const App: React.FC = () => {
                         <QuestCard
                           key={q.id}
                           quest={q}
+                          profile={profile}
                           onToggleComplete={handleToggleComplete}
                           onToggleSubQuest={handleToggleSubQuest}
                           onDelete={handleDeleteQuest}

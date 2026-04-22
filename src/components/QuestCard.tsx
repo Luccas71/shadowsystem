@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Quest, Rank } from '../types';
-import { RANK_COLORS } from '../constants';
+import { Quest, Rank, HunterProfile } from '../types';
+import { RANK_COLORS, calculateQuestRewards } from '../constants';
 import {
   Check,
   Trash2,
@@ -20,6 +20,7 @@ import {
 
 interface QuestCardProps {
   quest: Quest;
+  profile: HunterProfile;
   onToggleComplete: (questId: string) => void;
   onToggleSubQuest: (questId: string, subId: string) => void;
   onDelete: (questId: string) => void;
@@ -30,6 +31,7 @@ interface QuestCardProps {
 
 const QuestCard: React.FC<QuestCardProps> = ({
   quest,
+  profile,
   onToggleComplete,
   onToggleSubQuest,
   onDelete,
@@ -164,6 +166,8 @@ const QuestCard: React.FC<QuestCardProps> = ({
     }
   };
 
+  const { xpReward: projectedXp, goldReward: projectedGold } = calculateQuestRewards(quest, profile);
+
   return (
     <div className={`relative transition-all duration-500 group ${quest.completed ? 'opacity-50 grayscale' : quest.failed ? 'opacity-70 grayscale' : ''}`}>
 
@@ -251,7 +255,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
                    <Flame size={12} className={!quest.completed && !quest.failed ? `${colors.flameIcon} animate-pulse` : 'text-slate-700'} />
                    {!quest.completed && !quest.failed && <div className={`absolute inset-0 blur-sm bg-current opacity-20 animate-ping ${colors.flameIcon}`}></div>}
                  </div>
-                 <span className={!quest.completed && !quest.failed ? "text-glow-cyan" : ""}>{quest.xpReward.toLocaleString()}</span>
+                 <span className={!quest.completed && !quest.failed ? "text-glow-cyan" : ""}>{projectedXp.toLocaleString()}</span>
                  <span className="opacity-40 text-[9px]">XP</span>
                  {!quest.completed && !quest.failed && (
                    <span className="ml-1 text-[7px] bg-cyan-500/10 text-cyan-400 px-1 border border-cyan-500/30 rounded-[2px] animate-pulse">SISTEMA+</span>
@@ -260,7 +264,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
               <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-amber-500/80">
                  <Coins size={12} className={!quest.completed && !quest.failed ? 'text-amber-500' : 'text-slate-700'} />
-                 <span>{quest.goldReward.toLocaleString()}</span>
+                 <span>{projectedGold.toLocaleString()}</span>
                  <span className="opacity-40 text-[9px] text-amber-900">OURO</span>
               </div>
             </div>
