@@ -44,22 +44,22 @@ export const getStreakMultiplier = (streak: number) => {
 
 // Valores base sem o buff de 15%
 export const DIFFICULTY_XP: Record<QuestDifficulty, number> = {
-  [QuestDifficulty.E]: 400,
-  [QuestDifficulty.D]: 1200,
-  [QuestDifficulty.C]: 3800,
-  [QuestDifficulty.B]: 10000,
-  [QuestDifficulty.A]: 30000,
-  [QuestDifficulty.S]: 85000,
+  [QuestDifficulty.E]: 500,
+  [QuestDifficulty.D]: 1500,
+  [QuestDifficulty.C]: 4800,
+  [QuestDifficulty.B]: 12500,
+  [QuestDifficulty.A]: 38000,
+  [QuestDifficulty.S]: 110000,
 };
 
 // Valores base sem o buff de 15%
 export const DIFFICULTY_GOLD: Record<QuestDifficulty, number> = {
-  [QuestDifficulty.E]: 80,
-  [QuestDifficulty.D]: 280,
-  [QuestDifficulty.C]: 850,
-  [QuestDifficulty.B]: 2500,
-  [QuestDifficulty.A]: 8500,
-  [QuestDifficulty.S]: 38000,
+  [QuestDifficulty.E]: 100,
+  [QuestDifficulty.D]: 350,
+  [QuestDifficulty.C]: 1100,
+  [QuestDifficulty.B]: 3200,
+  [QuestDifficulty.A]: 11000,
+  [QuestDifficulty.S]: 48000,
 };
 
 export const DIFFICULTY_PENALTY: Record<QuestDifficulty, number> = {
@@ -76,7 +76,7 @@ export const DIFFICULTY_PENALTY: Record<QuestDifficulty, number> = {
  * f(x) = 1000x + 60x^2
  */
 export const calculateMaxXp = (level: number) => {
-  return Math.floor(800 * level + 40 * Math.pow(level, 2));
+  return Math.floor(600 * level + 30 * Math.pow(level, 2));
 };
 
 export const getRankByLevel = (level: number): Rank => {
