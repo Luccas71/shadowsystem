@@ -18,7 +18,19 @@ import {
   Heart,
   Wind,
   Brain,
-  Eye
+  Eye,
+  TrendingUp,
+  Coins,
+  ShieldCheck,
+  Package,
+  ShoppingBag,
+  Zap,
+  Star,
+  HandCoins,
+  Activity,
+  Dice5,
+  Snowflake,
+  Shield
 } from 'lucide-react';
 
 interface StatusWindowProps {
@@ -336,6 +348,140 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact, o
           />
         );
       })()}
+
+      {/* Benefícios de Rank */}
+      <div className="space-y-6">
+        <h3 className="font-game text-[14px] text-slate-400 uppercase flex items-center gap-3 border-b border-white/10 pb-3 font-black tracking-widest">
+          <Trophy size={16} className={profile.rank === Rank.S ? "text-red-500" : "text-emerald-500"} /> BENEFÍCIOS DO RANK {profile.rank}
+        </h3>
+
+        <div className={`grid grid-cols-2 ${compact ? 'md:grid-cols-2' : 'md:grid-cols-4'} gap-4`}>
+          {(() => {
+            const benefits = getRankBenefits(profile.rank);
+            const benefitItems = [
+              {
+                icon: <TrendingUp />,
+                label: 'BÔNUS DE XP',
+                value: `+${Math.round((benefits.xpMultiplier - 1) * 100)}%`,
+                description: 'SINCRONIA EXTRA',
+                show: benefits.xpMultiplier > 1,
+                color: 'text-emerald-400'
+              },
+              {
+                icon: <Coins />,
+                label: 'BÔNUS OURO',
+                value: `+${Math.round((benefits.goldMultiplier - 1) * 100)}%`,
+                description: 'GANHO MONETÁRIO',
+                show: benefits.goldMultiplier > 1,
+                color: 'text-amber-400'
+              },
+              {
+                icon: <Activity />,
+                label: 'RESISTÊNCIA',
+                value: `-${Math.round(benefits.corruptionReduction * 100)}%`,
+                description: 'CORRUPÇÃO MENOR',
+                show: benefits.corruptionReduction > 0,
+                color: 'text-rose-400'
+              },
+              {
+                icon: <Package />,
+                label: 'DROPS DIA',
+                value: `${benefits.maxDailyDrops}`,
+                description: 'LIMITE DE ITENS',
+                show: true,
+                color: 'text-blue-400'
+              },
+              {
+                icon: <ShoppingBag />,
+                label: 'DESC. LOJA',
+                value: `-${Math.round(benefits.shopDiscount * 100)}%`,
+                description: 'PREÇOS REDUZIDOS',
+                show: benefits.shopDiscount > 0,
+                color: 'text-purple-400'
+              },
+              {
+                icon: <Zap />,
+                label: 'BÔNUS STATS',
+                value: `+${Math.round(benefits.statBonus * 100)}%`,
+                description: 'ATRIBUTOS BASE',
+                show: benefits.statBonus > 0,
+                color: 'text-yellow-400'
+              },
+              {
+                icon: <Star />,
+                label: 'LIMIAR DROP',
+                value: `${(benefits.rareDropThreshold / 1000).toFixed(0)}K XP`,
+                description: 'PARA ITEM RARO',
+                show: true,
+                color: 'text-lime-400'
+              },
+              {
+                icon: <HandCoins />,
+                label: 'OURO EXTRA',
+                value: `+${benefits.passiveGoldPerQuest}`,
+                description: 'POR MISSÃO',
+                show: benefits.passiveGoldPerQuest > 0,
+                color: 'text-orange-400'
+              },
+              {
+                icon: <ShieldCheck />,
+                label: 'REGENERAÇÃO',
+                value: `${benefits.corruptionRegen}`,
+                description: 'LIMPEZA PASSIVA',
+                show: benefits.corruptionRegen > 0,
+                color: 'text-teal-400'
+              },
+              {
+                icon: <Snowflake />,
+                label: 'CONGELAMENTO',
+                value: 'ATIVO',
+                description: 'STREAK PROTEGIDO',
+                show: benefits.streakFreeze,
+                color: 'text-cyan-400'
+              },
+              {
+                icon: <Shield />,
+                label: 'SALVAGUARDA',
+                value: 'ATIVO',
+                description: 'NUNCA ZERA STREAK',
+                show: benefits.streakSafeguard,
+                color: 'text-indigo-400'
+              },
+              {
+                icon: <Dice5 />,
+                label: 'DROP DUPLO',
+                value: 'ATIVO',
+                description: 'CHANCE DOBRADA',
+                show: benefits.doubleDropChance,
+                color: 'text-pink-400'
+              },
+              {
+                icon: <ShieldCheck />,
+                label: 'IMUNIDADES',
+                value: `${benefits.immunities.length}`,
+                description: benefits.immunities.map(i => i.split('_').join(' ').toUpperCase()).join(', '),
+                show: benefits.immunities.length > 0,
+                color: 'text-red-400'
+              }
+            ];
+
+            return benefitItems.filter(item => item.show).map((item, idx) => (
+              <div key={idx} className="hud-board p-3 bg-black/40 border-l-2 border-white/10 flex items-center gap-3 group hover:bg-black/20 hover:border-white/30 transition-all duration-300">
+                <div className={`p-1.5 bg-black/60 border border-white/5 ${item.color}`}>
+                  {React.cloneElement(item.icon as any, { size: 14 })}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <h4 className="font-game text-[8px] text-white/50 uppercase tracking-[0.15em] truncate">{item.label}</h4>
+                    <span className={`font-game text-[10px] ${item.color} font-black drop-shadow-[0_0_3px_currentColor]`}>{item.value}</span>
+                  </div>
+                  <p className="text-[7px] text-slate-600 uppercase tracking-tight truncate font-bold">{item.description}</p>
+                </div>
+              </div>
+            ));
+          })()}
+        </div>
+      </div>
 
       {/* Efeitos Ativos (Buffs) */}
       <div className="space-y-6 mt-8">
