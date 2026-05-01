@@ -2,7 +2,7 @@ import React from 'react';
 
 const BackgroundHUD: React.FC = () => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden select-none bg-black">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-black">
       {/* Deep Shadow Void Base */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#030914] via-black to-black opacity-100"></div>
 
