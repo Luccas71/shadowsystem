@@ -41,7 +41,22 @@ body {
     100% { transform: scale(1) translate(0, 0); opacity: 0.4; }
 }
 
+@keyframes float-particle {
+    0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.6; }
+    100% { transform: translateY(-300px) translateX(100px) scale(0.5); opacity: 0; }
+}
 
+@keyframes shadow-swirl {
+    0% { transform: rotate(0deg) scale(1); opacity: 0.3; }
+    50% { transform: rotate(5deg) scale(1.05); opacity: 0.6; }
+    100% { transform: rotate(-5deg) scale(0.95); opacity: 0.3; }
+}
+
+.animate-float-particle {
+    animation: float-particle linear infinite;
+}
 
 .text-glow-cyan {
     text-shadow: 0 0 5px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.4);

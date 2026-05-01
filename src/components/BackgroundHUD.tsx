@@ -2,56 +2,74 @@ import React from 'react';
 
 const BackgroundHUD: React.FC = () => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden select-none bg-[#020611]">
-      {/* Dynamic Dark Aura Portal Effect */}
+    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden select-none bg-black">
+      {/* Deep Shadow Void Base */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#030914] via-black to-black opacity-100"></div>
+
+      {/* Dynamic Shadow Aura (Epic and Dark) */}
       <div 
-        className="absolute top-[-25%] left-[-25%] w-[150%] h-[150%] opacity-80"
+        className="absolute inset-[-50%] w-[200%] h-[200%] opacity-50 mix-blend-screen"
         style={{
           background: `
-            radial-gradient(circle at 30% 70%, rgba(14, 165, 233, 0.12) 0%, transparent 45%),
-            radial-gradient(circle at 70% 30%, rgba(168, 85, 247, 0.1) 0%, transparent 45%),
-            radial-gradient(circle at 50% 50%, rgba(5, 17, 28, 0) 0%, #010308 85%)
+            radial-gradient(circle at 40% 60%, rgba(14, 165, 233, 0.04) 0%, transparent 40%),
+            radial-gradient(circle at 60% 40%, rgba(107, 33, 168, 0.06) 0%, transparent 40%),
+            radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 0%, #000000 80%)
           `,
-          animation: 'aura-pulse 15s ease-in-out infinite alternate'
+          animation: 'shadow-swirl 25s ease-in-out infinite alternate'
         }}
       ></div>
 
-      {/* Runic / Circuit Lines overlay */}
-      <div className="absolute inset-0 opacity-[0.2]">
+      {/* Floating Shadow Ash/Particles */}
+      <div className="absolute inset-0">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-blue-500 shadow-[0_0_10px_2px_rgba(56,189,248,0.4)] animate-float-particle"
+            style={{
+              width: `${Math.random() * 2 + 1}px`,
+              height: `${Math.random() * 2 + 1}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${Math.random() * 15 + 10}s`,
+              opacity: 0 // Handled by animation
+            }}
+          ></div>
+        ))}
+      </div>
+
+      {/* Runic / Circuit Lines overlay - Very Subtle */}
+      <div className="absolute inset-0 opacity-[0.05] mix-blend-screen">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           {/* Main Diagonal Tracks */}
-          <path d="M 0 200 L 300 500 L 1000 500 L 1200 300" fill="none" stroke="#38bdf8" strokeWidth="2" />
-          <path d="M -100 400 L 400 900 L 1200 900 L 1500 600" fill="none" stroke="#0ea5e9" strokeWidth="1" strokeDasharray="10 10" />
+          <path d="M 0 200 L 300 500 L 1000 500 L 1200 300" fill="none" stroke="#38bdf8" strokeWidth="1" />
+          <path d="M -100 400 L 400 900 L 1200 900 L 1500 600" fill="none" stroke="#0ea5e9" strokeWidth="0.5" strokeDasharray="4 4" />
           
           {/* Top Right Clusters */}
-          <path d="M 80% 0 L 70% 10% L 90% 30% L 100% 30%" fill="none" stroke="#38bdf8" strokeWidth="1.5" />
-          <path d="M 70% 10% L 50% 10% L 40% 20%" fill="none" stroke="#0ea5e9" strokeWidth="1" strokeDasharray="5 5" />
+          <path d="M 80% 0 L 70% 10% L 90% 30% L 100% 30%" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
           
           {/* Tech Nodes */}
-          <circle cx="300" cy="500" r="4" fill="#38bdf8" className="animate-pulse" />
-          <circle cx="1000" cy="500" r="6" fill="none" stroke="#38bdf8" strokeWidth="2" />
-          <circle cx="1000" cy="500" r="2" fill="#0ea5e9" />
-          <circle cx="70%" cy="10%" r="5" fill="#0ea5e9" stroke="#38bdf8" strokeWidth="1" />
+          <circle cx="300" cy="500" r="3" fill="#38bdf8" className="animate-pulse" />
+          <circle cx="1000" cy="500" r="4" fill="none" stroke="#38bdf8" strokeWidth="1" />
+          <circle cx="1000" cy="500" r="1.5" fill="#0ea5e9" />
           
           {/* Center Lines */}
           <path d="M 30% 50% L 40% 40% L 60% 40% L 70% 50%" fill="none" stroke="#38bdf8" strokeWidth="0.5" strokeOpacity="0.5" />
-          <path d="M 35% 55% L 45% 45% L 55% 45% L 65% 55%" fill="none" stroke="#0ea5e9" strokeWidth="2" strokeOpacity="0.2" />
-          
-          {/* Small Crosshairs */}
-          <path d="M 20% 80% L 20% 75% M 20% 80% L 25% 80% M 20% 80% L 20% 85% M 20% 80% L 15% 80%" stroke="#38bdf8" strokeWidth="1" />
-          <path d="M 85% 70% L 85% 65% M 85% 70% L 90% 70% M 85% 70% L 85% 75% M 85% 70% L 80% 70%" stroke="#0ea5e9" strokeWidth="1" />
         </svg>
       </div>
 
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.03)_1px,transparent_1px)] bg-[size:100px_100px]"></div>
+      {/* Grid overlay - Darker */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.01)_1px,transparent_1px)] bg-[size:100px_100px]"></div>
+
+      {/* Vignette to focus center and darken edges heavily */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)] opacity-95"></div>
 
       {/* CRT Scanline Effect */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-50"
+        className="absolute inset-0 pointer-events-none opacity-30 mix-blend-multiply"
         style={{
           background: `
-            repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px),
-            linear-gradient(to bottom, rgba(14, 165, 233, 0.05) 0%, transparent 100%)
+            repeating-linear-gradient(0deg, rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 1px, transparent 1px, transparent 3px)
           `
         }}
       ></div>
