@@ -1,5 +1,5 @@
 
-import { Rank, QuestDifficulty, StoreItem, ItemRarity, HunterStats, DetailedStat } from './types';
+import { Rank, QuestDifficulty, StoreItem, ItemRarity, HunterStats, DetailedStat, Quest, HunterProfile } from './types';
 
 export const XP_DROP_THRESHOLD = 50000;
 

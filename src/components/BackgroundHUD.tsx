@@ -2,12 +2,22 @@ import React from 'react';
 
 const BackgroundHUD: React.FC = () => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-      {/* Background Deep Overlay - Adds that slight depth map feel */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#0ea5e9]/5"></div>
+    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden select-none bg-[#020611]">
+      {/* Dynamic Dark Aura Portal Effect */}
+      <div 
+        className="absolute top-[-25%] left-[-25%] w-[150%] h-[150%] opacity-80"
+        style={{
+          background: `
+            radial-gradient(circle at 30% 70%, rgba(14, 165, 233, 0.12) 0%, transparent 45%),
+            radial-gradient(circle at 70% 30%, rgba(168, 85, 247, 0.1) 0%, transparent 45%),
+            radial-gradient(circle at 50% 50%, rgba(5, 17, 28, 0) 0%, #010308 85%)
+          `,
+          animation: 'aura-pulse 15s ease-in-out infinite alternate'
+        }}
+      ></div>
 
       {/* Runic / Circuit Lines overlay */}
-      <div className="absolute inset-0 opacity-[0.15]">
+      <div className="absolute inset-0 opacity-[0.2]">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           {/* Main Diagonal Tracks */}
           <path d="M 0 200 L 300 500 L 1000 500 L 1200 300" fill="none" stroke="#38bdf8" strokeWidth="2" />
@@ -34,6 +44,17 @@ const BackgroundHUD: React.FC = () => {
       </div>
 
       <div className="absolute inset-0 bg-[linear-gradient(rgba(56,189,248,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.03)_1px,transparent_1px)] bg-[size:100px_100px]"></div>
+
+      {/* CRT Scanline Effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-50"
+        style={{
+          background: `
+            repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px),
+            linear-gradient(to bottom, rgba(14, 165, 233, 0.05) 0%, transparent 100%)
+          `
+        }}
+      ></div>
     </div>
   );
 };
