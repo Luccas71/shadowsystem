@@ -30,11 +30,33 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     -webkit-font-smoothing: antialiased;
-    background-color: var(--void-deep);
+    background-color: #020611; /* Deepest void */
     position: relative;
     background-attachment: fixed;
     user-select: none;
-    position: relative;
+}
+
+@keyframes aura-pulse {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.4; }
+    33% { transform: scale(1.02) translate(1%, -1%); opacity: 0.6; }
+    66% { transform: scale(0.98) translate(-1%, 1%); opacity: 0.5; }
+    100% { transform: scale(1) translate(0, 0); opacity: 0.4; }
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: -25%;
+    left: -25%;
+    width: 150%;
+    height: 150%;
+    background: 
+        radial-gradient(circle at 30% 70%, rgba(14, 165, 233, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 70% 30%, rgba(168, 85, 247, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(5, 17, 28, 0) 0%, #010308 80%);
+    z-index: -2;
+    pointer-events: none;
+    animation: aura-pulse 20s ease-in-out infinite alternate;
 }
 
 body::after {
@@ -44,11 +66,13 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(0deg,
-            rgba(0, 0, 0, 0.1) 0px,
-            rgba(0, 0, 0, 0.1) 1px,
+    background: 
+        repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0.15) 0px,
+            rgba(0, 0, 0, 0.15) 1px,
             transparent 1px,
-            transparent 2px);
+            transparent 3px),
+        linear-gradient(to bottom, rgba(14, 165, 233, 0.02) 0%, transparent 100%);
     pointer-events: none;
     z-index: 9999;
 }
