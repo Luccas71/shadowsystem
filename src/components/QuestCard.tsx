@@ -180,19 +180,19 @@ const QuestCard: React.FC<QuestCardProps> = ({
           : `border-sky-500/30`
         }`}>
 
-        <div className="p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 md:gap-7 relative z-10 min-w-0">
+        <div className="p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 relative z-10 min-w-0">
 
-          <div className="relative shrink-0 flex items-center justify-center w-12 h-12 md:w-16 md:h-16 self-center sm:self-auto group/check">
+          <div className="relative shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 self-center sm:self-auto group/check">
             {!quest.completed && !quest.failed && (
               <>
-                <div className={`checkbox-ring absolute w-10 min-h-10 md:w-12 md:h-12 rotate-45 border border-current opacity-10 ${rankTextClass} transition-all duration-500`}></div>
+                <div className={`checkbox-ring absolute w-8 min-h-8 md:w-10 md:h-10 rotate-45 border border-current opacity-10 ${rankTextClass} transition-all duration-500`}></div>
               </>
             )}
 
             <button
               disabled={quest.failed}
               onClick={() => onToggleComplete(quest.id)}
-              className={`w-9 h-9 md:w-10 md:h-10 rotate-45 border transition-all duration-500 flex items-center justify-center relative overflow-hidden hover:scale-110 hover:border-opacity-100 hover:shadow-[0_0_15px_currentColor] ${quest.completed
+              className={`w-7 h-7 md:w-8 md:h-8 rotate-45 border transition-all duration-500 flex items-center justify-center relative overflow-hidden hover:scale-110 hover:border-opacity-100 hover:shadow-[0_0_15px_currentColor] ${quest.completed
                 ? 'bg-slate-900 border-slate-800 text-slate-700'
                 : quest.failed
                   ? 'bg-red-950 border-red-900 text-red-900 cursor-not-allowed hover:scale-100 hover:shadow-none'
@@ -201,55 +201,51 @@ const QuestCard: React.FC<QuestCardProps> = ({
             >
               <div className="flex items-center justify-center relative z-20">
                 {quest.completed ? (
-                  <Check size={20} className="text-emerald-400 drop-shadow-[0_0_8px_#34d399] -rotate-45" strokeWidth={3} />
+                  <Check size={16} className="text-emerald-400 drop-shadow-[0_0_8px_#34d399] -rotate-45" strokeWidth={3} />
                 ) : quest.failed ? (
-                  <AlertCircle size={18} className="text-red-900 -rotate-45" />
+                  <AlertCircle size={14} className="text-red-900 -rotate-45" />
                 ) : (
-                  <div className={`w-2 h-2 bg-current transition-all duration-500 opacity-80 group-hover/check:opacity-100 group-hover/check:shadow-[0_0_15px_currentColor]`}></div>
+                  <div className={`w-1.5 h-1.5 bg-current transition-all duration-500 opacity-80 group-hover/check:opacity-100 group-hover/check:shadow-[0_0_15px_currentColor]`}></div>
                 )}
               </div>
             </button>
           </div>
 
-          <div className="flex-1 space-y-1.5 min-w-0 w-full">
-            <div className="flex flex-col gap-1 min-w-0">
+          <div className="flex-1 space-y-1 min-w-0 w-full">
+            <div className="flex flex-col gap-0.5 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-game text-[9px] px-2 py-0.5 border leading-none font-bold tracking-[0.1em] transition-all duration-500 ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/60 whitespace-nowrap`}>
+                <span className={`font-game text-[8px] px-1.5 py-0.5 border leading-none font-bold tracking-[0.1em] transition-all duration-500 ${quest.failed ? 'text-red-500 border-red-500 bg-red-950/40' : `${rankData} ${neonClass}`} bg-black/60 whitespace-nowrap`}>
                   {quest.failed ? 'FALHA' : `RANK_${quest.difficulty}`}
                 </span>
                 {quest.isDaily && (
-                  <span className={`font-game text-[8px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap ${quest.failed ? 'text-red-500' : 'text-cyan-500'}`}>
+                  <span className={`font-game text-[7px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap ${quest.failed ? 'text-red-500' : 'text-cyan-500'}`}>
                     Diário
                   </span>
                 )}
                 {quest.isScheduled && (
-                  <span className="font-game text-[8px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap text-indigo-400">
+                  <span className="font-game text-[7px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap text-indigo-400">
                     Programado
                   </span>
                 )}
                 {quest.isSpecial && (
-                  <span className="font-game text-[8px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap text-purple-400 font-bold">
+                  <span className="font-game text-[7px] opacity-40 uppercase tracking-widest font-bold whitespace-nowrap text-purple-400 font-bold">
                     Urgente
                   </span>
                 )}
                 {!quest.isDaily && !quest.isScheduled && quest.deadline && !quest.completed && !quest.failed && (
-                  <span className={`font-game text-[8px] uppercase tracking-widest font-bold whitespace-nowrap ${isUrgent ? 'text-red-500' : 'text-slate-500'}`}>
+                  <span className={`font-game text-[7px] uppercase tracking-widest font-bold whitespace-nowrap ${isUrgent ? 'text-red-500' : 'text-slate-500'}`}>
                     {timeLeft}
                   </span>
                 )}
               </div>
-              <h3 className={`font-game text-lg md:text-xl tracking-wide transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-glow-cyan'
+              <h3 className={`font-game text-base md:text-lg tracking-wide transition-all duration-500 uppercase leading-tight break-words ${quest.completed ? 'line-through text-slate-700' : quest.failed ? 'text-red-900 line-through' : 'text-glow-cyan'
                 }`}>
                 {quest.title}
               </h3>
             </div>
 
-            <p className={`text-[12px] md:text-[13px] font-medium leading-relaxed transition-colors duration-500 break-words ${quest.completed || quest.failed ? 'text-slate-700' : 'text-slate-500'
-              }`}>
-              {quest.failed ? 'Diretriz falha por descumprimento de prazo.' : quest.description}
-            </p>
 
-            <div className="flex items-center gap-6 pt-2">
+            <div className="flex items-center gap-4 pt-1">
               <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-slate-400 group/xp">
                  <div className="relative">
                    <Flame size={12} className={!quest.completed && !quest.failed ? `${colors.flameIcon} animate-pulse` : 'text-slate-700'} />
@@ -270,32 +266,32 @@ const QuestCard: React.FC<QuestCardProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-row sm:flex-col items-center gap-2 self-end sm:self-center shrink-0">
+          <div className="flex flex-row sm:flex-col items-center gap-1 self-end sm:self-center shrink-0">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className={`p-2 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
+              className={`p-1.5 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
             >
-              <ChevronDown size={22} />
+              <ChevronDown size={18} />
             </button>
             <button
               onClick={() => onEdit(quest)}
               disabled={quest.completed || quest.failed}
-              className={`p-2 transition-all duration-300 ${quest.completed || quest.failed ? 'text-slate-800' : 'text-slate-600'}`}
+              className={`p-1.5 transition-all duration-300 ${quest.completed || quest.failed ? 'text-slate-800' : 'text-slate-600'}`}
               title="RECALIBRAR DIRETRIZ"
             >
-              <Edit2 size={18} />
+              <Edit2 size={16} />
             </button>
             <button
               onClick={() => onDelete(quest.id)}
-              className="text-slate-800 hover:text-red-500 transition-all p-2"
+              className="text-slate-800 hover:text-red-500 transition-all p-1.5"
             >
-              <Trash2 size={18} />
+              <Trash2 size={16} />
             </button>
           </div>
         </div>
 
         {isExpanded && (
-          <div className="px-4 md:px-6 pb-6 pt-2 border-t border-slate-800 min-w-0">
+          <div className="px-3 md:px-4 pb-4 pt-2 border-t border-slate-800 min-w-0">
             <h4 className={`font-game text-[9px] uppercase tracking-widest mb-3 flex items-center gap-2 font-bold ${quest.failed ? 'text-red-600' : colors.subHeader}`}>
               SUB-DIRETRIZES
             </h4>
