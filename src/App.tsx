@@ -2015,31 +2015,31 @@ const App: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 bg-cyan-950/10 p-4 border border-cyan-900/20 rounded-lg transition-all ${editingQuest || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-900/20 cursor-pointer'}`}
-                    onClick={() => !editingQuest && !newQuestIsSpecial && setNewQuestIsDaily(!newQuestIsDaily)}>
+                  <div className={`flex items-center gap-4 bg-cyan-950/10 p-4 border border-cyan-900/20 rounded-lg transition-all ${newQuestIsSpecial || newQuestIsScheduled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-900/20 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsSpecial && !newQuestIsScheduled) setNewQuestIsDaily(!newQuestIsDaily); }}>
                     <button
-                      disabled={!!editingQuest || newQuestIsSpecial}
+                      disabled={newQuestIsSpecial || newQuestIsScheduled}
                       type="button"
-                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsDaily ? 'bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsDaily ? 'bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsSpecial || newQuestIsScheduled ? 'cursor-not-allowed' : ''}`}
                     >
-                      {editingQuest ? <Lock size={20} /> : <CalendarDays size={20} />}
+                      <CalendarDays size={20} />
                     </button>
                     <div className="min-w-0">
                       <p className="font-game text-[11px] text-cyan-400 uppercase font-bold truncate">Quest Diária</p>
-                      <p className="text-[10px] text-slate-500 uppercase font-medium">{editingQuest ? 'Sincronizado' : (newQuestIsDaily ? 'Reset Diário Ativado' : 'Ciclo Único')}</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-medium">{newQuestIsDaily ? 'Reset Diário Ativado' : 'Ciclo Único'}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 p-4 border rounded-lg transition-all ${editingQuest || newQuestIsDaily ? 'opacity-50 cursor-not-allowed border-slate-800 bg-slate-900/10' : newQuestIsSpecial ? 'border-orange-500/50 bg-orange-900/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'border-orange-900/30 bg-orange-950/10 hover:border-orange-700/50 cursor-pointer'}`}
-                    onClick={() => !editingQuest && !newQuestIsDaily && setNewQuestIsSpecial(!newQuestIsSpecial)}>
+                  <div className={`flex items-center gap-4 p-4 border rounded-lg transition-all ${newQuestIsDaily || newQuestIsScheduled ? 'opacity-50 cursor-not-allowed border-slate-800 bg-slate-900/10' : newQuestIsSpecial ? 'border-orange-500/50 bg-orange-900/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'border-orange-900/30 bg-orange-950/10 hover:border-orange-700/50 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsDaily && !newQuestIsScheduled) setNewQuestIsSpecial(!newQuestIsSpecial); }}>
                     <button
-                      disabled={!!editingQuest || newQuestIsDaily}
+                      disabled={newQuestIsDaily || newQuestIsScheduled}
                       type="button"
-                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsSpecial ? 'bg-orange-900/40 border-orange-400 text-orange-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsDaily ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsSpecial ? 'bg-orange-900/40 border-orange-400 text-orange-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsScheduled ? 'cursor-not-allowed' : ''}`}
                     >
-                      {editingQuest ? <Lock size={20} /> : <Zap size={20} />}
+                      <Zap size={20} />
                     </button>
                     <div className="min-w-0">
                       <p className={`font-game text-[11px] uppercase font-bold truncate ${newQuestIsSpecial ? 'text-orange-400' : 'text-orange-600'}`}>Quest Especial</p>
@@ -2049,14 +2049,14 @@ const App: React.FC = () => {
                 </div>
 
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 bg-indigo-950/10 p-4 border border-indigo-900/20 rounded-lg transition-all ${editingQuest || newQuestIsDaily || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-900/20 cursor-pointer'}`}
-                    onClick={() => !editingQuest && !newQuestIsDaily && !newQuestIsSpecial && setNewQuestIsScheduled(!newQuestIsScheduled)}>
+                  <div className={`flex items-center gap-4 bg-indigo-950/10 p-4 border border-indigo-900/20 rounded-lg transition-all ${newQuestIsDaily || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-900/20 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsDaily && !newQuestIsSpecial) setNewQuestIsScheduled(!newQuestIsScheduled); }}>
                     <button
-                      disabled={!!editingQuest || newQuestIsDaily || newQuestIsSpecial}
+                      disabled={newQuestIsDaily || newQuestIsSpecial}
                       type="button"
-                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsScheduled ? 'bg-indigo-900/40 border-indigo-400 text-indigo-300 shadow-[0_0_10px_#818cf8]' : 'bg-black border-slate-800 text-slate-700'} ${editingQuest || newQuestIsDaily || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsScheduled ? 'bg-indigo-900/40 border-indigo-400 text-indigo-300 shadow-[0_0_10px_#818cf8]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
                     >
-                      {editingQuest ? <Lock size={20} /> : <Timer size={20} />}
+                      <Timer size={20} />
                     </button>
                     <div className="min-w-0">
                       <p className="font-game text-[11px] text-indigo-400 uppercase font-bold truncate">Quest Programada</p>
@@ -2091,14 +2091,13 @@ const App: React.FC = () => {
                 {!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && (
                   <div className={`p-4 border flex flex-col justify-center transition-all bg-red-900/20 ${newQuestDeadline ? 'border-red-500/50' : 'border-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}>
                     <label className="block text-[10px] md:text-[11px] font-game text-red-400 uppercase font-bold mb-1 flex items-center gap-2">
-                      <CalendarDays size={16} className="text-red-500" /> Quest Única {editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? '(LIMITE DE EDIÇÃO ATINGIDO)' : editingQuest ? '(APENAS UMA EDIÇÃO PERMITIDA)' : '(PRAZO OBRIGATÓRIO)'}
+                      <CalendarDays size={16} className="text-red-500" /> Quest Única (PRAZO OBRIGATÓRIO)
                     </label>
                     <input
-                      disabled={!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1}
                       type="datetime-local"
                       value={newQuestDeadline}
                       onChange={e => setNewQuestDeadline(e.target.value)}
-                      className={`bg-black/60 border border-red-900/60 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all ${!!editingQuest && (editingQuest?.deadlineEdits || 0) >= 1 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                      className="bg-black/60 border border-red-900/60 text-red-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-red-500 transition-all"
                     />
                   </div>
                 )}
