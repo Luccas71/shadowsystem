@@ -253,9 +253,6 @@ const QuestCard: React.FC<QuestCardProps> = ({
                  </div>
                  <span className={!quest.completed && !quest.failed ? "text-glow-cyan" : ""}>{projectedXp.toLocaleString()}</span>
                  <span className="opacity-40 text-[9px]">XP</span>
-                 {!quest.completed && !quest.failed && (
-                   <span className="ml-1 text-[7px] bg-cyan-500/10 text-cyan-400 px-1 border border-cyan-500/30 rounded-[2px] animate-pulse">SISTEMA+</span>
-                 )}
               </div>
 
               <div className="flex items-center gap-2 text-[11px] font-game font-bold tracking-wider text-amber-500/80">
