@@ -303,6 +303,31 @@ const App: React.FC = () => {
     });
   }, [dataLoaded]);
 
+  // Quest Recalibration Hook (updates existing quests to new XP/Gold base values)
+  useEffect(() => {
+    if (!dataLoaded || isInitializing.current) return;
+
+    setQuests(prevQuests => {
+      let needsUpdate = false;
+      const updatedQuests = prevQuests.map(q => {
+        const correctXp = DIFFICULTY_XP[q.difficulty];
+        const correctGold = DIFFICULTY_GOLD[q.difficulty];
+        
+        if (q.xpReward !== correctXp || q.goldReward !== correctGold) {
+          needsUpdate = true;
+          return { ...q, xpReward: correctXp, goldReward: correctGold };
+        }
+        return q;
+      });
+
+      if (needsUpdate) {
+        hasUnsavedChanges.current = true;
+        return updatedQuests;
+      }
+      return prevQuests;
+    });
+  }, [dataLoaded]);
+
   useEffect(() => {
     const checkInterval = setInterval(() => {
       const now = Date.now();
@@ -1423,6 +1448,7 @@ const App: React.FC = () => {
       setQuests(prev => prev.map(q => {
         if (q.id === editingQuest.id) {
           const deadlineChanged = q.deadline !== resolvedDeadline;
+          const becameSpecial = !q.isSpecial && newQuestIsSpecial;
           return {
             ...q,
             title: newQuestTitle.toUpperCase(),
@@ -1435,6 +1461,7 @@ const App: React.FC = () => {
             isSpecial: newQuestIsSpecial,
             isScheduled: newQuestIsScheduled,
             repeatDays: newQuestIsScheduled ? newQuestRepeatDays : undefined,
+            createdAt: becameSpecial ? Date.now() : q.createdAt,
           };
         }
         return q;

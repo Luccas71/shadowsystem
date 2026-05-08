@@ -44,14 +44,14 @@ export const getStreakMultiplier = (streak: number) => {
   return getCurrentStreakTier(streak).multiplier;
 };
 
-// Valores base (agora com o buff de 15% aplicado)
+// Valores base recalibrados (reduzidos) para balancear com os bônus
 export const DIFFICULTY_XP: Record<QuestDifficulty, number> = {
-  [QuestDifficulty.E]: 750,
-  [QuestDifficulty.D]: 2300,
-  [QuestDifficulty.C]: 6900,
-  [QuestDifficulty.B]: 18400,
-  [QuestDifficulty.A]: 57500,
-  [QuestDifficulty.S]: 172500,
+  [QuestDifficulty.E]: 250,
+  [QuestDifficulty.D]: 800,
+  [QuestDifficulty.C]: 2500,
+  [QuestDifficulty.B]: 7500,
+  [QuestDifficulty.A]: 20000,
+  [QuestDifficulty.S]: 50000,
 };
 
 // Valores base (agora com o buff de 15% aplicado)
