@@ -203,6 +203,10 @@ const App: React.FC = () => {
     profileRef.current = profile;
   }, [quests, profile]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeTab]);
+
   const addSystemMessage = useCallback((text: string, type: SystemMessage['type'] = 'info') => {
     setMessages(prev => {
       // Prevent duplicate messages within 1 second
