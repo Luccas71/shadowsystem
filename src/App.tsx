@@ -928,6 +928,8 @@ const App: React.FC = () => {
         });
       }
 
+      addSystemMessage(`SISTEMA: MISSÃO "${quest.title.toUpperCase()}" CONCLUÍDA. RECOMPENSA: +${finalXpReward} XP, +${finalGoldReward} OURO.`, "success");
+
       setCompletingQuest({
         quest,
         rewards: {
@@ -1756,27 +1758,25 @@ const App: React.FC = () => {
         <div className="fixed top-24 left-4 z-[55] pointer-events-none">
           <button 
             onClick={() => setIsMessageLogOpen(!isMessageLogOpen)}
-            className="pointer-events-auto p-2 bg-black/40 border border-white/5 text-cyan-500/60 hover:text-cyan-400 transition-all mb-4 flex items-center justify-center group backdrop-blur-sm"
+            className="pointer-events-auto md:hidden p-2 bg-black/40 border border-white/5 text-cyan-500/60 hover:text-cyan-400 transition-all mb-4 flex items-center justify-center group backdrop-blur-sm"
           >
             <Bell size={18} className="group-hover:animate-pulse" />
           </button>
 
-          {isMessageLogOpen && (
-            <div className="pointer-events-auto hud-board p-6 w-72 md:w-80 border-cyan-500/20 bg-black/90 backdrop-blur-xl animate-in slide-in-from-left duration-300">
-              <div className="flex justify-between items-center mb-4 border-b border-cyan-900/40 pb-2">
-                <h2 className="font-game text-[11px] text-cyan-500 uppercase tracking-widest font-bold">ALERTAS</h2>
-                <button onClick={() => setIsMessageLogOpen(false)} className="text-slate-500 hover:text-white"><X size={14} /></button>
-              </div>
-              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {messages.map((m: SystemMessage) => (
-                  <div key={m.id} className={`text-[12px] font-medium border-l-2 pl-3 ${m.type === 'success' ? 'text-cyan-500 border-cyan-500' : m.type === 'error' ? 'text-red-500 border-red-500' : 'text-slate-500 border-slate-700'}`}>
-                    <p className="font-game uppercase tracking-tight break-words">&gt; {m.text}</p>
-                  </div>
-                ))}
-                {messages.length === 0 && <p className="text-[10px] text-slate-700 italic font-game uppercase">LOG VAZIO</p>}
-              </div>
+          <div className={`pointer-events-auto hud-board p-6 w-72 md:w-80 border-cyan-500/20 bg-black/90 backdrop-blur-xl animate-in slide-in-from-left duration-300 ${isMessageLogOpen ? 'block' : 'hidden md:block'}`}>
+            <div className="flex justify-between items-center mb-4 border-b border-cyan-900/40 pb-2">
+              <h2 className="font-game text-[11px] text-cyan-500 uppercase tracking-widest font-bold">ALERTAS</h2>
+              <button onClick={() => setIsMessageLogOpen(false)} className="text-slate-500 hover:text-white md:hidden"><X size={14} /></button>
             </div>
-          )}
+            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {messages.map((m: SystemMessage) => (
+                <div key={m.id} className={`text-[12px] font-medium border-l-2 pl-3 ${m.type === 'success' ? 'text-cyan-500 border-cyan-500' : m.type === 'error' ? 'text-red-500 border-red-500' : 'text-slate-500 border-slate-700'}`}>
+                  <p className="font-game uppercase tracking-tight break-words">&gt; {m.text}</p>
+                </div>
+              ))}
+              {messages.length === 0 && <p className="text-[10px] text-slate-700 italic font-game uppercase">LOG VAZIO</p>}
+            </div>
+          </div>
         </div>
 
         {/* Tab Content */}
