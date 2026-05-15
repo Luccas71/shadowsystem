@@ -358,29 +358,50 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact, o
         <div className={`grid grid-cols-2 ${compact ? 'md:grid-cols-2' : 'md:grid-cols-4'} gap-4`}>
           {(() => {
             const benefits = getRankBenefits(profile.rank);
+
+            // Cálculos reais com buffs (mesma lógica de constants.ts)
+            const xpBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-xp-boost').length;
+            const shadowEssenceBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-shadow-essence').length;
+            const intTotal = profile.stats.intelligence ? ((profile.stats.intelligence as any).base || 0) + ((profile.stats.intelligence as any).bonus || 0) : 0;
+            const statXpBoost = intTotal * 0.01;
+            const realXpMultiplier = benefits.xpMultiplier + (xpBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statXpBoost;
+
+            const orbBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-orb').length;
+            const ringBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-ring').length;
+            const strTotal = profile.stats.strength ? ((profile.stats.strength as any).base || 0) + ((profile.stats.strength as any).bonus || 0) : 0;
+            const statGoldBoost = strTotal * 0.01;
+            const realGoldMultiplier = benefits.goldMultiplier + (orbBuffs * 0.1) + (ringBuffs * 0.05) + (shadowEssenceBuffs * 0.02) + statGoldBoost;
+
+            const pendantBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-pendant').length;
+            const realCorruptionReduction = benefits.corruptionReduction + (pendantBuffs * 0.05);
+
+            const contractBuffs = profile.activeBuffs.filter(b => b.slug === 'buff-contract').length;
+            const agiTotal = profile.stats.agility ? ((profile.stats.agility as any).base || 0) + ((profile.stats.agility as any).bonus || 0) : 0;
+            const realShopDiscount = benefits.shopDiscount + (contractBuffs * 0.01) + (agiTotal * 0.005);
+
             const benefitItems = [
               {
                 icon: <TrendingUp />,
                 label: 'BÔNUS DE XP',
-                value: `+${Math.round((benefits.xpMultiplier - 1) * 100)}%`,
+                value: `+${Math.round((realXpMultiplier - 1) * 100)}%`,
                 description: 'SINCRONIA EXTRA',
-                show: benefits.xpMultiplier > 1,
+                show: realXpMultiplier > 1,
                 color: 'text-emerald-400'
               },
               {
                 icon: <Coins />,
                 label: 'BÔNUS OURO',
-                value: `+${Math.round((benefits.goldMultiplier - 1) * 100)}%`,
+                value: `+${Math.round((realGoldMultiplier - 1) * 100)}%`,
                 description: 'GANHO MONETÁRIO',
-                show: benefits.goldMultiplier > 1,
+                show: realGoldMultiplier > 1,
                 color: 'text-amber-400'
               },
               {
                 icon: <Activity />,
                 label: 'RESISTÊNCIA',
-                value: `-${Math.round(benefits.corruptionReduction * 100)}%`,
+                value: `-${Math.round(realCorruptionReduction * 100)}%`,
                 description: 'CORRUPÇÃO MENOR',
-                show: benefits.corruptionReduction > 0,
+                show: realCorruptionReduction > 0,
                 color: 'text-rose-400'
               },
               {
@@ -394,9 +415,9 @@ const StatusWindow: React.FC<StatusWindowProps> = ({ profile, quests, compact, o
               {
                 icon: <ShoppingBag />,
                 label: 'DESC. LOJA',
-                value: `-${Math.round(benefits.shopDiscount * 100)}%`,
+                value: `-${Math.round(realShopDiscount * 100)}%`,
                 description: 'PREÇOS REDUZIDOS',
-                show: benefits.shopDiscount > 0,
+                show: realShopDiscount > 0,
                 color: 'text-purple-400'
               },
               {

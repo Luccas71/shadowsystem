@@ -1936,7 +1936,7 @@ const App: React.FC = () => {
             <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
               <Store
                 gold={profile.gold}
-                items={storeItems.filter(i => !i.origin)}
+                items={storeItems.filter(i => !i.origin && i.name.toLowerCase() !== 'baú de ouro antigo' && i.name.toLowerCase() !== 'bau de ouro antigo')}
                 onAddItem={handleAddItem}
                 onRemoveItem={handleRemoveItem}
                 onPurchaseItem={i => {
