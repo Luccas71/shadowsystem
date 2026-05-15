@@ -180,7 +180,10 @@ const QuestCard: React.FC<QuestCardProps> = ({
           : `border-sky-500/30`
         }`}>
 
-        <div className="p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 relative z-10 min-w-0">
+        <div 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 relative z-10 min-w-0 cursor-pointer hover:bg-slate-900/20 transition-colors"
+        >
 
           <div className="relative shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 self-center sm:self-auto group/check">
             {!quest.completed && !quest.failed && (
@@ -191,7 +194,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
             <button
               disabled={quest.failed}
-              onClick={() => onToggleComplete(quest.id)}
+              onClick={(e) => { e.stopPropagation(); onToggleComplete(quest.id); }}
               className={`w-7 h-7 md:w-8 md:h-8 rotate-45 border transition-all duration-500 flex items-center justify-center relative overflow-hidden hover:scale-110 hover:border-opacity-100 hover:shadow-[0_0_15px_currentColor] ${quest.completed
                 ? 'bg-slate-900 border-slate-800 text-slate-700'
                 : quest.failed
@@ -265,13 +268,12 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
           <div className="flex flex-row sm:flex-col items-center gap-1 self-end sm:self-center shrink-0">
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
               className={`p-1.5 transition-all duration-300 ${isExpanded ? 'text-cyan-400 rotate-180' : 'text-slate-600'}`}
             >
               <ChevronDown size={18} />
             </button>
             <button
-              onClick={() => onEdit(quest)}
+              onClick={(e) => { e.stopPropagation(); onEdit(quest); }}
               disabled={quest.completed || quest.failed}
               className={`p-1.5 transition-all duration-300 ${quest.completed || quest.failed ? 'text-slate-800' : 'text-slate-600'}`}
               title="RECALIBRAR DIRETRIZ"
@@ -279,7 +281,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
               <Edit2 size={16} />
             </button>
             <button
-              onClick={() => onDelete(quest.id)}
+              onClick={(e) => { e.stopPropagation(); onDelete(quest.id); }}
               className="text-slate-800 hover:text-red-500 transition-all p-1.5"
             >
               <Trash2 size={16} />
