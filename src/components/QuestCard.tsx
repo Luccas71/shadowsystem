@@ -297,19 +297,21 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
             <div className="space-y-2 mb-4">
               {quest.subQuests && quest.subQuests.map(sq => (
-                <div key={sq.id} className={`flex items-center gap-3 p-2.5 bg-slate-950/40 system-border transition-all ${sq.completed ? 'border-slate-800 opacity-40' : quest.failed ? 'border-red-900/40' : colors.subBorder} min-w-0`}>
-                  <button
-                    disabled={quest.failed}
-                    onClick={() => onToggleSubQuest(quest.id, sq.id)}
+                <div 
+                  key={sq.id} 
+                  onClick={() => !quest.failed && onToggleSubQuest(quest.id, sq.id)}
+                  className={`flex items-center gap-3 p-2.5 bg-slate-950/40 system-border transition-all ${quest.failed ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-slate-900/60'} ${sq.completed ? 'border-slate-800 opacity-40' : quest.failed ? 'border-red-900/40' : colors.subBorder} min-w-0`}
+                >
+                  <div
                     className={`shrink-0 w-3.5 h-3.5 rotate-45 border flex items-center justify-center transition-all ${sq.completed ? colors.subCheckActive : 'border-slate-700'}`}
                   >
                     {sq.completed && <Check size={18} className="text-emerald-400 drop-shadow-[0_0_5px_#34d399] -rotate-45" strokeWidth={3} />}
-                  </button>
+                  </div>
                   <span className={`text-[11px] md:text-xs min-w-0 font-game uppercase tracking-wide truncate transition-colors duration-500 ${sq.completed ? 'line-through text-slate-700' : 'text-glow-cyan'}`}>
                     {sq.title}
                   </span>
                   <button
-                    onClick={() => onRemoveSubQuest(quest.id, sq.id)}
+                    onClick={(e) => { e.stopPropagation(); onRemoveSubQuest(quest.id, sq.id); }}
                     className="shrink-0 text-slate-800 hover:text-red-500"
                   >
                     <X size={12} />
