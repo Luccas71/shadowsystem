@@ -180,6 +180,8 @@ const App: React.FC = () => {
   const [newQuestIsSpecial, setNewQuestIsSpecial] = useState(false);
   const [newQuestIsScheduled, setNewQuestIsScheduled] = useState(false);
   const [newQuestRepeatDays, setNewQuestRepeatDays] = useState<number[]>([]);
+  const [newQuestIsDateSpecific, setNewQuestIsDateSpecific] = useState(false);
+  const [newQuestSpecificDate, setNewQuestSpecificDate] = useState<string>('');
   const [newQuestDeadline, setNewQuestDeadline] = useState<string>('');
   const [completingQuest, setCompletingQuest] = useState<{
     quest: Quest;
@@ -1420,16 +1422,18 @@ const App: React.FC = () => {
     setNewQuestIsSpecial(!!quest.isSpecial);
     setNewQuestIsScheduled(!!quest.isScheduled);
     setNewQuestRepeatDays(quest.repeatDays || []);
+    setNewQuestIsDateSpecific(!!quest.isDateSpecific);
+    setNewQuestSpecificDate(quest.specificDate || '');
     setNewQuestDeadline(quest.deadline ? new Date(quest.deadline).toISOString().slice(0, 16) : '');
     setQuestForm({ isOpen: true });
   };
 
   const handleSaveQuest = () => {
     if (!newQuestTitle.trim()) return;
-    const isFormInvalid = !newQuestTitle.trim() || (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestDeadline) || (newQuestIsScheduled && newQuestRepeatDays.length === 0);
+    const isFormInvalid = !newQuestTitle.trim() || (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestIsDateSpecific && !newQuestDeadline) || (newQuestIsScheduled && newQuestRepeatDays.length === 0) || (newQuestIsDateSpecific && !newQuestSpecificDate);
     if (isFormInvalid) return;
 
-    if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestDeadline) {
+    if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestIsDateSpecific && !newQuestDeadline) {
       addSystemMessage("SISTEMA: ERRO DE PROTOCOLO. QUESTS ÚNICAS EXIGEM UM PRAZO FINAL.", "error");
       return;
     }
@@ -1446,6 +1450,11 @@ const App: React.FC = () => {
       const endOfDay = new Date();
       endOfDay.setHours(23, 59, 59, 999);
       resolvedDeadline = endOfDay.getTime();
+    } else if (newQuestIsDateSpecific && newQuestSpecificDate) {
+      // Set to 23:59:59 of the specific date
+      const [year, month, day] = newQuestSpecificDate.split('-').map(Number);
+      const endOfSpecificDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+      resolvedDeadline = endOfSpecificDay.getTime();
     } else if (!newQuestIsDaily && newQuestDeadline) {
       resolvedDeadline = new Date(newQuestDeadline).getTime();
     }
@@ -1467,6 +1476,8 @@ const App: React.FC = () => {
             isSpecial: newQuestIsSpecial,
             isScheduled: newQuestIsScheduled,
             repeatDays: newQuestIsScheduled ? newQuestRepeatDays : undefined,
+            isDateSpecific: newQuestIsDateSpecific,
+            specificDate: newQuestIsDateSpecific ? newQuestSpecificDate : undefined,
             createdAt: becameSpecial ? Date.now() : q.createdAt,
           };
         }
@@ -1487,6 +1498,8 @@ const App: React.FC = () => {
         isSpecial: newQuestIsSpecial,
         isScheduled: newQuestIsScheduled,
         repeatDays: newQuestIsScheduled ? newQuestRepeatDays : undefined,
+        isDateSpecific: newQuestIsDateSpecific,
+        specificDate: newQuestIsDateSpecific ? newQuestSpecificDate : undefined,
         deadline: resolvedDeadline,
         deadlineEdits: 0,
         lastResetAt: (newQuestIsDaily || newQuestIsScheduled) ? Date.now() : undefined,
@@ -1498,6 +1511,7 @@ const App: React.FC = () => {
       if (newQuestIsDaily) categoryName = "QUEST DIÁRIA";
       if (newQuestIsSpecial) categoryName = "QUEST ESPECIAL";
       if (newQuestIsScheduled) categoryName = "QUEST PROGRAMADA";
+      if (newQuestIsDateSpecific) categoryName = "QUEST DE DATA ÚNICA";
       addSystemMessage(`SISTEMA: NOVA ${categoryName} REGISTRADA.`, "success");
     }
 
@@ -1541,6 +1555,8 @@ const App: React.FC = () => {
     setNewQuestIsSpecial(false);
     setNewQuestIsScheduled(false);
     setNewQuestRepeatDays([]);
+    setNewQuestIsDateSpecific(false);
+    setNewQuestSpecificDate('');
     setNewQuestDeadline('');
     setNewQuestDifficulty(QuestDifficulty.E);
   };
@@ -1550,12 +1566,16 @@ const App: React.FC = () => {
   const xpRemainingForDrop = XP_DROP_THRESHOLD - (profile.totalXpGained % XP_DROP_THRESHOLD);
 
   const isFormInvalid = !newQuestTitle.trim() || 
-    (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestDeadline) || 
-    (newQuestIsScheduled && newQuestRepeatDays.length === 0);
+    (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestIsDateSpecific && !newQuestDeadline) || 
+    (newQuestIsScheduled && newQuestRepeatDays.length === 0) ||
+    (newQuestIsDateSpecific && !newQuestSpecificDate);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+  const todayDateObj = new Date();
+  const todayYMD = `${todayDateObj.getFullYear()}-${String(todayDateObj.getMonth() + 1).padStart(2, '0')}-${String(todayDateObj.getDate()).padStart(2, '0')}`;
 
   // Loading state while checking auth
   if (authLoading) {
@@ -1812,6 +1832,9 @@ const App: React.FC = () => {
                 if (q.isScheduled && q.repeatDays) {
                   return q.repeatDays.includes(new Date().getDay());
                 }
+                if (q.isDateSpecific && q.specificDate) {
+                  return q.specificDate === todayYMD;
+                }
                 return true;
               }).sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty])} onReorder={(newOrder) => {
                 const completedOrFailed = quests.filter(q => q.completed || q.failed);
@@ -1819,6 +1842,9 @@ const App: React.FC = () => {
                   if (q.completed || q.failed) return false;
                   if (q.isScheduled && q.repeatDays) {
                     return !q.repeatDays.includes(new Date().getDay());
+                  }
+                  if (q.isDateSpecific && q.specificDate) {
+                    return q.specificDate !== todayYMD;
                   }
                   return false;
                 });
@@ -1828,6 +1854,9 @@ const App: React.FC = () => {
                   if (q.completed || q.failed) return false;
                   if (q.isScheduled && q.repeatDays) {
                     return q.repeatDays.includes(new Date().getDay());
+                  }
+                  if (q.isDateSpecific && q.specificDate) {
+                    return q.specificDate === todayYMD;
                   }
                   return true;
                 }).sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]).map(q => (
@@ -1852,6 +1881,9 @@ const App: React.FC = () => {
                 if (q.isScheduled && q.repeatDays) {
                   return !q.repeatDays.includes(new Date().getDay());
                 }
+                if (q.isDateSpecific && q.specificDate) {
+                  return q.specificDate !== todayYMD;
+                }
                 return false;
               }).length > 0 && (
                 <div className="mt-12 space-y-4">
@@ -1873,6 +1905,9 @@ const App: React.FC = () => {
                         if (q.completed || q.failed) return false;
                         if (q.isScheduled && q.repeatDays) {
                           return !q.repeatDays.includes(new Date().getDay());
+                        }
+                        if (q.isDateSpecific && q.specificDate) {
+                          return q.specificDate !== todayYMD;
                         }
                         return false;
                       }).sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]).map(q => (
@@ -2046,12 +2081,12 @@ const App: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 bg-cyan-950/10 p-4 border border-cyan-900/20 rounded-lg transition-all ${newQuestIsSpecial || newQuestIsScheduled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-900/20 cursor-pointer'}`}
-                    onClick={() => { if (!newQuestIsSpecial && !newQuestIsScheduled) setNewQuestIsDaily(!newQuestIsDaily); }}>
+                  <div className={`flex items-center gap-4 bg-cyan-950/10 p-4 border border-cyan-900/20 rounded-lg transition-all ${newQuestIsSpecial || newQuestIsScheduled || newQuestIsDateSpecific ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-900/20 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsSpecial && !newQuestIsScheduled && !newQuestIsDateSpecific) setNewQuestIsDaily(!newQuestIsDaily); }}>
                     <button
-                      disabled={newQuestIsSpecial || newQuestIsScheduled}
+                      disabled={newQuestIsSpecial || newQuestIsScheduled || newQuestIsDateSpecific}
                       type="button"
-                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsDaily ? 'bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsSpecial || newQuestIsScheduled ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsDaily ? 'bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_10px_#10b981]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsSpecial || newQuestIsScheduled || newQuestIsDateSpecific ? 'cursor-not-allowed' : ''}`}
                     >
                       <CalendarDays size={20} />
                     </button>
@@ -2063,12 +2098,12 @@ const App: React.FC = () => {
                 </div>
 
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 p-4 border rounded-lg transition-all ${newQuestIsDaily || newQuestIsScheduled ? 'opacity-50 cursor-not-allowed border-slate-800 bg-slate-900/10' : newQuestIsSpecial ? 'border-orange-500/50 bg-orange-900/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'border-orange-900/30 bg-orange-950/10 hover:border-orange-700/50 cursor-pointer'}`}
-                    onClick={() => { if (!newQuestIsDaily && !newQuestIsScheduled) setNewQuestIsSpecial(!newQuestIsSpecial); }}>
+                  <div className={`flex items-center gap-4 p-4 border rounded-lg transition-all ${newQuestIsDaily || newQuestIsScheduled || newQuestIsDateSpecific ? 'opacity-50 cursor-not-allowed border-slate-800 bg-slate-900/10' : newQuestIsSpecial ? 'border-orange-500/50 bg-orange-900/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : 'border-orange-900/30 bg-orange-950/10 hover:border-orange-700/50 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsDaily && !newQuestIsScheduled && !newQuestIsDateSpecific) setNewQuestIsSpecial(!newQuestIsSpecial); }}>
                     <button
-                      disabled={newQuestIsDaily || newQuestIsScheduled}
+                      disabled={newQuestIsDaily || newQuestIsScheduled || newQuestIsDateSpecific}
                       type="button"
-                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsSpecial ? 'bg-orange-900/40 border-orange-400 text-orange-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsScheduled ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsSpecial ? 'bg-orange-900/40 border-orange-400 text-orange-300 shadow-[0_0_10px_#a855f7]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsScheduled || newQuestIsDateSpecific ? 'cursor-not-allowed' : ''}`}
                     >
                       <Zap size={20} />
                     </button>
@@ -2080,18 +2115,35 @@ const App: React.FC = () => {
                 </div>
 
                 <div className={`flex flex-col gap-2`}>
-                  <div className={`flex items-center gap-4 bg-indigo-950/10 p-4 border border-indigo-900/20 rounded-lg transition-all ${newQuestIsDaily || newQuestIsSpecial ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-900/20 cursor-pointer'}`}
-                    onClick={() => { if (!newQuestIsDaily && !newQuestIsSpecial) setNewQuestIsScheduled(!newQuestIsScheduled); }}>
+                  <div className={`flex items-center gap-4 bg-indigo-950/10 p-4 border border-indigo-900/20 rounded-lg transition-all ${newQuestIsDaily || newQuestIsSpecial || newQuestIsDateSpecific ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-900/20 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsDateSpecific) setNewQuestIsScheduled(!newQuestIsScheduled); }}>
                     <button
-                      disabled={newQuestIsDaily || newQuestIsSpecial}
+                      disabled={newQuestIsDaily || newQuestIsSpecial || newQuestIsDateSpecific}
                       type="button"
-                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsScheduled ? 'bg-indigo-900/40 border-indigo-400 text-indigo-300 shadow-[0_0_10px_#818cf8]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsSpecial ? 'cursor-not-allowed' : ''}`}
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsScheduled ? 'bg-indigo-900/40 border-indigo-400 text-indigo-300 shadow-[0_0_10px_#818cf8]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsSpecial || newQuestIsDateSpecific ? 'cursor-not-allowed' : ''}`}
                     >
                       <Timer size={20} />
                     </button>
                     <div className="min-w-0">
                       <p className="font-game text-[11px] text-indigo-400 uppercase font-bold truncate">Quest Programada</p>
                       <p className="text-[10px] text-slate-500 uppercase font-medium">{newQuestIsScheduled ? 'Repetição Semanal' : 'Não Selecionado'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`flex flex-col gap-2`}>
+                  <div className={`flex items-center gap-4 bg-emerald-950/10 p-4 border border-emerald-900/20 rounded-lg transition-all ${newQuestIsDaily || newQuestIsSpecial || newQuestIsScheduled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-900/20 cursor-pointer'}`}
+                    onClick={() => { if (!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled) setNewQuestIsDateSpecific(!newQuestIsDateSpecific); }}>
+                    <button
+                      disabled={newQuestIsDaily || newQuestIsSpecial || newQuestIsScheduled}
+                      type="button"
+                      className={`p-3 border-2 transition-all flex items-center justify-center ${newQuestIsDateSpecific ? 'bg-emerald-900/40 border-emerald-400 text-emerald-300 shadow-[0_0_10px_#34d399]' : 'bg-black border-slate-800 text-slate-700'} ${newQuestIsDaily || newQuestIsSpecial || newQuestIsScheduled ? 'cursor-not-allowed' : ''}`}
+                    >
+                      <Clock size={20} />
+                    </button>
+                    <div className="min-w-0">
+                      <p className="font-game text-[11px] text-emerald-400 uppercase font-bold truncate">Quest Data Única</p>
+                      <p className="text-[10px] text-slate-500 uppercase font-medium">{newQuestIsDateSpecific ? 'Data Específica' : 'Não Selecionado'}</p>
                     </div>
                   </div>
                 </div>
@@ -2119,8 +2171,25 @@ const App: React.FC = () => {
                   </div>
                 )}
 
-                {!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && (
-                  <div className={`p-4 border flex flex-col justify-center transition-all bg-red-900/20 ${newQuestDeadline ? 'border-red-500/50' : 'border-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}>
+                {newQuestIsDateSpecific && (
+                  <div className="col-span-1 sm:col-span-2 p-4 border flex flex-col justify-center transition-all bg-emerald-950/20 border-emerald-900/40">
+                    <label className="block text-[10px] md:text-[11px] font-game text-emerald-400 uppercase font-bold mb-1 flex items-center gap-2">
+                      <CalendarDays size={16} className="text-emerald-500" /> Data Programada
+                    </label>
+                    <input
+                      type="date"
+                      value={newQuestSpecificDate}
+                      onChange={e => setNewQuestSpecificDate(e.target.value)}
+                      className="bg-black/60 border border-emerald-900/60 text-emerald-400 p-2 text-[10px] md:text-xs font-game outline-none focus:border-emerald-500 transition-all"
+                    />
+                    <p className="text-[9px] text-emerald-600/80 uppercase font-game mt-2">
+                      A missão aparecerá apenas na data selecionada e irá falhar caso não seja concluída até 23:59:59 do mesmo dia.
+                    </p>
+                  </div>
+                )}
+
+                {!newQuestIsDaily && !newQuestIsSpecial && !newQuestIsScheduled && !newQuestIsDateSpecific && (
+                  <div className={`col-span-1 sm:col-span-2 p-4 border flex flex-col justify-center transition-all bg-red-900/20 ${newQuestDeadline ? 'border-red-500/50' : 'border-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}>
                     <label className="block text-[10px] md:text-[11px] font-game text-red-400 uppercase font-bold mb-1 flex items-center gap-2">
                       <CalendarDays size={16} className="text-red-500" /> Quest Única (PRAZO OBRIGATÓRIO)
                     </label>

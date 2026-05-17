@@ -121,6 +121,8 @@ export interface Quest {
   isSpecial?: boolean; // Expira a meia noite, gera punicao se nao completada e desaparece
   isScheduled?: boolean; // Novo: Se repete em dias específicos
   repeatDays?: number[]; // Novo: Array de dias da semana (0-6)
+  isDateSpecific?: boolean; // Novo: Ocorre apenas em uma data específica
+  specificDate?: string; // Novo: Formato YYYY-MM-DD
   completedAt?: number; // Data de conclusão da missão
   history?: QuestHistoryEntry[]; // Histórico de completude da quest em dias anteriores
 }
